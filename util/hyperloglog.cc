@@ -73,6 +73,14 @@ bool HyperLogLog::AddHash(int64_t hash) {//加入key值对应的hash数目
   return bucket_changed;
 }
 
+/////////////////meggie 
+void HyperLogLog::AddKey(const Slice& key) {
+	const Slice& user_key = ExtractUserKey(key);
+    int64_t hash = MurmurHash64A(user_key.data(), user_key.size(), 0);
+    AddHash(hash);
+}
+//////////////////meggie
+
 //-----------------------------------------------------------------------------
 
 int64_t HyperLogLog::MergedEstimate(const vector<HyperLogLog*>& hll_vector) {//估计基数的大小

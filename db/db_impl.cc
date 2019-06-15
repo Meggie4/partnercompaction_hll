@@ -562,8 +562,10 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
     if (base != nullptr) {
       level = base->PickLevelForMemTableOutput(min_user_key, max_user_key);
     }
+	///////////////meggie
     edit->AddFile(level, meta.number, meta.file_size,
-                  meta.smallest, meta.largest);
+                  meta.smallest, meta.largest, meta.hll);
+	///////////////meggie
   }
 
   CompactionStats stats;
@@ -770,10 +772,10 @@ void DBImpl::BackgroundCompaction() {
         DEBUG_T("file%d trivial move to level+1\n", f->number);
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
                        f->smallest, f->largest, f->origin_smallest, 
-                       f->origin_largest, f->partners);
+                       f->origin_largest, f->partners, f->hll);
     } else 
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
-                       f->smallest, f->largest);
+                       f->smallest, f->largest, f->hll);
     ////////////meggie
     status = versions_->LogAndApply(c->edit(), &mutex_);
     if (!status.ok()) {
@@ -1600,6 +1602,9 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
       }
       compact->current_output()->largest.DecodeFrom(key);
       compact->builder->Add(key, input->value());
+	  ////////////meggie
+	  compact->current_output()->AddToHyperloglog(key);
+	  ////////////meggie
 
       // Close output file if it is big enough
       if (compact->builder->FileSize() >=

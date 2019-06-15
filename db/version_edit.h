@@ -25,6 +25,7 @@ struct Partner {
 	uint64_t partner_size;
     InternalKey partner_smallest;
     InternalKey partner_largest;
+	std::shared_ptr<HyperLogLog> hll;
 };
 ///////////meggie
 
@@ -47,14 +48,6 @@ struct FileMetaData {
     hll(std::make_shared<HyperLogLog>(12))
     //////////////meggie
     { }
-  ////////////meggie
-  void AddToHyperloglog(const Slice& key) {
-    const Slice& user_key = ExtractUserKey(key);
-    int64_t hash = MurmurHash64A(user_key.data(), user_key.size(), 0);
-    hll->AddHash(hash);
-  }
-  ////////////meggie
-  
 };
 
 class VersionEdit {
@@ -111,6 +104,22 @@ class VersionEdit {
   void AddFile(int level, uint64_t file,
                uint64_t file_size,
                const InternalKey& smallest,
+               const InternalKey& largest, 
+			   std::shared_ptr<HyperLogLog>& hll) {
+	  FileMetaData f;
+	  f.number = file;
+	  f.file_size = file_size;
+	  f.smallest = smallest;
+	  f.largest = largest;
+	  f.origin_smallest = smallest;
+	  f.origin_largest = largest;
+	  f.hll = hll;
+	  new_files_.push_back(std::make_pair(level, f));
+  }
+  
+  void AddFile(int level, uint64_t file,
+               uint64_t file_size,
+               const InternalKey& smallest,
                const InternalKey& largest,
                const InternalKey& origin_smallest,
                const InternalKey& origin_largest, 
@@ -125,6 +134,26 @@ class VersionEdit {
     f.origin_largest = origin_largest;
     f.partners.assign(partners.begin(), partners.end());
     new_files_.push_back(std::make_pair(level, f));
+  }
+  
+  void AddFile(int level, uint64_t file,
+               uint64_t file_size,
+               const InternalKey& smallest,
+               const InternalKey& largest,
+               const InternalKey& origin_smallest,
+               const InternalKey& origin_largest, 
+               std::vector<Partner>& partners,
+			   std::shared_ptr<HyperLogLog>& hll) {
+	  FileMetaData f;
+	  f.number = file;
+	  f.file_size = file_size;
+	  f.smallest = smallest;
+	  f.largest = largest;
+	  f.origin_smallest = origin_smallest;
+	  f.origin_largest = origin_largest;
+	  f.partners.assign(partners.begin(), partners.end());
+	  f.hll = hll;
+	  new_files_.push_back(std::make_pair(level, f));
   }
   ///////////////meggie
 
