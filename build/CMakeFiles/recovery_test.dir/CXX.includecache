@@ -189,8 +189,6 @@ port/port.h
 ..//util/murmurhash.h
 stdint.h
 -
-leveldb/slice.h
-../util/leveldb/slice.h
 
 ..//util/random.h
 stdint.h

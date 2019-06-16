@@ -675,8 +675,6 @@ CMakeFiles/leveldb.dir/util/logging.cc.o
  include/port/port_config.h
 CMakeFiles/leveldb.dir/util/murmurhash.cc.o
  ..//util/murmurhash.h
- ../include/leveldb/export.h
- ../include/leveldb/slice.h
  /home/meggie/文档/partnercompaction_hll/util/murmurhash.cc
 CMakeFiles/leveldb.dir/util/options.cc.o
  ../include/leveldb/comparator.h

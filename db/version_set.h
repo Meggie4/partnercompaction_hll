@@ -299,6 +299,8 @@ class VersionSet {
 						std::vector<SplitCompaction*>& t_sptcompactions,
 						std::vector<SplitCompaction*>& p_sptcompactions);
   double GetOverlappingRatio(Compaction* c, SplitCompaction* sptcompaction);
+  double GetOverlappingRatio_1(Compaction* c, SplitCompaction* sptcompaction);
+  double GetOverlappingRatio_2(Compaction* c, SplitCompaction* sptcompaction);
   bool HasPartnerInVictim(Compaction* c);
   void MergeTSplitCompaction(Compaction* c, 
 							std::vector<SplitCompaction*>& t_sptcompactions,

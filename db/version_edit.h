@@ -26,6 +26,11 @@ struct Partner {
     InternalKey partner_smallest;
     InternalKey partner_largest;
 	std::shared_ptr<HyperLogLog> hll;
+    int hll_add_count;
+    ///////////meggie
+    Partner() : hll(std::make_shared<HyperLogLog>(12)), 
+                hll_add_count(0) {}
+    ///////////meggie
 };
 ///////////meggie
 
@@ -42,11 +47,13 @@ struct FileMetaData {
   InternalKey origin_largest;
   std::vector<Partner> partners;
   std::shared_ptr<HyperLogLog> hll;
+  int hll_add_count;
   //////////////meggie
-  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0), 
-    //////////////meggie
-    hll(std::make_shared<HyperLogLog>(12))
-    //////////////meggie
+  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0),
+    ///////////meggie
+    hll(std::make_shared<HyperLogLog>(12)), 
+    hll_add_count(0)
+    ///////////meggie
     { }
 };
 
@@ -105,7 +112,8 @@ class VersionEdit {
                uint64_t file_size,
                const InternalKey& smallest,
                const InternalKey& largest, 
-			   std::shared_ptr<HyperLogLog>& hll) {
+			   const std::shared_ptr<HyperLogLog>& hll, 
+               int hll_add_count) {
 	  FileMetaData f;
 	  f.number = file;
 	  f.file_size = file_size;
@@ -114,6 +122,7 @@ class VersionEdit {
 	  f.origin_smallest = smallest;
 	  f.origin_largest = largest;
 	  f.hll = hll;
+      f.hll_add_count = hll_add_count;
 	  new_files_.push_back(std::make_pair(level, f));
   }
   
@@ -123,8 +132,7 @@ class VersionEdit {
                const InternalKey& largest,
                const InternalKey& origin_smallest,
                const InternalKey& origin_largest, 
-               std::vector<Partner>& partners
-               ) {
+               std::vector<Partner>& partners) {
     FileMetaData f;
     f.number = file;
     f.file_size = file_size;
@@ -143,7 +151,8 @@ class VersionEdit {
                const InternalKey& origin_smallest,
                const InternalKey& origin_largest, 
                std::vector<Partner>& partners,
-			   std::shared_ptr<HyperLogLog>& hll) {
+			   const std::shared_ptr<HyperLogLog>& hll, 
+               int hll_add_count) {
 	  FileMetaData f;
 	  f.number = file;
 	  f.file_size = file_size;
@@ -153,6 +162,7 @@ class VersionEdit {
 	  f.origin_largest = origin_largest;
 	  f.partners.assign(partners.begin(), partners.end());
 	  f.hll = hll;
+      f.hll_add_count = hll_add_count;
 	  new_files_.push_back(std::make_pair(level, f));
   }
   ///////////////meggie

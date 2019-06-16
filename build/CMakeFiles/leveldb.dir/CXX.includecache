@@ -335,8 +335,6 @@ port/port.h
 ..//util/murmurhash.h
 stdint.h
 -
-leveldb/slice.h
-../util/leveldb/slice.h
 
 ..//util/mutexlock.h
 port/port.h
@@ -545,6 +543,8 @@ leveldb/iterator.h
 /home/meggie/文档/partnercompaction_hll/db/leveldb/iterator.h
 util/debug.h
 /home/meggie/文档/partnercompaction_hll/db/util/debug.h
+util/hyperloglog.h
+/home/meggie/文档/partnercompaction_hll/db/util/hyperloglog.h
 
 /home/meggie/文档/partnercompaction_hll/db/c.cc
 leveldb/c.h

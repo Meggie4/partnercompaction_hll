@@ -13,8 +13,18 @@
 #include "leveldb/iterator.h"
 
 #include "util/debug.h"
+////////////meggie
+#include "util/hyperloglog.h"
+////////////meggie
 
 namespace leveldb {
+////////////meggie
+static void AddKeyToHyperLogLog(std::shared_ptr<HyperLogLog>& hll, const Slice& key) {
+	const Slice& user_key = ExtractUserKey(key);
+    int64_t hash = MurmurHash64A(user_key.data(), user_key.size(), 0);
+    hll->AddHash(hash);
+}
+////////////meggie
 
 Status BuildTable(const std::string& dbname,
                   Env* env,
@@ -43,8 +53,9 @@ Status BuildTable(const std::string& dbname,
       meta->largest.DecodeFrom(key);
       builder->Add(key, iter->value());
 	  ////////meggie
-	  meta->AddToHyperloglog(key);
-	  ////////meggie
+	  AddKeyToHyperLogLog(meta->hll, key);
+	  meta->hll_add_count++;
+      ////////meggie
     }
 	
     // Finish and check for builder errors

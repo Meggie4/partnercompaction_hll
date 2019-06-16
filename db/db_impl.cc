@@ -80,6 +80,12 @@ struct DBImpl::CompactionState {
     uint64_t number;
     uint64_t file_size;
     InternalKey smallest, largest;
+    /////////////meggie
+    std::shared_ptr<HyperLogLog> hll;
+    int hll_add_count;
+    Output() : hll(std::make_shared<HyperLogLog>(12)), 
+               hll_add_count(0){}
+    /////////////meggie
   };
   std::vector<Output> outputs;
 
@@ -138,6 +144,12 @@ void DBImpl::PrintTimerAudit(){
     //timer->DebugString();
     printf("%s\n", timer->DebugString().c_str());
     printf("-----end timer information-------\n");
+}
+
+static void AddKeyToHyperLogLog(std::shared_ptr<HyperLogLog>& hll, const Slice& key) {
+	const Slice& user_key = ExtractUserKey(key);
+    int64_t hash = MurmurHash64A(user_key.data(), user_key.size(), 0);
+    hll->AddHash(hash);
 }
 ////////////meggie
 
@@ -564,7 +576,7 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
     }
 	///////////////meggie
     edit->AddFile(level, meta.number, meta.file_size,
-                  meta.smallest, meta.largest, meta.hll);
+                  meta.smallest, meta.largest, meta.hll, meta.hll_add_count);
 	///////////////meggie
   }
 
@@ -772,10 +784,10 @@ void DBImpl::BackgroundCompaction() {
         DEBUG_T("file%d trivial move to level+1\n", f->number);
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
                        f->smallest, f->largest, f->origin_smallest, 
-                       f->origin_largest, f->partners, f->hll);
+                       f->origin_largest, f->partners, f->hll, f->hll_add_count);
     } else 
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
-                       f->smallest, f->largest, f->hll);
+                       f->smallest, f->largest, f->hll, f->hll_add_count);
     ////////////meggie
     status = versions_->LogAndApply(c->edit(), &mutex_);
     if (!status.ok()) {
@@ -942,9 +954,12 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
   const int level = compact->compaction->level();
   for (size_t i = 0; i < compact->outputs.size(); i++) {
     const CompactionState::Output& out = compact->outputs[i];
+    //////////////meggie
     compact->compaction->edit()->AddFile(
         level + 1,
-        out.number, out.file_size, out.smallest, out.largest);
+        out.number, out.file_size, out.smallest, 
+        out.largest, out.hll, out.hll_add_count);
+    //////////////meggie
   }
   return versions_->LogAndApply(compact->compaction->edit(), &mutex_);
 }
@@ -990,7 +1005,7 @@ void DBImpl::AddFileWithTraditionalCompaction(VersionEdit* edit,
            const CompactionState::Output& out = compact->outputs[j];
            DEBUG_T("%d, ", out.number);
            edit->AddFile(level + 1, out.number, out.file_size
-                   , out.smallest, out.largest);
+                   , out.smallest, out.largest, out.hll, out.hll_add_count);
        }
     }
     DEBUG_T("\n");
@@ -1014,6 +1029,8 @@ void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit,
           ptner.partner_size = out.file_size;
           ptner.partner_smallest = out.smallest;
           ptner.partner_largest = out.largest;
+          ptner.hll = out.hll;
+          ptner.hll_add_count = out.hll_add_count;
           partners.push_back(ptner);
        }
        edit->UpdateFile(level + 1, pcompaction_files[i], partners);
@@ -1118,6 +1135,8 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
 
             compact->current_output()->largest.DecodeFrom(key);
             compact->builder->Add(key, merge_iter->value());
+            AddKeyToHyperLogLog(compact->current_output()->hll, key);
+            compact->current_output()->hll_add_count++;
 
             if(compact->builder->FileSize() >= 
                     compact->compaction->MaxOutputFileSize()) {
@@ -1230,6 +1249,8 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
 
             compact->current_output()->largest.DecodeFrom(key);
             compact->builder->Add(key, input->value());
+            AddKeyToHyperLogLog(compact->current_output()->hll, key);
+            compact->current_output()->hll_add_count++;
 
             if(compact->builder->FileSize() >= 
                     compact->compaction->MaxOutputFileSize()) {
@@ -1603,7 +1624,8 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
       compact->current_output()->largest.DecodeFrom(key);
       compact->builder->Add(key, input->value());
 	  ////////////meggie
-	  compact->current_output()->AddToHyperloglog(key);
+      AddKeyToHyperLogLog(compact->current_output()->hll, key);
+      compact->current_output()->hll_add_count++;
 	  ////////////meggie
 
       // Close output file if it is big enough

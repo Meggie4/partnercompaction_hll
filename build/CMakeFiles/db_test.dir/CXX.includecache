@@ -195,8 +195,6 @@ port/port.h
 ..//util/murmurhash.h
 stdint.h
 -
-leveldb/slice.h
-../util/leveldb/slice.h
 
 ..//util/mutexlock.h
 port/port.h

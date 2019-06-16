@@ -674,8 +674,6 @@ CMakeFiles/leveldb.dir/util/logging.cc.o: ../util/logging.cc
 CMakeFiles/leveldb.dir/util/logging.cc.o: include/port/port_config.h
 
 CMakeFiles/leveldb.dir/util/murmurhash.cc.o: ../util/murmurhash.h
-CMakeFiles/leveldb.dir/util/murmurhash.cc.o: ../include/leveldb/export.h
-CMakeFiles/leveldb.dir/util/murmurhash.cc.o: ../include/leveldb/slice.h
 CMakeFiles/leveldb.dir/util/murmurhash.cc.o: ../util/murmurhash.cc
 
 CMakeFiles/leveldb.dir/util/options.cc.o: ../include/leveldb/comparator.h
