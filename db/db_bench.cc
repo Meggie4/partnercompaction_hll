@@ -241,7 +241,7 @@ class WorkloadGenerator{
       return result;
   }
 
-  Status getRequest(char* type, std::string& key, 
+  Status getRequest1(char* type, std::string& key, 
           std::string& value){
     if(pos >= mapend)
         return Status::IOError("it's the end\n");
@@ -262,7 +262,7 @@ class WorkloadGenerator{
         return Status::IOError("type is unvalid\n");
   }
 
-  Status getRequest1(char* type, std::string& key, 
+  Status getRequest(char* type, std::string& key, 
       std::string& value){
     std::string wtype;
     if(getline(fin, wtype) && isValid(wtype)){
@@ -270,12 +270,15 @@ class WorkloadGenerator{
       switch(*type){
         case 'i':
           getline(fin, key);
+          key.pop_back();
           getline(fin, value);
+          value.pop_back();
           break;
         case 'd':
         case 'r':
         case 's':
           getline(fin, key);
+          key.pop_back();
           break;
         default:
           return Status::IOError("Already finished obtain request....");
@@ -740,11 +743,6 @@ class Benchmark {
         method = &Benchmark::Readzipfian100_25000k;
       } else if(name == Slice("readzipfian100_30000k")) {
         method = &Benchmark::Readzipfian100_30000k;
-      ////write
-      } else if(name == Slice("writezipfian100_5000k")) {
-        entries_per_batch_ = 1000;
-        fresh_db = true;
-        method = &Benchmark::writezipfian100_5000k;
       /////latest
       } else if(name == Slice("customedlatest1k_100k")) {
         entries_per_batch_ = 1000;
@@ -1358,10 +1356,6 @@ class Benchmark {
       CustomedWorkloadRead(thread, fname);
   }
   ///////////write
-  void writezipfian100_5000k(ThreadState* thread){
-      std::string fname = "/mnt/workloads/zipfian/write_500M.txt"; 
-      CustomedWorkloadWrite(thread, fname);
-  }
   
   void CustomedWorkloadRead(ThreadState* thread, std::string fname) {
       leveldb::WorkloadGenerator wlgnerator(fname);
@@ -1692,7 +1686,7 @@ int main(){
 }
 
 int main(){
-    std::string fname = "/mnt/workloads/zipfian/write_500M.txt";
+    std::string fname = "/mnt/workloads/zipfian/load_500M.txt";
     leveldb::WorkloadGenerator wlgnerator(fname);
     char type;
     std::string key;

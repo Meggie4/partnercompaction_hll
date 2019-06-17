@@ -173,8 +173,8 @@ class VersionEdit {
   }
 
   ///////////meggie
-  void UpdateFile(int level, uint64_t file, std::vector<Partner>& partners) {
-     updated_files_.push_back(std::make_pair(level, std::make_pair(file, partners))); 
+  void AddPartner(int level, uint64_t file, Partner& partner) {
+     updated_files_.push_back(std::make_pair(level, std::make_pair(file, partner))); 
   }
   ///////////meggie
 
@@ -188,7 +188,7 @@ class VersionEdit {
 
   typedef std::set< std::pair<int, uint64_t> > DeletedFileSet;
   ///////////////meggie
-  typedef std::vector< std::pair<int, std::pair< uint64_t, std::vector<Partner>>> > UpdatedFileSet;
+  typedef std::vector< std::pair<int, std::pair< uint64_t, Partner>> > UpdatedFileSet;
   ///////////////meggie
   
   std::string comparator_;

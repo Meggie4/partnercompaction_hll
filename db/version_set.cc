@@ -343,6 +343,7 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 		int sz = file->partners.size() + 1;
 		Iterator** list = new Iterator*[sz];
 		list[0] = cache->NewIterator(options, file->number, file->file_size);
+        DEBUG_T("in GetFileIterator, partner count is:%d\n", file->partners.size());
 		for(int i = 0; i < sz - 1; i++) {
 			list[i + 1] = cache->NewIterator(options,
 								  file->partners[i].partner_number,
@@ -825,7 +826,7 @@ class VersionSet::Builder {
     std::set<uint64_t> deleted_files;
     FileSet* added_files;
 	///////////meggie
-	std::map<uint64_t, std::vector<Partner>> updated_files;
+	std::map<uint64_t, Partner> updated_files;
 	///////////meggie
   };
 
@@ -984,28 +985,27 @@ class VersionSet::Builder {
 	   std::vector<FileMetaData*>* files = &v->files_[level];
 	   FileMetaData* fm = new FileMetaData(*f);
 	   fm->refs = 1;
-	   std::vector<Partner>& partners = levels_[level].updated_files[f->number];
-	   fm->partners.assign(partners.begin(), partners.end());	   
+	   Partner& ptner = levels_[level].updated_files[f->number];
+	   fm->partners.push_back(ptner);	   
 	   
-	   for(int j =0; j < fm->partners.size(); j++){
-		   Partner& ptner = fm->partners[j];
-		   DEBUG_T("get partner, origin SSTable:%d, smallest:%s, largest:%s\n", 
-				   fm->number, 
-				   fm->smallest.user_key().ToString().c_str(), 
-				   fm->largest.user_key().ToString().c_str());
-		   DEBUG_T("get partner, partner number:%d, partner_smallest:%s, partner_largest:%s\n",
-				   ptner.partner_number,
-				   ptner.partner_smallest.user_key().ToString().c_str(),
-				   ptner.partner_largest.user_key().ToString().c_str());
-		   if(vset_->icmp_.Compare(ptner.partner_largest, fm->largest) > 0)
-			   fm->largest = ptner.partner_largest;
-		   if(vset_->icmp_.Compare(ptner.partner_smallest, fm->smallest) < 0)
-			   fm->smallest = ptner.partner_smallest;
-		   DEBUG_T("UpdateFile, smallest:%s, largest:%s\n",
-				   fm->smallest.user_key().ToString().c_str(),
-				   fm->largest.user_key().ToString().c_str());
-	   }
-	   fm->allowed_seeks = (fm->file_size / 16384);
+       DEBUG_T("add partner, origin SSTable:%d, smallest:%s, largest:%s\n", 
+               fm->number, 
+               fm->smallest.user_key().ToString().c_str(), 
+               fm->largest.user_key().ToString().c_str());
+       DEBUG_T("add partner, partner number:%d, partner_smallest:%s, partner_largest:%s\n",
+               ptner.partner_number,
+               ptner.partner_smallest.user_key().ToString().c_str(),
+               ptner.partner_largest.user_key().ToString().c_str());
+       DEBUG_T("now partners number is %d\n", fm->partners.size());
+       if(vset_->icmp_.Compare(ptner.partner_largest, fm->largest) > 0)
+           fm->largest = ptner.partner_largest;
+       if(vset_->icmp_.Compare(ptner.partner_smallest, fm->smallest) < 0)
+           fm->smallest = ptner.partner_smallest;
+       DEBUG_T("UpdateFile, smallest:%s, largest:%s\n",
+               fm->smallest.user_key().ToString().c_str(),
+               fm->largest.user_key().ToString().c_str());
+	   
+       fm->allowed_seeks = (fm->file_size / 16384);
 	   if (fm->allowed_seeks < 100) fm->allowed_seeks = 100;
 	   
 	   if (level > 0 && !files->empty()) {
@@ -1829,6 +1829,7 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         int victimsz = sptcompaction->victims.size();
         int victimstart_index = sptcompaction->victims[0];
         int victimend_index = sptcompaction->victims[victimsz - 1];
+        DEBUG_T("in GetSplitCompactions\n");
 		sptcompaction->victim_iter = 
                 GetIteratorWithPartner(inputs0, 
                     victimstart_index, victimend_index); 
@@ -1844,15 +1845,25 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         DEBUG_T("inputs1[%d], sptcompaction:", i);
         PrintSplitCompaction(sptcompaction);
        
-        if(inputs1[i]->partners.size() != 0) {
+        if(inputs1[i]->partners.size() > 10) {
             t_sptcompactions.push_back(sptcompaction);
-            DEBUG_T("has partners\n");
-        }
-        else {
-            DEBUG_T("has no partners\n");
-            p_sptcompactions.push_back(sptcompaction);
+            DEBUG_T("partner count more than 10\n");
             double ratio = GetOverlappingRatio_2(c, sptcompaction);
 			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
+        }
+        else {
+            p_sptcompactions.push_back(sptcompaction);
+            DEBUG_T("partner count less than 10\n");
+            if(inputs1[i]->partners.size() > 2) {
+                double ratio = GetOverlappingRatio_2(c, sptcompaction);
+			    DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
+                if(ratio > 0.2) {
+                    DEBUG_T("there is ratio greater than 0.2, partner count is:%d\n", 
+                            inputs1[i]->partners.size());
+                }
+            }
+            //double ratio = GetOverlappingRatio_2(c, sptcompaction);
+			//DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
             //if(ratio < PCompactionThresh){
             //    p_sptcompactions.push_back(sptcompaction);
 			//}
@@ -1906,8 +1917,8 @@ void VersionSet::AddLiveFiles(std::set<uint64_t>* live) {
         live->insert(files[i]->number);
         /////////meggie
         for(int j = 0; j < files[i]->partners.size(); j++) {
-            DEBUG_T("AddLiveFiles, partner number%d\n", 
-                    files[i]->partners[j].partner_number);
+            //DEBUG_T("AddLiveFiles, partner number%d\n", 
+            //        files[i]->partners[j].partner_number);
             live->insert(files[i]->partners[j].partner_number); 
         }
         /////////meggie

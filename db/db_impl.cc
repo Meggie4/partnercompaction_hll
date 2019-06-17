@@ -1022,18 +1022,17 @@ void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit,
        CompactionState* compact = p_compactionstate_list[i];
        std::vector<Partner> partners;
 	   int level = compact->compaction->level();
-       for(size_t j = 0; j < compact->outputs.size(); j++) {
-          const CompactionState::Output& out = compact->outputs[j];
-          Partner ptner; 
-          ptner.partner_number = out.number;
-          ptner.partner_size = out.file_size;
-          ptner.partner_smallest = out.smallest;
-          ptner.partner_largest = out.largest;
-          ptner.hll = out.hll;
-          ptner.hll_add_count = out.hll_add_count;
-          partners.push_back(ptner);
-       }
-       edit->UpdateFile(level + 1, pcompaction_files[i], partners);
+       assert(compact->outputs.size() == 1);
+       const CompactionState::Output& out = compact->outputs[0];
+       Partner ptner; 
+       ptner.partner_number = out.number;
+       ptner.partner_size = out.file_size;
+       ptner.partner_smallest = out.smallest;
+       ptner.partner_largest = out.largest;
+       ptner.hll = out.hll;
+       ptner.hll_add_count = out.hll_add_count;
+       partners.push_back(ptner);
+       edit->AddPartner(level + 1, pcompaction_files[i], ptner);
    }
 }
 
@@ -1252,13 +1251,13 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
             AddKeyToHyperLogLog(compact->current_output()->hll, key);
             compact->current_output()->hll_add_count++;
 
-            if(compact->builder->FileSize() >= 
-                    compact->compaction->MaxOutputFileSize()) {
-                status = FinishCompactionOutputFile(compact, input);
-                if(!status.ok()) {
-                    break;
-                }
-            }
+            //if(compact->builder->FileSize() >= 
+            //        compact->compaction->MaxOutputFileSize()) {
+            //    status = FinishCompactionOutputFile(compact, input);
+            //    if(!status.ok()) {
+            //        break;
+            //    }
+            //}
         }
 
         input->Next();
