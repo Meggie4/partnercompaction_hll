@@ -1764,6 +1764,42 @@ double VersionSet::GetOverlappingRatio_2(Compaction* c,
     return ratio;
 }
 
+double VersionSet::GetGlobalOverlappingRatio(Compaction* c) {
+	std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
+    std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
+
+    uint64_t total_keys = 0; 
+    std::vector<HyperLogLog*> v;
+
+    for(int i = 0; i < inputs0.size(); i++) {
+        FileMetaData* f = inputs0[i];
+        v.push_back(f->hll.get());
+        total_keys += f->hll_add_count;
+        for(auto partner : f->partners) {
+            v.push_back(partner.hll.get());
+            total_keys += partner.hll_add_count;
+        }
+    }
+    
+    for(int j = 0; j < inputs1.size(); j++) {
+        FileMetaData* f = inputs1[j];
+        v.push_back(f->hll.get());
+        total_keys += f->hll_add_count;
+        for(auto partner : f->partners) {
+            v.push_back(partner.hll.get());
+            total_keys += partner.hll_add_count;
+        }
+    }
+
+    uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
+    DEBUG_T("global distinct_nums:%lld, global total_keys:%lld\n", 
+            distinct_nums, total_keys);
+    uint64_t overlapped_nums = total_keys - distinct_nums;
+    double ratio = (overlapped_nums * 1.0) / total_keys;
+
+    return ratio;
+}
+
 void VersionSet::GetSplitCompactions(Compaction* c, 
 						std::vector<SplitCompaction*>& t_sptcompactions,
 						std::vector<SplitCompaction*>& p_sptcompactions) {
@@ -1783,11 +1819,14 @@ void VersionSet::GetSplitCompactions(Compaction* c,
     
     DEBUG_T("sz1:%d, inputs1 info:\n", sz1);
     for(int j = 0; j < sz1; j++) {
-        DEBUG_T("filenumber:%lld, smallest%s, largest:%s\n",
+        DEBUG_T("filenumber:%lld, smallest:%s, largest:%s\n",
                 inputs1[j]->number, 
                 inputs1[j]->smallest.user_key().ToString().c_str(),
                 inputs1[j]->largest.user_key().ToString().c_str());
     }
+
+
+    double global_ratio = GetGlobalOverlappingRatio(c);
 
     int i = 0, j = 0;
     for(; i < sz1; i++) {
@@ -1846,16 +1885,22 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         if(inputs1[i]->partners.size() > 10) {
             t_sptcompactions.push_back(sptcompaction);
             DEBUG_T("partner count more than 10\n");
-            double ratio = GetOverlappingRatio_2(c, sptcompaction);
-			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
         }
         else {
             double ratio = GetOverlappingRatio_2(c, sptcompaction);
 			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
-            if(inputs1[i]->partners.size() > 1 && ratio > 0.2) {
-                DEBUG_T("there is ratio greater than 0.2, partner count is:%d\n", 
+            if(inputs1[i]->partners.size() > 1){
+                if(global_ratio > 0.2 && ratio > 0.15) {
+                    DEBUG_T("global_ratio greater than 0.2, ratio greater than 0.15, partner count is:%d\n", 
                         inputs1[i]->partners.size());
-                t_sptcompactions.push_back(sptcompaction);
+                    t_sptcompactions.push_back(sptcompaction);
+                } else if(ratio > 2.0){
+                    DEBUG_T("global_ratio less than 0.2, ratio greater than 0.20, partner count is:%d\n", 
+                        inputs1[i]->partners.size());
+                    t_sptcompactions.push_back(sptcompaction);
+                } else {
+                    p_sptcompactions.push_back(sptcompaction);
+                }
             } else {
                 p_sptcompactions.push_back(sptcompaction);
             }

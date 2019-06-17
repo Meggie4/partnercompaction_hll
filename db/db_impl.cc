@@ -577,6 +577,9 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
 	///////////////meggie
     edit->AddFile(level, meta.number, meta.file_size,
                   meta.smallest, meta.largest, meta.hll, meta.hll_add_count);
+    DEBUG_T("WriteLevel0Table, AddFile, file_number:%lld, smallest:%s, largest:%s\n", 
+            meta.number, meta.smallest.user_key().ToString().c_str(), 
+            meta.largest.user_key().ToString().c_str());
 	///////////////meggie
   }
 
@@ -959,6 +962,9 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
         level + 1,
         out.number, out.file_size, out.smallest, 
         out.largest, out.hll, out.hll_add_count);
+    DEBUG_T("InstallCompactionResults, AddFile, file_number:%lld, smallest:%s, largest:%s\n", 
+            out.number, out.smallest.user_key().ToString().c_str(), 
+            out.largest.user_key().ToString().c_str());
     //////////////meggie
   }
   return versions_->LogAndApply(compact->compaction->edit(), &mutex_);
@@ -1160,6 +1166,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
         status = FinishCompactionOutputFile(compact, merge_iter);
     }
 
+
     if(!status.ok()) {
         RecordBackgroundError(status);
     }
@@ -1179,14 +1186,6 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
 
     Compaction* c = compact->compaction;
     std::vector<int>& victims = p_sptcompaction->victims;
-    bool use_origin_victim = true;
-    for(int i = 0; i < victims.size(); i++) {
-        if(c->input(0, victims[i])->partners.size() !=  0)
-            use_origin_victim = false;
-    }
-    if(use_origin_victim)
-        use_origin_victim_num++;
-    partner_compaction_num++;
     
     Iterator* input = p_sptcompaction->victim_iter;
     InternalKey victim_end = p_sptcompaction->victim_end;
@@ -1237,6 +1236,7 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
         
         if(!drop) {
             if(compact->builder == nullptr) {
+                DEBUG_T("has set builder\n");
                 status = OpenCompactionOutputFile(compact);
                 if(!status.ok()) {
                     break;
@@ -1271,6 +1271,8 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
         status = FinishCompactionOutputFile(compact, input);
     }
     
+    DEBUG_T("after DealWithPartnerCompaction, compact->outputs size:%d\n", 
+            compact->outputs.size());
     if(!status.ok()) {
         RecordBackgroundError(status);
     }
