@@ -602,8 +602,6 @@ Status Version::Get(const ReadOptions& options,
                       return s;
                   }
               }
-              if(search_partner)
-                  break;
         }
       }
       s = vset_->table_cache_->Get(options, f->number, f->file_size,

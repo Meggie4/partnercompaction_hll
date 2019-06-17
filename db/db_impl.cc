@@ -1781,9 +1781,7 @@ Status DBImpl::Get(const ReadOptions& options,
   }
 
   if (have_stat_update && current->UpdateStats(stats)) {
-      ///////////meggie
       MaybeScheduleCompaction();
-      ///////////meggie
   }
   mem->Unref();
   if (imm != nullptr) imm->Unref();
