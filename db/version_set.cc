@@ -1850,23 +1850,15 @@ void VersionSet::GetSplitCompactions(Compaction* c,
 			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
         }
         else {
-            p_sptcompactions.push_back(sptcompaction);
-            DEBUG_T("partner count less than 10\n");
-            if(inputs1[i]->partners.size() > 2) {
-                double ratio = GetOverlappingRatio_2(c, sptcompaction);
-			    DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
-                if(ratio > 0.2) {
-                    DEBUG_T("there is ratio greater than 0.2, partner count is:%d\n", 
-                            inputs1[i]->partners.size());
-                }
+            double ratio = GetOverlappingRatio_2(c, sptcompaction);
+			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
+            if(inputs1[i]->partners.size() > 1 && ratio > 0.2) {
+                DEBUG_T("there is ratio greater than 0.2, partner count is:%d\n", 
+                        inputs1[i]->partners.size());
+                t_sptcompactions.push_back(sptcompaction);
+            } else {
+                p_sptcompactions.push_back(sptcompaction);
             }
-            //double ratio = GetOverlappingRatio_2(c, sptcompaction);
-			//DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
-            //if(ratio < PCompactionThresh){
-            //    p_sptcompactions.push_back(sptcompaction);
-			//}
-            //else 
-            //    t_sptcompactions.push_back(sptcompaction);
         } 
     }
 }
