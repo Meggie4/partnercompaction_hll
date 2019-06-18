@@ -50,6 +50,7 @@
 //uint64_t partner_number;
 int use_origin_victim_num = 0;
 int partner_compaction_num = 0;
+std::vector<uint64_t> partner_size;
 ////////////meggie
 namespace leveldb {
 
@@ -1026,6 +1027,8 @@ void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit,
    DEBUG_T("UpdateFileWithPartnerCompaction, size:%d\n", sz1);
    for(int i = 0; i < sz1; i++) {
        CompactionState* compact = p_compactionstate_list[i];
+       if(compact->outputs.size() == 0)
+           continue;
        std::vector<Partner> partners;
 	   int level = compact->compaction->level();
        assert(compact->outputs.size() == 1);
@@ -1269,10 +1272,13 @@ void DBImpl::DealWithPartnerCompaction(CompactionState* compact,
    
     if(status.ok() && compact->builder != nullptr) {
         status = FinishCompactionOutputFile(compact, input);
+        DEBUG_T("push partner_size:%llu\n", 
+                compact->current_output()->file_size);
+        partner_size.push_back(compact->current_output()->file_size);
+        DEBUG_T("after DealWithPartnerCompaction, compact->outputs size:%d\n", 
+            compact->outputs.size());
     }
     
-    DEBUG_T("after DealWithPartnerCompaction, compact->outputs size:%d\n", 
-            compact->outputs.size());
     if(!status.ok()) {
         RecordBackgroundError(status);
     }

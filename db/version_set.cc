@@ -1943,22 +1943,31 @@ uint64_t VersionSet::ApproximateOffsetOf(Version* v, const InternalKey& ikey) {
 }
 
 void VersionSet::AddLiveFiles(std::set<uint64_t>* live) {
+  ///////////////meggie
+  int index = 0;
+  ///////////////meggie
   for (Version* v = dummy_versions_.next_;
        v != &dummy_versions_;
        v = v->next_) {
+    uint64_t sstable_size = 0, partner_size = 0;
+    DEBUG_T("start addlivefiles, version%d\n", index);
     for (int level = 0; level < config::kNumLevels; level++) {
       const std::vector<FileMetaData*>& files = v->files_[level];
       for (size_t i = 0; i < files.size(); i++) {
         live->insert(files[i]->number);
+        sstable_size += files[i]->file_size;
         /////////meggie
         for(int j = 0; j < files[i]->partners.size(); j++) {
             //DEBUG_T("AddLiveFiles, partner number%d\n", 
             //        files[i]->partners[j].partner_number);
             live->insert(files[i]->partners[j].partner_number); 
+            partner_size += files[i]->partners[j].partner_size;
         }
         /////////meggie
       }
     }
+    DEBUG_T("in this version, SSTable size is %llu, partner_size is %llu\n", sstable_size, partner_size);
+    DEBUG_T("end addlivefiles, version%d\n", index++);
   }
 }
 

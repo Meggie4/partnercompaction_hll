@@ -33,6 +33,7 @@
 ///////////meggie
 extern int use_origin_victim_num;
 extern int partner_compaction_num;
+extern std::vector<uint64_t> partner_size;
 ///////////meggie
 
 // Comma-separated list of operations to run in the specified order
@@ -118,6 +119,7 @@ static int FLAGS_open_files = 0;
 
 // Bloom filter bits per key.
 // Negative means use default settings.
+//static int FLAGS_bloom_bits = 10;
 static int FLAGS_bloom_bits = -1;
 
 // If true, do not destroy the existing database.  If you set this
@@ -879,6 +881,13 @@ class Benchmark {
       db_->PrintTimerAudit();
       DEBUG_T("use_origin_victim_num:%d, partner_compaction_num:%d\n", 
               use_origin_victim_num, partner_compaction_num);
+      DEBUG_T("Generate partner:%d, details like this:\n", partner_size.size());
+      for(int i = 0; i < partner_size.size(); i++) {
+          DEBUG_T("%lld, ", partner_size[i]);
+          if(i % 15 == 0)
+              DEBUG_T("\n");
+      }
+      DEBUG_T("\n");
       ////////////meggie
     }
   }
