@@ -1110,6 +1110,60 @@ db/memtable.cc.s:
 	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/memtable.cc.s
 .PHONY : db/memtable.cc.s
 
+db/partner_index.o: db/partner_index.cc.o
+
+.PHONY : db/partner_index.o
+
+# target to build an object file
+db/partner_index.cc.o:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.o
+.PHONY : db/partner_index.cc.o
+
+db/partner_index.i: db/partner_index.cc.i
+
+.PHONY : db/partner_index.i
+
+# target to preprocess a source file
+db/partner_index.cc.i:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.i
+.PHONY : db/partner_index.cc.i
+
+db/partner_index.s: db/partner_index.cc.s
+
+.PHONY : db/partner_index.s
+
+# target to generate assembly for a file
+db/partner_index.cc.s:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.s
+.PHONY : db/partner_index.cc.s
+
+db/partner_table.o: db/partner_table.cc.o
+
+.PHONY : db/partner_table.o
+
+# target to build an object file
+db/partner_table.cc.o:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.o
+.PHONY : db/partner_table.cc.o
+
+db/partner_table.i: db/partner_table.cc.i
+
+.PHONY : db/partner_table.i
+
+# target to preprocess a source file
+db/partner_table.cc.i:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.i
+.PHONY : db/partner_table.cc.i
+
+db/partner_table.s: db/partner_table.cc.s
+
+.PHONY : db/partner_table.s
+
+# target to generate assembly for a file
+db/partner_table.cc.s:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.s
+.PHONY : db/partner_table.cc.s
+
 db/recovery_test.o: db/recovery_test.cc.o
 
 .PHONY : db/recovery_test.o
@@ -2894,6 +2948,12 @@ help:
 	@echo "... db/memtable.o"
 	@echo "... db/memtable.i"
 	@echo "... db/memtable.s"
+	@echo "... db/partner_index.o"
+	@echo "... db/partner_index.i"
+	@echo "... db/partner_index.s"
+	@echo "... db/partner_table.o"
+	@echo "... db/partner_table.i"
+	@echo "... db/partner_table.s"
 	@echo "... db/recovery_test.o"
 	@echo "... db/recovery_test.i"
 	@echo "... db/recovery_test.s"
