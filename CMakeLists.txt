@@ -19,6 +19,25 @@ option(LEVELDB_BUILD_TESTS "Build LevelDB's unit tests" ON)
 option(LEVELDB_BUILD_BENCHMARKS "Build LevelDB's benchmarks" ON)
 option(LEVELDB_INSTALL "Install LevelDB's header and library" ON)
 
+##############meggie
+option(USE_OFFSETS "Define macro" ON)
+if(USE_OFFSETS)
+    ADD_DEFINITIONS(-DUSE_OFFSETS)
+endif(USE_OFFSETS)
+option(ENABLE_RECOVERY "Define macro" ON)
+if(ENABLE_RECOVERY)
+    ADD_DEFINITIONS(-DENABLE_RECOVERY)
+endif(ENABLE_RECOVERY)
+#option(_USE_ARENA2_ALLOC "Define macro" ON)
+#if(_USE_ARENA2_ALLOC)
+#    ADD_DEFINITIONS(-D_USE_ARENA2_ALLOC)
+#endif(_USE_ARENA2_ALLOC)
+ADD_DEFINITIONS(-std=c++11)
+#set(CMAKE_CXX_FLAGS "-g")
+#set(CMAKE_CXX_FLAGS "-Wall")
+#set(CMAKE_CXX_FLAGS_DEBUG "-O0")
+##############meggie
+
 include(TestBigEndian)
 test_big_endian(LEVELDB_IS_BIG_ENDIAN)
 
@@ -123,6 +142,9 @@ target_sources(leveldb
     "${PROJECT_SOURCE_DIR}/port/port_stdcxx.h"
     "${PROJECT_SOURCE_DIR}/port/port.h"
     "${PROJECT_SOURCE_DIR}/port/thread_annotations.h"
+    ####################meggie
+    "${PROJECT_SOURCE_DIR}/port/cache_flush.h"
+    ####################meggie
     "${PROJECT_SOURCE_DIR}/table/block_builder.cc"
     "${PROJECT_SOURCE_DIR}/table/block_builder.h"
     "${PROJECT_SOURCE_DIR}/table/block.cc"
@@ -168,6 +190,10 @@ target_sources(leveldb
     "${PROJECT_SOURCE_DIR}/util/hyperloglog.h"
     "${PROJECT_SOURCE_DIR}/util/murmurhash.cc"
     "${PROJECT_SOURCE_DIR}/util/murmurhash.h"
+    "${PROJECT_SOURCE_DIR}/util/BloomFilter.cc"
+    "${PROJECT_SOURCE_DIR}/util/BloomFilter.h"
+    "${PROJECT_SOURCE_DIR}/util/MurmurHash3.cc"
+    "${PROJECT_SOURCE_DIR}/util/MurmurHash3.h"
     #########meggie
 
   # Only CMake 3.3+ supports PUBLIC sources in targets exported by "install".
@@ -305,7 +331,7 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("${PROJECT_SOURCE_DIR}/db/filename_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/log_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/recovery_test.cc")
-    leveldb_test("${PROJECT_SOURCE_DIR}/db/skiplist_test.cc")
+    #leveldb_test("${PROJECT_SOURCE_DIR}/db/skiplist_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_edit_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_set_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/write_batch_test.cc")

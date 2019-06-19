@@ -7,6 +7,8 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/hash_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/edit_cache.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/coding_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/crc32c_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/cache_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/bloom_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/arena_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/list_install_components.dir
@@ -31,9 +33,6 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/log_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/recovery_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/version_set_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/crc32c_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/cache_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/skiplist_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/version_edit_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/corruption_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/filter_block_test.dir

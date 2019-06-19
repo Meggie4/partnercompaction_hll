@@ -9,8 +9,10 @@ CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../port/atomic_pointer
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../port/port.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/arena.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/coding.h
+CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/debug.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/logging.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/random.h
 CMakeFiles/write_batch_test.dir/db/write_batch_test.cc.o: ../util/testharness.h

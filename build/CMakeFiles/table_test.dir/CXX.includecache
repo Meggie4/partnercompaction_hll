@@ -35,6 +35,14 @@ db/skiplist.h
 ../db/db/skiplist.h
 util/arena.h
 ../db/util/arena.h
+util/BloomFilter.h
+../db/util/BloomFilter.h
+string
+-
+unordered_set
+-
+util/debug.h
+../db/util/debug.h
 
 ..//db/skiplist.h
 assert.h
@@ -126,6 +134,14 @@ leveldb/status.h
 leveldb/table_builder.h
 ../table/leveldb/table_builder.h
 
+..//util/BloomFilter.h
+stdlib.h
+-
+vector
+-
+stdint.h
+-
+
 ..//util/arena.h
 vector
 -
@@ -149,6 +165,8 @@ leveldb/slice.h
 ../util/leveldb/slice.h
 port/port.h
 ../util/port/port.h
+
+..//util/debug.h
 
 ..//util/logging.h
 stdio.h
