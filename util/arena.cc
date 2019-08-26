@@ -37,9 +37,11 @@ Arena::~Arena() {
         if(this->nvmarena_ == true) {
             assert(i <= 0);
             assert(kSize != kBlockSize);
-            //DEBUG_T("munmap,start\n");
-            munmap(blocks_[i], MEM_THRESH * kSize);
-            //DEBUG_T("munmap, end\n");
+            DEBUG_T("munmap,start, kSize:%d, %llu\n", kSize, MEM_THRESH * kSize);
+            //munmap(blocks_[i], MEM_THRESH * kSize);
+            munmap(blocks_[i], 6291456);
+
+            DEBUG_T("munmap, end\n");
         }
         else
             delete[] blocks_[i];
@@ -196,18 +198,18 @@ void* ArenaNVM::operator new[](size_t size) {
 }
 
 ArenaNVM::~ArenaNVM() {
-    //DEBUG_T("delete ArenaNVM, blocks size:%d\n", blocks_.size());
+    DEBUG_T("delete ArenaNVM, blocks size:%d\n", blocks_.size());
     for (size_t i = 0; i < blocks_.size(); i++) {
 #ifdef ENABLE_RECOVERY
         munmap(blocks_[i], MEM_THRESH * kSize);
-        //DEBUG_T("munmap, end\n");
+        DEBUG_T("munmap, end\n");
         blocks_[i] = NULL;
     }
     close(fd);
 #else
     delete[] blocks_[i];
     blocks_[i] = NULL;
-}
+    }
 #endif
 }
 
@@ -239,8 +241,8 @@ char* ArenaNVM::AllocateNVMBlock(size_t block_bytes) {
         return NULL;
     }
 
-    //DEBUG_T("get mmap, start, block_bytes:%zu, mmap_size:%zu\n",
-      //      block_bytes, mmap_size);
+    DEBUG_T("get mmap, start, block_bytes:%zu, mmap_size:%zu\n",
+            block_bytes, mmap_size);
 
     char *result = (char *)mmap(NULL, mmap_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     //DEBUG_T("get mmap, end,result:%p, mmap_size:%zu\n", 

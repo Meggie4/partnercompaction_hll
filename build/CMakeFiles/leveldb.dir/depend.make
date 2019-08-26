@@ -60,6 +60,7 @@ CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/version_edit.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/version_set.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/write_batch_internal.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../port/thread_annotations.h
@@ -280,11 +281,13 @@ CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../db/partner_index.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../db/partner_table.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../db/skiplist.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../port/thread_annotations.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../util/arena.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../util/coding.h
+CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../util/logging.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../util/random.h
 CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../include/leveldb/comparator.h
@@ -314,6 +317,7 @@ CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/table_cache.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/version_edit.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/write_batch_internal.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/repair.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../port/thread_annotations.h
@@ -400,6 +404,7 @@ CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/table_cache.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/version_edit.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/version_set.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/version_set.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../port/thread_annotations.h
@@ -433,6 +438,7 @@ CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../db/memtable.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../db/skiplist.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../db/write_batch_internal.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/write_batch.cc.o: ../port/thread_annotations.h
@@ -629,11 +635,13 @@ CMakeFiles/leveldb.dir/util/BloomFilter.cc.o: ../util/MurmurHash3.h
 CMakeFiles/leveldb.dir/util/MurmurHash3.cc.o: ../util/MurmurHash3.cc
 CMakeFiles/leveldb.dir/util/MurmurHash3.cc.o: ../util/MurmurHash3.h
 
+CMakeFiles/leveldb.dir/util/arena.cc.o: ../hoard/heaplayers/wrappers/gnuwrapper.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../port/atomic_pointer.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../port/thread_annotations.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../util/arena.h
+CMakeFiles/leveldb.dir/util/arena.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../util/arena.cc
 CMakeFiles/leveldb.dir/util/arena.cc.o: include/port/port_config.h
 

@@ -181,6 +181,7 @@ Iterator* Table::BlockReader(void* arg,
       if (cache_handle != nullptr) {
         block = reinterpret_cast<Block*>(block_cache->Value(cache_handle));
       } else {
+        //从底层读取block
         s = ReadBlock(table->rep_->file, options, handle, &contents);
         if (s.ok()) {
           block = new Block(contents);
@@ -233,6 +234,7 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
         !filter->KeyMayMatch(handle.offset(), k)) {
       // Not found
     } else {
+      //获取data block的迭代器
       Iterator* block_iter = BlockReader(this, options, iiter->value());
       block_iter->Seek(k);
       if (block_iter->Valid()) {
@@ -249,6 +251,20 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
   return s;
 }
 
+
+////////////////meggie
+/*
+  原始的sstable的block获取步骤如下：
+  (1)读取footer
+  (2)读取index block
+  (3)根据index block，获取data block, 如果block cache中存在，那就直接获取，否则从file中获取
+  (4)根据data block的迭代器seek得到
+  针对partner table, 步骤如下：
+  （1）由于nvm index中存在了data block编号，以及data block的偏移量
+  （2）可以获取需要的data block
+  （3）得到data block后，根据在data block中的偏移量， 获取相应的数据
+*/
+///////////////meggie
 
 uint64_t Table::ApproximateOffsetOf(const Slice& key) const {
   Iterator* index_iter =

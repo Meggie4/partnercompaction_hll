@@ -42,6 +42,10 @@ std::string TableFileName(const std::string& dbname, uint64_t number);
 // "dbname".
 std::string SSTTableFileName(const std::string& dbname, uint64_t number);
 
+///////////////////////meggie
+std::string MapFileName(const std::string& name, uint64_t number);
+///////////////////////meggie
+
 // Return the name of the descriptor file for the db named by
 // "dbname" and the specified incarnation number.  The result will be
 // prefixed with "dbname".

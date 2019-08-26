@@ -363,6 +363,19 @@ env_test/fast:
 .PHONY : env_test/fast
 
 #=============================================================================
+# Target rules for targets named partner_index_test
+
+# Build rule for target.
+partner_index_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 partner_index_test
+.PHONY : partner_index_test
+
+# fast build rule for target.
+partner_index_test/fast:
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/build
+.PHONY : partner_index_test/fast
+
+#=============================================================================
 # Target rules for targets named leveldb
 
 # Build rule for target.
@@ -1136,6 +1149,33 @@ db/partner_index.s: db/partner_index.cc.s
 db/partner_index.cc.s:
 	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.s
 .PHONY : db/partner_index.cc.s
+
+db/partner_index_test.o: db/partner_index_test.cc.o
+
+.PHONY : db/partner_index_test.o
+
+# target to build an object file
+db/partner_index_test.cc.o:
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.o
+.PHONY : db/partner_index_test.cc.o
+
+db/partner_index_test.i: db/partner_index_test.cc.i
+
+.PHONY : db/partner_index_test.i
+
+# target to preprocess a source file
+db/partner_index_test.cc.i:
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.i
+.PHONY : db/partner_index_test.cc.i
+
+db/partner_index_test.s: db/partner_index_test.cc.s
+
+.PHONY : db/partner_index_test.s
+
+# target to generate assembly for a file
+db/partner_index_test.cc.s:
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.s
+.PHONY : db/partner_index_test.cc.s
 
 db/partner_table.o: db/partner_table.cc.o
 
@@ -2643,6 +2683,7 @@ util/testharness.cc.o:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.o
@@ -2680,6 +2721,7 @@ util/testharness.cc.i:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.i
@@ -2717,6 +2759,7 @@ util/testharness.cc.s:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.s
@@ -2754,6 +2797,7 @@ util/testutil.cc.o:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.o
@@ -2791,6 +2835,7 @@ util/testutil.cc.i:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.i
@@ -2828,6 +2873,7 @@ util/testutil.cc.s:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.s
@@ -2871,6 +2917,7 @@ help:
 	@echo "... no_destructor_test"
 	@echo "... status_test"
 	@echo "... env_test"
+	@echo "... partner_index_test"
 	@echo "... leveldb"
 	@echo "... c_test"
 	@echo "... issue178_test"
@@ -2951,6 +2998,9 @@ help:
 	@echo "... db/partner_index.o"
 	@echo "... db/partner_index.i"
 	@echo "... db/partner_index.s"
+	@echo "... db/partner_index_test.o"
+	@echo "... db/partner_index_test.i"
+	@echo "... db/partner_index_test.s"
 	@echo "... db/partner_table.o"
 	@echo "... db/partner_table.i"
 	@echo "... db/partner_table.s"

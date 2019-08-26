@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/partner_index_test.dir/util/testharness.cc.o CMakeFiles/partner_index_test.dir/util/testutil.cc.o CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.o  -o partner_index_test libleveldb.a -lpthread 

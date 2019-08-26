@@ -26,16 +26,18 @@ namespace leveldb {
                 --refs_;
                 assert(refs_ >= 0);
                 if (refs_ <= 0) {
+                    DEBUG_T("to delete partner index\n");
                     delete this;
+                    DEBUG_T("after delete partner index\n");
                 } 
             }
             
-            void Add(const Slice& key, uint64_t offset);
-            bool Get(const LookupKey& key, uint64_t* offset, Status* s);
+            void Add(const Slice& key, uint32_t partner_number, uint64_t offset);
+            bool Get(const LookupKey& key, uint32_t* partner_number, uint64_t* offset, Status* s);
             size_t ApproximateMemoryUsage();
             Iterator* NewIterator();
            
-            ArenaNVM* arena_;
+            Arena* arena_;
             
         private:
             ~PartnerIndex();

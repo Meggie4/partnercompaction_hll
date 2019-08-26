@@ -18,6 +18,7 @@ add_test(dbformat_test "/home/meggie/文档/partnercompaction_hll/build/dbformat
 add_test(filename_test "/home/meggie/文档/partnercompaction_hll/build/filename_test")
 add_test(log_test "/home/meggie/文档/partnercompaction_hll/build/log_test")
 add_test(recovery_test "/home/meggie/文档/partnercompaction_hll/build/recovery_test")
+add_test(partner_index_test "/home/meggie/文档/partnercompaction_hll/build/partner_index_test")
 add_test(version_edit_test "/home/meggie/文档/partnercompaction_hll/build/version_edit_test")
 add_test(version_set_test "/home/meggie/文档/partnercompaction_hll/build/version_set_test")
 add_test(write_batch_test "/home/meggie/文档/partnercompaction_hll/build/write_batch_test")

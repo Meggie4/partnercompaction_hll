@@ -39,6 +39,13 @@ std::string SSTTableFileName(const std::string& dbname, uint64_t number) {
   return MakeFileName(dbname, number, "sst");
 }
 
+///////////////meggie
+std::string MapFileName(const std::string& dbname, uint64_t number) {
+  assert(number > 0);
+  return MakeFileName(dbname, number, "map");
+}
+///////////////////////meggie
+
 std::string DescriptorFileName(const std::string& dbname, uint64_t number) {
   assert(number > 0);
   char buf[100];

@@ -19,6 +19,7 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/no_destructor_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/status_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/env_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/partner_index_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/leveldb.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/c_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/issue178_test.dir

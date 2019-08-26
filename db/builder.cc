@@ -52,9 +52,9 @@ Status BuildTable(const std::string& dbname,
       Slice key = iter->key();
       meta->largest.DecodeFrom(key);
       builder->Add(key, iter->value());
-	  ////////meggie
-	  AddKeyToHyperLogLog(meta->hll, key);
-	  meta->hll_add_count++;
+	    ////////meggie
+	    AddKeyToHyperLogLog(meta->hll, key);
+	    meta->hll_add_count++;
       ////////meggie
     }
 	

@@ -338,6 +338,9 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("${PROJECT_SOURCE_DIR}/db/log_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/recovery_test.cc")
     #leveldb_test("${PROJECT_SOURCE_DIR}/db/skiplist_test.cc")
+    ##########meggie
+    leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_index_test.cc")
+    #########meggie 
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_edit_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_set_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/write_batch_test.cc")

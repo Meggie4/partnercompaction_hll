@@ -73,6 +73,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/no_destructor_test.dir/DependInfo.cmake"
   "CMakeFiles/status_test.dir/DependInfo.cmake"
   "CMakeFiles/env_test.dir/DependInfo.cmake"
+  "CMakeFiles/partner_index_test.dir/DependInfo.cmake"
   "CMakeFiles/leveldb.dir/DependInfo.cmake"
   "CMakeFiles/c_test.dir/DependInfo.cmake"
   "CMakeFiles/issue178_test.dir/DependInfo.cmake"

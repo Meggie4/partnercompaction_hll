@@ -263,6 +263,17 @@ Status TableBuilder::Finish() {
   return r->status;
 }
 
+//////////////meggie
+//针对partner table, 不需要写filter_block, metaindex_block, index_block以及footer,
+//可通过nvm索引直接获取
+Status TableBuilder::PartnerFinish() {
+  Rep* r = rep_;
+  Flush();
+  assert(!r->closed);
+  r->closed = true;
+}
+//////////////meggie
+
 void TableBuilder::Abandon() {
   Rep* r = rep_;
   assert(!r->closed);

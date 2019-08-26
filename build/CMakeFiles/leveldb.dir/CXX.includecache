@@ -127,6 +127,8 @@ leveldb/slice.h
 ../db/leveldb/slice.h
 string
 -
+db/partner_index.h
+../db/db/partner_index.h
 
 ..//db/skiplist.h
 assert.h
@@ -139,6 +141,8 @@ util/arena.h
 ../db/util/arena.h
 util/random.h
 ../db/util/random.h
+port/cache_flush.h
+../db/port/cache_flush.h
 
 ..//db/snapshot.h
 db/dbformat.h
@@ -201,6 +205,8 @@ leveldb/write_batch.h
 ..//helpers/memenv/memenv.h
 leveldb/export.h
 ../helpers/memenv/leveldb/export.h
+
+..//hoard/heaplayers/wrappers/gnuwrapper.h
 
 ..//port/atomic_pointer.h
 stdint.h
@@ -1137,10 +1143,26 @@ stdint.h
 -
 
 /home/meggie/文档/partnercompaction_hll/util/arena.cc
+cstdlib
+-
 util/arena.h
 /home/meggie/文档/partnercompaction_hll/util/util/arena.h
 assert.h
 -
+hoard/heaplayers/wrappers/gnuwrapper.h
+/home/meggie/文档/partnercompaction_hll/util/hoard/heaplayers/wrappers/gnuwrapper.h
+unistd.h
+-
+sys/mman.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+fcntl.h
+-
+util/debug.h
+/home/meggie/文档/partnercompaction_hll/util/util/debug.h
 
 /home/meggie/文档/partnercompaction_hll/util/bloom.cc
 leveldb/filter_policy.h

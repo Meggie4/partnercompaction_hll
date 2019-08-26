@@ -36,13 +36,16 @@ namespace leveldb {
         : comparator_(cmp), 
           refs_(0), 
           arena_(arena), 
-          index_(comparator_, arena_, recovery){          
+          index_(comparator_, arena, recovery){          
     }
 
     PartnerIndex::~PartnerIndex() {
         assert(refs_ == 0);
-        if(arena_)
+        if(arena_){
+            DEBUG_T("before delete arena\n");
             delete arena_;
+            DEBUG_T("after delete arena\n");
+        }
     }
 
     size_t PartnerIndex::ApproximateMemoryUsage() {
@@ -121,12 +124,14 @@ namespace leveldb {
         return new PartnerIndexIterator(&index_);
     }
 
-    void PartnerIndex::Add(const Slice& key, uint64_t offset) {
+    //这里的partner number指的是0~9中
+    void PartnerIndex::Add(const Slice& key, uint32_t partner_number, uint64_t offset) {
+       ///存储的形式是：key_size + key + partner_number(varint 32) + offset(64)
        size_t key_size = key.size();
-       const size_t encoded_len = VarintLength(key_size) + key_size + 8;
+       const size_t encoded_len = VarintLength(key_size) + key_size + VarintLength(partner_number) + 8;
        char* buf = nullptr;
        
-       buf = arena_->AllocateAlignedNVM(encoded_len);
+       buf = ((ArenaNVM*)arena_)->AllocateAlignedNVM(encoded_len);
        
        if(!buf) {
            perror("Memory allocation failed");
@@ -135,9 +140,13 @@ namespace leveldb {
 
        char* p = EncodeVarint32(buf, key_size);
        
+       DEBUG_T("add key is %s\n", key.ToString().c_str());
        memcpy_persist(p, key.data(), key_size);
         
        p += key_size;
+       
+       p = EncodeVarint32(p, partner_number);
+       DEBUG_T("add offset is %d\n", offset);
        EncodeFixed64(p, offset);
        p += 8;
 
@@ -146,12 +155,14 @@ namespace leveldb {
        index_.Insert(buf);
     }
 
-    bool PartnerIndex::Get(const LookupKey& key, uint64_t* offset, Status* s) {
+    bool PartnerIndex::Get(const LookupKey& key, uint32_t* partner_number,  uint64_t* offset, Status* s) {
         Slice memkey = key.memtable_key();
         Index::Iterator iter(&index_);
+        DEBUG_T("memtable key is %s\n", memkey.ToString().c_str());
         iter.Seek(memkey.data());
         
         if(iter.Valid()) {
+            DEBUG_T("find!\n");
 #if defined(USE_OFFSETS)
             const char* entry = reinterpret_cast<const char*>((intptr_t)iter.node_ - 
                                                 (intptr_t)iter.key_offset());
@@ -166,7 +177,9 @@ namespace leveldb {
                 uint64_t tag = DecodeFixed64(key_ptr + key_length - 8);
                 switch (static_cast<ValueType>(tag & 0xff)) {
                 case kTypeValue: {
-                    *offset = DecodeFixed64(key_ptr + key_length);
+                    const char* number_ptr = GetVarint32Ptr(key_ptr + key_length, key_ptr + key_length + 5, partner_number);
+                    *offset = DecodeFixed64(number_ptr);
+                    DEBUG_T("get partner number is:%d, offset, is %d\n", *partner_number, *offset);
                     return true;
                 }
                 case kTypeDeletion:
@@ -175,6 +188,7 @@ namespace leveldb {
                 }
             }
         }
+        DEBUG_T("not find!\n");
         return false;
     }
                 
