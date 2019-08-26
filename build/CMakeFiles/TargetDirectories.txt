@@ -1,7 +1,6 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/install/local.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/install.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/rebuild_cache.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/db_bench.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/env_posix_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/logging_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/hash_test.dir
@@ -19,11 +18,12 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/no_destructor_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/status_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/env_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/partner_index_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/leveldb.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/c_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/issue178_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/leveldbutil.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/db_bench.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/partner_meta_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/write_batch_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/fault_injection_test.dir

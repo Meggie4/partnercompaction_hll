@@ -24,3 +24,29 @@ munmap,start, kSize:4194304, 8
 munmap, end
 after delete arena
 after delete partner index
+before get mapfilename
+after get mapfilename:/mnt/pmemdir/leveldbtest-0/000001.map
+after get arena nvm
+SkipList, start
+NewNode, start
+node AllocateAlignedNVM, start
+get mmap, start, block_bytes:4194304, mmap_size:6291456
+node AllocateAlignedNVM, end
+get offset_mem, start
+get offset_mem, end
+NewNode, end
+ArenaNVM, init alloc_rem, start
+after get partner Meta
+add key is 00000000mykey
+add offset is 1
+after add key
+memtable key is 00000000mykey
+find!
+get partner number is:1, offset, is 1, size:0
+partner_number is 1, offset is 1, block size:0
+to delete partner meta
+before delete arena
+munmap,start, kSize:4194304, 8
+munmap, end
+after delete arena
+after delete partner meta

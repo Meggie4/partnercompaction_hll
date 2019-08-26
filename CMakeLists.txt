@@ -141,8 +141,8 @@ target_sources(leveldb
     ##############meggie
     "${PROJECT_SOURCE_DIR}/db/partner_table.cc"
     "${PROJECT_SOURCE_DIR}/db/partner_table.h"
-    "${PROJECT_SOURCE_DIR}/db/partner_index.cc"
-    "${PROJECT_SOURCE_DIR}/db/partner_index.h"
+    "${PROJECT_SOURCE_DIR}/db/partner_meta.cc"
+    "${PROJECT_SOURCE_DIR}/db/partner_meta.h"
     ##############meggie
     "${PROJECT_SOURCE_DIR}/port/atomic_pointer.h"
     "${PROJECT_SOURCE_DIR}/port/port_stdcxx.h"
@@ -339,7 +339,7 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("${PROJECT_SOURCE_DIR}/db/recovery_test.cc")
     #leveldb_test("${PROJECT_SOURCE_DIR}/db/skiplist_test.cc")
     ##########meggie
-    leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_index_test.cc")
+    leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_meta_test.cc")
     #########meggie 
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_edit_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_set_test.cc")

@@ -112,7 +112,7 @@ unordered_set
 util/debug.h
 ../db/util/debug.h
 
-..//db/partner_index.h
+..//db/partner_meta.h
 db/dbformat.h
 ../db/db/dbformat.h
 db/skiplist.h
@@ -127,8 +127,8 @@ leveldb/slice.h
 ../db/leveldb/slice.h
 string
 -
-db/partner_index.h
-../db/db/partner_index.h
+db/partner_meta.h
+../db/db/partner_meta.h
 
 ..//db/skiplist.h
 assert.h
@@ -812,9 +812,9 @@ unordered_set
 util/debug.h
 /home/meggie/文档/partnercompaction_hll/db/util/debug.h
 
-/home/meggie/文档/partnercompaction_hll/db/partner_index.cc
-db/partner_index.h
-/home/meggie/文档/partnercompaction_hll/db/db/partner_index.h
+/home/meggie/文档/partnercompaction_hll/db/partner_meta.cc
+db/partner_meta.h
+/home/meggie/文档/partnercompaction_hll/db/db/partner_meta.h
 db/dbformat.h
 /home/meggie/文档/partnercompaction_hll/db/db/dbformat.h
 leveldb/comparator.h
@@ -841,8 +841,8 @@ util/debug.h
 /home/meggie/文档/partnercompaction_hll/db/partner_table.cc
 db/partner_table.h
 /home/meggie/文档/partnercompaction_hll/db/db/partner_table.h
-db/partner_index.h
-/home/meggie/文档/partnercompaction_hll/db/db/partner_index.h
+db/partner_meta.h
+/home/meggie/文档/partnercompaction_hll/db/db/partner_meta.h
 leveldb/env.h
 /home/meggie/文档/partnercompaction_hll/db/leveldb/env.h
 db/dbformat.h

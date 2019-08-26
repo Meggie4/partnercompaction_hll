@@ -168,19 +168,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named db_bench
-
-# Build rule for target.
-db_bench: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 db_bench
-.PHONY : db_bench
-
-# fast build rule for target.
-db_bench/fast:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/build
-.PHONY : db_bench/fast
-
-#=============================================================================
 # Target rules for targets named env_posix_test
 
 # Build rule for target.
@@ -363,19 +350,6 @@ env_test/fast:
 .PHONY : env_test/fast
 
 #=============================================================================
-# Target rules for targets named partner_index_test
-
-# Build rule for target.
-partner_index_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 partner_index_test
-.PHONY : partner_index_test
-
-# fast build rule for target.
-partner_index_test/fast:
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/build
-.PHONY : partner_index_test/fast
-
-#=============================================================================
 # Target rules for targets named leveldb
 
 # Build rule for target.
@@ -426,6 +400,32 @@ leveldbutil: cmake_check_build_system
 leveldbutil/fast:
 	$(MAKE) -f CMakeFiles/leveldbutil.dir/build.make CMakeFiles/leveldbutil.dir/build
 .PHONY : leveldbutil/fast
+
+#=============================================================================
+# Target rules for targets named db_bench
+
+# Build rule for target.
+db_bench: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 db_bench
+.PHONY : db_bench
+
+# fast build rule for target.
+db_bench/fast:
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/build
+.PHONY : db_bench/fast
+
+#=============================================================================
+# Target rules for targets named partner_meta_test
+
+# Build rule for target.
+partner_meta_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 partner_meta_test
+.PHONY : partner_meta_test
+
+# fast build rule for target.
+partner_meta_test/fast:
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/build
+.PHONY : partner_meta_test/fast
 
 #=============================================================================
 # Target rules for targets named write_batch_test
@@ -1123,59 +1123,59 @@ db/memtable.cc.s:
 	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/memtable.cc.s
 .PHONY : db/memtable.cc.s
 
-db/partner_index.o: db/partner_index.cc.o
+db/partner_meta.o: db/partner_meta.cc.o
 
-.PHONY : db/partner_index.o
-
-# target to build an object file
-db/partner_index.cc.o:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.o
-.PHONY : db/partner_index.cc.o
-
-db/partner_index.i: db/partner_index.cc.i
-
-.PHONY : db/partner_index.i
-
-# target to preprocess a source file
-db/partner_index.cc.i:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.i
-.PHONY : db/partner_index.cc.i
-
-db/partner_index.s: db/partner_index.cc.s
-
-.PHONY : db/partner_index.s
-
-# target to generate assembly for a file
-db/partner_index.cc.s:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_index.cc.s
-.PHONY : db/partner_index.cc.s
-
-db/partner_index_test.o: db/partner_index_test.cc.o
-
-.PHONY : db/partner_index_test.o
+.PHONY : db/partner_meta.o
 
 # target to build an object file
-db/partner_index_test.cc.o:
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.o
-.PHONY : db/partner_index_test.cc.o
+db/partner_meta.cc.o:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_meta.cc.o
+.PHONY : db/partner_meta.cc.o
 
-db/partner_index_test.i: db/partner_index_test.cc.i
+db/partner_meta.i: db/partner_meta.cc.i
 
-.PHONY : db/partner_index_test.i
+.PHONY : db/partner_meta.i
 
 # target to preprocess a source file
-db/partner_index_test.cc.i:
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.i
-.PHONY : db/partner_index_test.cc.i
+db/partner_meta.cc.i:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_meta.cc.i
+.PHONY : db/partner_meta.cc.i
 
-db/partner_index_test.s: db/partner_index_test.cc.s
+db/partner_meta.s: db/partner_meta.cc.s
 
-.PHONY : db/partner_index_test.s
+.PHONY : db/partner_meta.s
 
 # target to generate assembly for a file
-db/partner_index_test.cc.s:
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/db/partner_index_test.cc.s
-.PHONY : db/partner_index_test.cc.s
+db/partner_meta.cc.s:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_meta.cc.s
+.PHONY : db/partner_meta.cc.s
+
+db/partner_meta_test.o: db/partner_meta_test.cc.o
+
+.PHONY : db/partner_meta_test.o
+
+# target to build an object file
+db/partner_meta_test.cc.o:
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o
+.PHONY : db/partner_meta_test.cc.o
+
+db/partner_meta_test.i: db/partner_meta_test.cc.i
+
+.PHONY : db/partner_meta_test.i
+
+# target to preprocess a source file
+db/partner_meta_test.cc.i:
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.i
+.PHONY : db/partner_meta_test.cc.i
+
+db/partner_meta_test.s: db/partner_meta_test.cc.s
+
+.PHONY : db/partner_meta_test.s
+
+# target to generate assembly for a file
+db/partner_meta_test.cc.s:
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.s
+.PHONY : db/partner_meta_test.cc.s
 
 db/partner_table.o: db/partner_table.cc.o
 
@@ -2668,7 +2668,6 @@ util/testharness.o: util/testharness.cc.o
 
 # target to build an object file
 util/testharness.cc.o:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testharness.cc.o
@@ -2683,9 +2682,10 @@ util/testharness.cc.o:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.o
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.o
@@ -2706,7 +2706,6 @@ util/testharness.i: util/testharness.cc.i
 
 # target to preprocess a source file
 util/testharness.cc.i:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testharness.cc.i
@@ -2721,9 +2720,10 @@ util/testharness.cc.i:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.i
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.i
@@ -2744,7 +2744,6 @@ util/testharness.s: util/testharness.cc.s
 
 # target to generate assembly for a file
 util/testharness.cc.s:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testharness.cc.s
@@ -2759,9 +2758,10 @@ util/testharness.cc.s:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.s
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.s
@@ -2782,7 +2782,6 @@ util/testutil.o: util/testutil.cc.o
 
 # target to build an object file
 util/testutil.cc.o:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testutil.cc.o
@@ -2797,9 +2796,10 @@ util/testutil.cc.o:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.o
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.o
@@ -2820,7 +2820,6 @@ util/testutil.i: util/testutil.cc.i
 
 # target to preprocess a source file
 util/testutil.cc.i:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testutil.cc.i
@@ -2835,9 +2834,10 @@ util/testutil.cc.i:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.i
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.i
@@ -2858,7 +2858,6 @@ util/testutil.s: util/testutil.cc.s
 
 # target to generate assembly for a file
 util/testutil.cc.s:
-	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/env_posix_test.dir/build.make CMakeFiles/env_posix_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/logging_test.dir/build.make CMakeFiles/logging_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/hash_test.dir/build.make CMakeFiles/hash_test.dir/util/testutil.cc.s
@@ -2873,9 +2872,10 @@ util/testutil.cc.s:
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.s
-	$(MAKE) -f CMakeFiles/partner_index_test.dir/build.make CMakeFiles/partner_index_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/issue178_test.dir/build.make CMakeFiles/issue178_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.s
@@ -2899,7 +2899,6 @@ help:
 	@echo "... install/local"
 	@echo "... install"
 	@echo "... rebuild_cache"
-	@echo "... db_bench"
 	@echo "... env_posix_test"
 	@echo "... logging_test"
 	@echo "... hash_test"
@@ -2917,11 +2916,12 @@ help:
 	@echo "... no_destructor_test"
 	@echo "... status_test"
 	@echo "... env_test"
-	@echo "... partner_index_test"
 	@echo "... leveldb"
 	@echo "... c_test"
 	@echo "... issue178_test"
 	@echo "... leveldbutil"
+	@echo "... db_bench"
+	@echo "... partner_meta_test"
 	@echo "... test"
 	@echo "... write_batch_test"
 	@echo "... fault_injection_test"
@@ -2995,12 +2995,12 @@ help:
 	@echo "... db/memtable.o"
 	@echo "... db/memtable.i"
 	@echo "... db/memtable.s"
-	@echo "... db/partner_index.o"
-	@echo "... db/partner_index.i"
-	@echo "... db/partner_index.s"
-	@echo "... db/partner_index_test.o"
-	@echo "... db/partner_index_test.i"
-	@echo "... db/partner_index_test.s"
+	@echo "... db/partner_meta.o"
+	@echo "... db/partner_meta.i"
+	@echo "... db/partner_meta.s"
+	@echo "... db/partner_meta_test.o"
+	@echo "... db/partner_meta_test.i"
+	@echo "... db/partner_meta_test.s"
 	@echo "... db/partner_table.o"
 	@echo "... db/partner_table.i"
 	@echo "... db/partner_table.s"

@@ -58,7 +58,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/db_bench.dir/DependInfo.cmake"
   "CMakeFiles/env_posix_test.dir/DependInfo.cmake"
   "CMakeFiles/logging_test.dir/DependInfo.cmake"
   "CMakeFiles/hash_test.dir/DependInfo.cmake"
@@ -73,11 +72,12 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/no_destructor_test.dir/DependInfo.cmake"
   "CMakeFiles/status_test.dir/DependInfo.cmake"
   "CMakeFiles/env_test.dir/DependInfo.cmake"
-  "CMakeFiles/partner_index_test.dir/DependInfo.cmake"
   "CMakeFiles/leveldb.dir/DependInfo.cmake"
   "CMakeFiles/c_test.dir/DependInfo.cmake"
   "CMakeFiles/issue178_test.dir/DependInfo.cmake"
   "CMakeFiles/leveldbutil.dir/DependInfo.cmake"
+  "CMakeFiles/db_bench.dir/DependInfo.cmake"
+  "CMakeFiles/partner_meta_test.dir/DependInfo.cmake"
   "CMakeFiles/write_batch_test.dir/DependInfo.cmake"
   "CMakeFiles/fault_injection_test.dir/DependInfo.cmake"
   "CMakeFiles/filename_test.dir/DependInfo.cmake"
