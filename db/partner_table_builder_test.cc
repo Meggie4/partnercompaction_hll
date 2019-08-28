@@ -31,7 +31,7 @@ namespace leveldb {
         //假设partners的公共前缀为abc， 当添加abcd时，选择一个新的partner, 添加abcf选择另外一个新的partner
         //也就是大于这个partners的为公共前缀
         const std::string& common_prefix = "abc";
-        PartnerTableBuilder* pbuilder = new PartnerTableBuilder(dbname, common_prefix, pm);
+        PartnerTableBuilder* pbuilder = new PartnerTableBuilder(common_prefix, pm);
         //然后传入新的builder, 比如文件0001, 对应前缀为abcd, 那为这个前缀的partner，都加入到这个partner
         std::string prefix = "abcd";
         std::string fname = TableFileName(dbname, 1);
@@ -56,6 +56,7 @@ namespace leveldb {
         DEBUG_T("there is old builder\n");
         pbuilder->Add(mybuilder, lkey.internal_key(), value);
         pbuilder->Finish();
+        delete pbuilder;
     }
 }
 

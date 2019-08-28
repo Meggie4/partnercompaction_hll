@@ -9,6 +9,7 @@
 #include "table/block.h"
 #include "util/coding.h"
 #include "util/crc32c.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -75,6 +76,7 @@ Status ReadBlock(RandomAccessFile* file,
   size_t n = static_cast<size_t>(handle.size());
   char* buf = new char[n + kBlockTrailerSize];
   Slice contents;
+  DEBUG_T("read block， block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
   Status s = file->Read(handle.offset(), n + kBlockTrailerSize, &contents, buf);
   if (!s.ok()) {
     delete[] buf;

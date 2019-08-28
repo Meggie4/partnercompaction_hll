@@ -294,6 +294,7 @@ bool TableBuilder::PartnerAdd(const Slice& key, const Slice& value, uint64_t* bl
   //写data block
   r->last_key.assign(key.data(), key.size());
   r->num_entries++;
+  DEBUG_H_("to add kv to data block\n");
   r->data_block.Add(key, value);
 
   const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();

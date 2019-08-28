@@ -347,6 +347,34 @@ CMakeFiles/leveldb.dir/db/repair.cc.o: ../include/leveldb/write_batch.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/repair.cc
 CMakeFiles/leveldb.dir/db/repair.cc.o: include/port/port_config.h
 
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/dbformat.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/filename.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/partner_meta.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/single_partner_table.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/skiplist.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../port/cache_flush.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../port/port.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../port/port_stdcxx.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../port/thread_annotations.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../util/arena.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../util/coding.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../util/debug.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../util/logging.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../util/random.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/comparator.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/db.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/env.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/export.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/filter_policy.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/iterator.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/options.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/slice.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/status.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../include/leveldb/table_builder.h
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: ../db/single_partner_table.cc
+CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: include/port/port_config.h
+
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/dbformat.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/filename.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/table_cache.h
@@ -529,6 +557,7 @@ CMakeFiles/leveldb.dir/table/format.cc.o: ../table/block.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../table/format.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../util/coding.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../util/crc32c.h
+CMakeFiles/leveldb.dir/table/format.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../include/leveldb/env.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../include/leveldb/export.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../include/leveldb/iterator.h
@@ -575,6 +604,7 @@ CMakeFiles/leveldb.dir/table/table.cc.o: ../table/filter_block.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../table/format.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../table/two_level_iterator.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../util/coding.h
+CMakeFiles/leveldb.dir/table/table.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../util/hash.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../include/leveldb/cache.h
 CMakeFiles/leveldb.dir/table/table.cc.o: ../include/leveldb/comparator.h

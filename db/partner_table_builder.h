@@ -15,9 +15,10 @@ namespace leveldb {
     class TableBuilder;
     class PartnerTableBuilder{
         public:
-            PartnerTableBuilder(const std::string& dbname, const std::string& common_prefix, PartnerMeta* meta);
+            PartnerTableBuilder(const std::string& common_prefix, PartnerMeta* meta);
             PartnerTableBuilder(const PartnerTableBuilder&) = delete;
             void operator=(const PartnerTableBuilder&) = delete;
+            //~PartnerTableBuilder();
             
             void Add(TableBuilder* builder, const Slice& key, const Slice& value);
             //bool Get(const LookupKey& lkey,  std::string* value, Status* s);
@@ -38,7 +39,6 @@ namespace leveldb {
             //prefix对应的table builder
             std::map<std::string, TableBuilder*> builders_;
             //key对应的block offset
-            const std::string dbname_;
             std::map<TableBuilder*, info> curr_info_;
     };
 }

@@ -467,6 +467,45 @@ write_batch_test/fast:
 .PHONY : write_batch_test/fast
 
 #=============================================================================
+# Target rules for targets named memenv_test
+
+# Build rule for target.
+memenv_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 memenv_test
+.PHONY : memenv_test
+
+# fast build rule for target.
+memenv_test/fast:
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/build
+.PHONY : memenv_test/fast
+
+#=============================================================================
+# Target rules for targets named dbformat_test
+
+# Build rule for target.
+dbformat_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dbformat_test
+.PHONY : dbformat_test
+
+# fast build rule for target.
+dbformat_test/fast:
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/build
+.PHONY : dbformat_test/fast
+
+#=============================================================================
+# Target rules for targets named single_partner_table_test
+
+# Build rule for target.
+single_partner_table_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 single_partner_table_test
+.PHONY : single_partner_table_test
+
+# fast build rule for target.
+single_partner_table_test/fast:
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/build
+.PHONY : single_partner_table_test/fast
+
+#=============================================================================
 # Target rules for targets named fault_injection_test
 
 # Build rule for target.
@@ -491,32 +530,6 @@ filename_test: cmake_check_build_system
 filename_test/fast:
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/build
 .PHONY : filename_test/fast
-
-#=============================================================================
-# Target rules for targets named dbformat_test
-
-# Build rule for target.
-dbformat_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 dbformat_test
-.PHONY : dbformat_test
-
-# fast build rule for target.
-dbformat_test/fast:
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/build
-.PHONY : dbformat_test/fast
-
-#=============================================================================
-# Target rules for targets named memenv_test
-
-# Build rule for target.
-memenv_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 memenv_test
-.PHONY : memenv_test
-
-# fast build rule for target.
-memenv_test/fast:
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/build
-.PHONY : memenv_test/fast
 
 #=============================================================================
 # Target rules for targets named table_test
@@ -1297,6 +1310,60 @@ db/repair.s: db/repair.cc.s
 db/repair.cc.s:
 	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/repair.cc.s
 .PHONY : db/repair.cc.s
+
+db/single_partner_table.o: db/single_partner_table.cc.o
+
+.PHONY : db/single_partner_table.o
+
+# target to build an object file
+db/single_partner_table.cc.o:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/single_partner_table.cc.o
+.PHONY : db/single_partner_table.cc.o
+
+db/single_partner_table.i: db/single_partner_table.cc.i
+
+.PHONY : db/single_partner_table.i
+
+# target to preprocess a source file
+db/single_partner_table.cc.i:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/single_partner_table.cc.i
+.PHONY : db/single_partner_table.cc.i
+
+db/single_partner_table.s: db/single_partner_table.cc.s
+
+.PHONY : db/single_partner_table.s
+
+# target to generate assembly for a file
+db/single_partner_table.cc.s:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/single_partner_table.cc.s
+.PHONY : db/single_partner_table.cc.s
+
+db/single_partner_table_test.o: db/single_partner_table_test.cc.o
+
+.PHONY : db/single_partner_table_test.o
+
+# target to build an object file
+db/single_partner_table_test.cc.o:
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/db/single_partner_table_test.cc.o
+.PHONY : db/single_partner_table_test.cc.o
+
+db/single_partner_table_test.i: db/single_partner_table_test.cc.i
+
+.PHONY : db/single_partner_table_test.i
+
+# target to preprocess a source file
+db/single_partner_table_test.cc.i:
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/db/single_partner_table_test.cc.i
+.PHONY : db/single_partner_table_test.cc.i
+
+db/single_partner_table_test.s: db/single_partner_table_test.cc.s
+
+.PHONY : db/single_partner_table_test.s
+
+# target to generate assembly for a file
+db/single_partner_table_test.cc.s:
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/db/single_partner_table_test.cc.s
+.PHONY : db/single_partner_table_test.cc.s
 
 db/table_cache.o: db/table_cache.cc.o
 
@@ -2729,10 +2796,11 @@ util/testharness.cc.o:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.o
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.o
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.o
@@ -2768,10 +2836,11 @@ util/testharness.cc.i:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.i
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.i
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.i
@@ -2807,10 +2876,11 @@ util/testharness.cc.s:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testharness.cc.s
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testharness.cc.s
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.s
@@ -2846,10 +2916,11 @@ util/testutil.cc.o:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.o
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.o
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.o
@@ -2885,10 +2956,11 @@ util/testutil.cc.i:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.i
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.i
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.i
@@ -2924,10 +2996,11 @@ util/testutil.cc.s:
 	$(MAKE) -f CMakeFiles/db_bench.dir/build.make CMakeFiles/db_bench.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/write_batch_test.dir/build.make CMakeFiles/write_batch_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/single_partner_table_test.dir/build.make CMakeFiles/single_partner_table_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/fault_injection_test.dir/build.make CMakeFiles/fault_injection_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/filename_test.dir/build.make CMakeFiles/filename_test.dir/util/testutil.cc.s
-	$(MAKE) -f CMakeFiles/dbformat_test.dir/build.make CMakeFiles/dbformat_test.dir/util/testutil.cc.s
-	$(MAKE) -f CMakeFiles/memenv_test.dir/build.make CMakeFiles/memenv_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/table_test.dir/build.make CMakeFiles/table_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.s
@@ -2972,10 +3045,11 @@ help:
 	@echo "... partner_meta_test"
 	@echo "... test"
 	@echo "... write_batch_test"
+	@echo "... memenv_test"
+	@echo "... dbformat_test"
+	@echo "... single_partner_table_test"
 	@echo "... fault_injection_test"
 	@echo "... filename_test"
-	@echo "... dbformat_test"
-	@echo "... memenv_test"
 	@echo "... table_test"
 	@echo "... log_test"
 	@echo "... recovery_test"
@@ -3060,6 +3134,12 @@ help:
 	@echo "... db/repair.o"
 	@echo "... db/repair.i"
 	@echo "... db/repair.s"
+	@echo "... db/single_partner_table.o"
+	@echo "... db/single_partner_table.i"
+	@echo "... db/single_partner_table.s"
+	@echo "... db/single_partner_table_test.o"
+	@echo "... db/single_partner_table_test.i"
+	@echo "... db/single_partner_table_test.s"
 	@echo "... db/table_cache.o"
 	@echo "... db/table_cache.i"
 	@echo "... db/table_cache.s"

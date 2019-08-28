@@ -41,6 +41,12 @@ class LEVELDB_EXPORT Table {
                      uint64_t file_size,
                      Table** table);
 
+  ////////////////meggie
+  static Status OpenPartnerTable(const Options& options,
+                     RandomAccessFile* file,
+                     Table** table);
+  ////////////////meggie
+
   Table(const Table&) = delete;
   void operator=(const Table&) = delete;
 
@@ -74,7 +80,13 @@ class LEVELDB_EXPORT Table {
       const ReadOptions&, const Slice& key,
       void* arg,
       void (*handle_result)(void* arg, const Slice& k, const Slice& v));
-
+  //////////////meggie
+  Status InternalGet(const ReadOptions& options, const Slice& k,
+                          void* arg,
+                          void (*saver)(void*, const Slice&, const Slice&), 
+                          uint64_t block_offset, 
+                          uint64_t block_size);
+  //////////////meggie
 
   void ReadMeta(const Footer& footer);
   void ReadFilter(const Slice& filter_handle_value);

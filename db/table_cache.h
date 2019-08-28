@@ -44,6 +44,16 @@ class TableCache {
              void* arg,
              void (*handle_result)(void*, const Slice&, const Slice&));
 
+  ///////////////meggie
+  Status Get(const ReadOptions& options,
+                       uint64_t file_number,                
+                       const Slice& k,
+                       void* arg,
+                       void (*saver)(void*, const Slice&, const Slice&), 
+                       uint64_t block_offset, 
+                       uint64_t block_size);
+  //////////////meggie
+
   // Evict any entry for the specified file number
   void Evict(uint64_t file_number);
 
@@ -53,7 +63,7 @@ class TableCache {
   const Options& options_;
   Cache* cache_;
 
-  Status FindTable(uint64_t file_number, uint64_t file_size, Cache::Handle**);
+  Status FindTable(uint64_t file_number, uint64_t file_size, Cache::Handle**, bool isPartnerTable = false);
 };
 
 }  // namespace leveldb

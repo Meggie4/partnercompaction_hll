@@ -43,7 +43,7 @@ TableCache::~TableCache() {
 }
 
 Status TableCache::FindTable(uint64_t file_number, uint64_t file_size,
-                             Cache::Handle** handle) {
+                             Cache::Handle** handle, bool isPartnerTable) {
   Status s;
   char buf[sizeof(file_number)];
   EncodeFixed64(buf, file_number);
@@ -61,7 +61,13 @@ Status TableCache::FindTable(uint64_t file_number, uint64_t file_size,
       }
     }
     if (s.ok()) {
-      s = Table::Open(options_, file, file_size, &table);
+      //////////////meggie
+      if(isPartnerTable) {
+        s = Table::OpenPartnerTable(options_, file, &table);
+      } else {
+        s = Table::Open(options_, file, file_size, &table);
+      }
+      //////////////meggie
     }
 
     if (!s.ok()) {
@@ -117,6 +123,25 @@ Status TableCache::Get(const ReadOptions& options,
   }
   return s;
 }
+
+//////////////meggie
+Status TableCache::Get(const ReadOptions& options,
+                       uint64_t file_number,
+                       const Slice& k,
+                       void* arg,
+                       void (*saver)(void*, const Slice&, const Slice&), 
+                       uint64_t block_offset, 
+                       uint64_t block_size) {
+  Cache::Handle* handle = nullptr;
+  Status s = FindTable(file_number, 0, &handle, true);
+  if (s.ok()) {
+    Table* t = reinterpret_cast<TableAndFile*>(cache_->Value(handle))->table;
+    s = t->InternalGet(options, k, arg, saver, block_offset, block_size);
+    cache_->Release(handle);
+  }
+  return s;
+}
+/////////////meggie
 
 void TableCache::Evict(uint64_t file_number) {
   char buf[sizeof(file_number)];

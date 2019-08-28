@@ -1313,7 +1313,7 @@ class Benchmark {
       std::string fname = "/mnt/workloads/uniform/read_3G.txt"; 
       CustomedWorkloadRead(thread, fname);
   }
-  ////uniform
+  ////zipfian
   //////////load 
   void Loadzipfian100_5000k(ThreadState* thread){
       std::string fname = "/mnt/workloads/zipfian/load_500M.txt"; 

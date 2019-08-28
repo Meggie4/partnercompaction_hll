@@ -12,9 +12,8 @@
 */
 
 namespace leveldb {
-    PartnerTableBuilder::PartnerTableBuilder(const std::string& dbname, const std::string& common_prefix, PartnerMeta* meta)
+    PartnerTableBuilder::PartnerTableBuilder(const std::string& common_prefix, PartnerMeta* meta)
     : meta_(meta),
-      dbname_(dbname),
       common_prefix_(common_prefix){
     }
 
@@ -48,6 +47,8 @@ namespace leveldb {
         curr_info_[builder].queue_.clear();
     }
 
+    //针对没有办法获得公共前缀的，那就直接只有一个partner，针对这个partner拥有一个nvm skiplist索引
+    //先观察一下sstable的范围
     std::string PartnerTableBuilder::GetPrefix(const Slice& key) {
         std::string skey = key.ToString();
         size_t len = common_prefix_.size();
@@ -58,6 +59,7 @@ namespace leveldb {
         }
     }
 
+    //需要
     TableBuilder* PartnerTableBuilder::GetTableBuilder(const std::string& prefix) {
         DEBUG_T("prefix is %s\n", prefix.c_str());
         auto iter = builders_.find(prefix);

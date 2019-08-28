@@ -28,10 +28,11 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/partner_meta_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/write_batch_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/memenv_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/dbformat_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/single_partner_table_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/fault_injection_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/filename_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/dbformat_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/memenv_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/table_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/log_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/recovery_test.dir

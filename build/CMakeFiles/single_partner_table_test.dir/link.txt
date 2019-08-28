@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/single_partner_table_test.dir/util/testharness.cc.o CMakeFiles/single_partner_table_test.dir/util/testutil.cc.o CMakeFiles/single_partner_table_test.dir/db/single_partner_table_test.cc.o  -o single_partner_table_test libleveldb.a -lpthread 

@@ -141,6 +141,8 @@ target_sources(leveldb
     ##############meggie
     "${PROJECT_SOURCE_DIR}/db/partner_table_builder.cc"
     "${PROJECT_SOURCE_DIR}/db/partner_table_builder.h"
+    "${PROJECT_SOURCE_DIR}/db/single_partner_table.cc"
+    "${PROJECT_SOURCE_DIR}/db/single_partner_table.h"
     "${PROJECT_SOURCE_DIR}/db/partner_meta.cc"
     "${PROJECT_SOURCE_DIR}/db/partner_meta.h"
     ##############meggie
@@ -341,6 +343,7 @@ if(LEVELDB_BUILD_TESTS)
     ##########meggie
     leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_meta_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_table_builder_test.cc")
+    leveldb_test("${PROJECT_SOURCE_DIR}/db/single_partner_table_test.cc")
     #########meggie 
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_edit_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_set_test.cc")

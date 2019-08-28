@@ -9,9 +9,22 @@ get offset_mem, start
 get offset_mem, end
 NewNode, end
 ArenaNVM, init alloc_rem, start
-prefix is abcd
-there is old builder
 data block offset is:0
-to finish table builder
 add key is abcdmykey
 add offset is 0, add block size is:42
+finish add single partner table
+memtable key is abcdmykey
+find!
+offset, is 0, size:42
+offset is 0, block size:42
+internal get, block offset is:0, block_size is 42
+handle decode success
+read block， block offset is:0, block_size is 42
+block iter is valid
+get value this is my key
+to delete partner meta
+before delete arena
+munmap,start, kSize:4194304, 8
+munmap, end
+after delete arena
+after delete partner meta

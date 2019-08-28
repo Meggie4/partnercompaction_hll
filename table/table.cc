@@ -14,6 +14,7 @@
 #include "table/format.h"
 #include "table/two_level_iterator.h"
 #include "util/coding.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -171,6 +172,7 @@ Iterator* Table::BlockReader(void* arg,
   // can add more features in the future.
 
   if (s.ok()) {
+    DEBUG_T("handle decode success\n");
     BlockContents contents;
     if (block_cache != nullptr) {
       char cache_key_buffer[16];
@@ -197,7 +199,10 @@ Iterator* Table::BlockReader(void* arg,
         block = new Block(contents);
       }
     }
+  } else {
+    DEBUG_T("handle decode failed\n");
   }
+
 
   Iterator* iter;
   if (block != nullptr) {
@@ -239,7 +244,7 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
       block_iter->Seek(k);
       if (block_iter->Valid()) {
         (*saver)(arg, block_iter->key(), block_iter->value());
-      }
+      } 
       s = block_iter->status();
       delete block_iter;
     }
@@ -264,6 +269,45 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
   （2）可以获取需要的data block
   （3）得到data block后，根据在data block中的偏移量， 获取相应的数据
 */
+Status Table::InternalGet(const ReadOptions& options, const Slice& k,
+                          void* arg,
+                          void (*saver)(void*, const Slice&, const Slice&), 
+                          uint64_t block_offset, 
+                          uint64_t block_size) {
+ //获取data block的迭代器
+      std::string dst;
+      PutVarint64(&dst, block_offset);
+      PutVarint64(&dst, block_size);
+      DEBUG_T("internal get, block offset is:%llu, block_size is %llu\n", block_offset, block_size);
+      Iterator* block_iter = BlockReader(this, options, Slice(dst));
+      block_iter->Seek(k);
+      if (block_iter->Valid()) {
+        DEBUG_T("block iter is valid\n");
+        (*saver)(arg, block_iter->key(), block_iter->value());
+      } else {
+        DEBUG_T("block iter is not valid\n");
+      }
+      Status s = block_iter->status();
+      delete block_iter;
+      return s;
+}
+
+Status Table::OpenPartnerTable(const Options& options,
+                   RandomAccessFile* file,
+                   Table** table) {
+ *table = nullptr;
+
+  Rep* rep = new Table::Rep;
+  rep->options = options;
+  rep->file = file;
+  rep->index_block = nullptr;
+  rep->cache_id = (options.block_cache ? options.block_cache->NewId() : 0);
+  rep->filter_data = nullptr;
+  rep->filter = nullptr;
+  *table = new Table(rep);
+
+  return Status::OK();
+}
 ///////////////meggie
 
 uint64_t Table::ApproximateOffsetOf(const Slice& key) const {
