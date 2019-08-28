@@ -16,6 +16,8 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/install/strip.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/db_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/no_destructor_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/filter_block_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/corruption_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/status_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/env_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/leveldb.dir
@@ -34,6 +36,5 @@
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/log_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/recovery_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/version_set_test.dir
+/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/partner_table_builder_test.dir
 /home/meggie/文档/partnercompaction_hll/build/CMakeFiles/version_edit_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/corruption_test.dir
-/home/meggie/文档/partnercompaction_hll/build/CMakeFiles/filter_block_test.dir

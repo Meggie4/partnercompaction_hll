@@ -107,6 +107,7 @@ void TableBuilder::Add(const Slice& key, const Slice& value) {
     assert(r->options.comparator->Compare(key, Slice(r->last_key)) > 0);
   }
 
+  //写index block
   if (r->pending_index_entry) {
     assert(r->data_block.empty());
     r->options.comparator->FindShortestSeparator(&r->last_key, key);
@@ -116,10 +117,12 @@ void TableBuilder::Add(const Slice& key, const Slice& value) {
     r->pending_index_entry = false;
   }
 
+  //写filter block
   if (r->filter_block != nullptr) {
     r->filter_block->AddKey(key);
   }
 
+  //写data block
   r->last_key.assign(key.data(), key.size());
   r->num_entries++;
   r->data_block.Add(key, value);
@@ -128,6 +131,8 @@ void TableBuilder::Add(const Slice& key, const Slice& value) {
   if (estimated_block_size >= r->options.block_size) {
     Flush();
   }
+  //flush之后可以通过r->pending_handle得到data offset以及data size
+  //其中offset为r->offset
 }
 
 void TableBuilder::Flush() {
@@ -263,17 +268,6 @@ Status TableBuilder::Finish() {
   return r->status;
 }
 
-//////////////meggie
-//针对partner table, 不需要写filter_block, metaindex_block, index_block以及footer,
-//可通过nvm索引直接获取
-Status TableBuilder::PartnerFinish() {
-  Rep* r = rep_;
-  Flush();
-  assert(!r->closed);
-  r->closed = true;
-}
-//////////////meggie
-
 void TableBuilder::Abandon() {
   Rep* r = rep_;
   assert(!r->closed);
@@ -288,4 +282,39 @@ uint64_t TableBuilder::FileSize() const {
   return rep_->offset;
 }
 
+//////////////meggie
+//针对partner table, 不需要写filter_block, metaindex_block, index_block以及footer,
+bool TableBuilder::PartnerAdd(const Slice& key, const Slice& value, uint64_t* block_offset, uint64_t* block_size) {
+  Rep* r = rep_;
+  assert(!r->closed);
+  if (!ok()) return false;
+  if (r->num_entries > 0) {
+    assert(r->options.comparator->Compare(key, Slice(r->last_key)) > 0);
+  }
+  //写data block
+  r->last_key.assign(key.data(), key.size());
+  r->num_entries++;
+  r->data_block.Add(key, value);
+
+  const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
+  if (estimated_block_size >= r->options.block_size) {
+    Flush();
+    *block_size = r->pending_handle.size();
+    *block_offset = r->pending_handle.offset();
+  }
+  //flush之后可以通过r->pending_handle得到data offset以及data size
+  //其中offset为r->offset
+  *block_offset = r->offset;
+  return true;
+}
+//可通过nvm索引直接获取
+Status TableBuilder::PartnerFinish(uint64_t* block_size) {
+  Rep* r = rep_;
+  Flush();
+  *block_size = r->pending_handle.size();
+  assert(!r->closed);
+  r->closed = true;
+  return Status::OK();
+}
+//////////////meggie
 }  // namespace leveldb

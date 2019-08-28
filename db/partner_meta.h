@@ -32,8 +32,8 @@ namespace leveldb {
                 } 
             }
             
-            void Add(const Slice& key, uint32_t partner_index, uint64_t block_offset_, uint64_t block_size);
-            bool Get(const LookupKey& key, uint32_t* partner_index, uint64_t* block_offset, uint32_t* block_size, Status* s);
+            void Add(const Slice& key, uint64_t block_offset_, uint64_t block_size);
+            bool Get(const LookupKey& key, uint64_t* block_offset, uint64_t* block_size, Status* s);
             size_t ApproximateMemoryUsage();
             Iterator* NewIterator();
            

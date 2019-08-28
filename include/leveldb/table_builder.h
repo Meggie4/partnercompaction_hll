@@ -66,10 +66,6 @@ class LEVELDB_EXPORT TableBuilder {
   // REQUIRES: Finish(), Abandon() have not been called
   Status Finish();
 
-  //////////////meggie
-  Status PartnerFinish();
-  //////////////meggie
-
   // Indicate that the contents of this builder should be abandoned.  Stops
   // using the file passed to the constructor after this function returns.
   // If the caller is not going to call Finish(), it must call Abandon()
@@ -83,6 +79,11 @@ class LEVELDB_EXPORT TableBuilder {
   // Size of the file generated so far.  If invoked after a successful
   // Finish() call, returns the size of the final generated file.
   uint64_t FileSize() const;
+
+  //////////////meggie
+  bool PartnerAdd(const Slice& key, const Slice& value, uint64_t* block_offset, uint64_t* block_size);
+  Status PartnerFinish(uint64_t* block_size);
+  //////////////meggie
 
  private:
   bool ok() const { return status().ok(); }

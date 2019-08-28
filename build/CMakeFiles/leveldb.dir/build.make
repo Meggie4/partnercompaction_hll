@@ -417,28 +417,28 @@ CMakeFiles/leveldb.dir/db/write_batch.cc.o.provides: CMakeFiles/leveldb.dir/db/w
 CMakeFiles/leveldb.dir/db/write_batch.cc.o.provides.build: CMakeFiles/leveldb.dir/db/write_batch.cc.o
 
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.o: CMakeFiles/leveldb.dir/flags.make
-CMakeFiles/leveldb.dir/db/partner_table.cc.o: ../db/partner_table.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/meggie/文档/partnercompaction_hll/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/leveldb.dir/db/partner_table.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/leveldb.dir/db/partner_table.cc.o -c /home/meggie/文档/partnercompaction_hll/db/partner_table.cc
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: CMakeFiles/leveldb.dir/flags.make
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/partner_table_builder.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/meggie/文档/partnercompaction_hll/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o -c /home/meggie/文档/partnercompaction_hll/db/partner_table_builder.cc
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/leveldb.dir/db/partner_table.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/meggie/文档/partnercompaction_hll/db/partner_table.cc > CMakeFiles/leveldb.dir/db/partner_table.cc.i
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/leveldb.dir/db/partner_table_builder.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/meggie/文档/partnercompaction_hll/db/partner_table_builder.cc > CMakeFiles/leveldb.dir/db/partner_table_builder.cc.i
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/leveldb.dir/db/partner_table.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/meggie/文档/partnercompaction_hll/db/partner_table.cc -o CMakeFiles/leveldb.dir/db/partner_table.cc.s
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/leveldb.dir/db/partner_table_builder.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/meggie/文档/partnercompaction_hll/db/partner_table_builder.cc -o CMakeFiles/leveldb.dir/db/partner_table_builder.cc.s
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.o.requires:
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.requires:
 
-.PHONY : CMakeFiles/leveldb.dir/db/partner_table.cc.o.requires
+.PHONY : CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.requires
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.o.provides: CMakeFiles/leveldb.dir/db/partner_table.cc.o.requires
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.o.provides.build
-.PHONY : CMakeFiles/leveldb.dir/db/partner_table.cc.o.provides
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.provides: CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.requires
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.provides.build
+.PHONY : CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.provides
 
-CMakeFiles/leveldb.dir/db/partner_table.cc.o.provides.build: CMakeFiles/leveldb.dir/db/partner_table.cc.o
+CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.provides.build: CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o
 
 
 CMakeFiles/leveldb.dir/db/partner_meta.cc.o: CMakeFiles/leveldb.dir/flags.make
@@ -1154,7 +1154,7 @@ leveldb_OBJECTS = \
 "CMakeFiles/leveldb.dir/db/version_edit.cc.o" \
 "CMakeFiles/leveldb.dir/db/version_set.cc.o" \
 "CMakeFiles/leveldb.dir/db/write_batch.cc.o" \
-"CMakeFiles/leveldb.dir/db/partner_table.cc.o" \
+"CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o" \
 "CMakeFiles/leveldb.dir/db/partner_meta.cc.o" \
 "CMakeFiles/leveldb.dir/table/block_builder.cc.o" \
 "CMakeFiles/leveldb.dir/table/block.cc.o" \
@@ -1203,7 +1203,7 @@ libleveldb.a: CMakeFiles/leveldb.dir/db/table_cache.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/db/version_edit.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/db/version_set.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/db/write_batch.cc.o
-libleveldb.a: CMakeFiles/leveldb.dir/db/partner_table.cc.o
+libleveldb.a: CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/db/partner_meta.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/table/block_builder.cc.o
 libleveldb.a: CMakeFiles/leveldb.dir/table/block.cc.o
@@ -1259,7 +1259,7 @@ CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/table_cache.cc.o.requ
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/version_edit.cc.o.requires
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/version_set.cc.o.requires
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/write_batch.cc.o.requires
-CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/partner_table.cc.o.requires
+CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o.requires
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/db/partner_meta.cc.o.requires
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/table/block_builder.cc.o.requires
 CMakeFiles/leveldb.dir/requires: CMakeFiles/leveldb.dir/table/block.cc.o.requires

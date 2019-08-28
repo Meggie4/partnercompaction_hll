@@ -125,10 +125,10 @@ namespace leveldb {
     }
 
     //这里的partner number指的是0~9中， 以及data的offset以及data block的大小
-    void PartnerMeta::Add(const Slice& key, uint32_t partner_index, uint64_t block_offset, uint64_t block_size) {
-       ///存储的形式是：key_size + key + partner_index(varint 32) + block_offset(64) + block_size(64)
+    void PartnerMeta::Add(const Slice& key, uint64_t block_offset, uint64_t block_size) {
+       ///存储的形式是：key_size + key + block_offset(64) + block_size(64)
        size_t key_size = key.size();
-       const size_t encoded_len = VarintLength(key_size) + key_size + VarintLength(partner_index) + 8 + 4;
+       const size_t encoded_len = VarintLength(key_size) + key_size + 8 + 8;
        char* buf = nullptr;
        
        buf = ((ArenaNVM*)arena_)->AllocateAlignedNVM(encoded_len);
@@ -145,18 +145,17 @@ namespace leveldb {
         
        p += key_size;
        
-       p = EncodeVarint32(p, partner_index);
-       DEBUG_T("add offset is %d\n", block_offset);
+       DEBUG_T("add offset is %llu, add block size is:%llu\n", block_offset, block_size);
        EncodeFixed64(p, block_offset);
        p += 8;
-       EncodeFixed32(p, block_size);
-       p += 4;
+       EncodeFixed64(p, block_size);
+       p += 8;
        assert(p - buf == encoded_len);
 
        meta_.Insert(buf);
     }
 
-    bool PartnerMeta::Get(const LookupKey& key, uint32_t* partner_index,  uint64_t* block_offset, uint32_t* block_size, Status* s) {
+    bool PartnerMeta::Get(const LookupKey& key, uint64_t* block_offset, uint64_t* block_size, Status* s) {
         Slice memkey = key.memtable_key();
         Meta::Iterator iter(&meta_);
         DEBUG_T("memtable key is %s\n", memkey.ToString().c_str());
@@ -178,10 +177,9 @@ namespace leveldb {
                 uint64_t tag = DecodeFixed64(key_ptr + key_length - 8);
                 switch (static_cast<ValueType>(tag & 0xff)) {
                 case kTypeValue: {
-                    const char* number_ptr = GetVarint32Ptr(key_ptr + key_length, key_ptr + key_length + 5, partner_index);
-                    *block_offset = DecodeFixed64(number_ptr);
-                    *block_size = DecodeFixed64(number_ptr + 8); 
-                    DEBUG_T("get partner number is:%d, offset, is %d, size:%llu\n", *partner_index, *block_offset, *block_size);
+                    *block_offset = DecodeFixed64(key_ptr + key_length);
+                    *block_size = DecodeFixed64(key_ptr + key_length + 8); 
+                    DEBUG_T("offset, is %d, size:%llu\n", *block_offset, *block_size);
                     return true;
                 }
                 case kTypeDeletion:

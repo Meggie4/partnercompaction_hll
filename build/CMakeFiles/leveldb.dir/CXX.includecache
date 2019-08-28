@@ -120,11 +120,13 @@ db/skiplist.h
 util/arena.h
 ../db/util/arena.h
 
-..//db/partner_table.h
+..//db/partner_table_builder.h
 cstdio
 -
 leveldb/slice.h
 ../db/leveldb/slice.h
+map
+-
 string
 -
 db/partner_meta.h
@@ -838,15 +840,19 @@ string
 util/debug.h
 /home/meggie/文档/partnercompaction_hll/db/util/debug.h
 
-/home/meggie/文档/partnercompaction_hll/db/partner_table.cc
-db/partner_table.h
-/home/meggie/文档/partnercompaction_hll/db/db/partner_table.h
+/home/meggie/文档/partnercompaction_hll/db/partner_table_builder.cc
+db/partner_table_builder.h
+/home/meggie/文档/partnercompaction_hll/db/db/partner_table_builder.h
 db/partner_meta.h
 /home/meggie/文档/partnercompaction_hll/db/db/partner_meta.h
 leveldb/env.h
 /home/meggie/文档/partnercompaction_hll/db/leveldb/env.h
 db/dbformat.h
 /home/meggie/文档/partnercompaction_hll/db/db/dbformat.h
+db/filename.h
+/home/meggie/文档/partnercompaction_hll/db/db/filename.h
+leveldb/table_builder.h
+/home/meggie/文档/partnercompaction_hll/db/leveldb/table_builder.h
 
 /home/meggie/文档/partnercompaction_hll/db/repair.cc
 db/builder.h

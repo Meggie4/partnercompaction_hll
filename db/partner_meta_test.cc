@@ -27,15 +27,15 @@ namespace leveldb {
         DEBUG_T("after get partner Meta\n");
         pi->Ref();
         LookupKey lkey(Slice("00000000mykey"), 0);
-        pi->Add(lkey.internal_key(), 1, 1, 0);
+        pi->Add(lkey.internal_key(), 1, 0);
         DEBUG_T("after add key\n");
         uint64_t block_offset = 0;
-        uint32_t partner_index, block_size;
+        uint64_t block_size;
         Status s;
         LookupKey lkey2(Slice("00000000mykey"), 1);
-        bool find = pi->Get(lkey, &partner_index, &block_offset, &block_size, &s);
+        bool find = pi->Get(lkey, &block_offset, &block_size, &s);
         if(find) {
-            DEBUG_T("partner_number is %d, offset is %llu, block size:%llu\n", partner_index, block_offset, block_size);
+            DEBUG_T("offset is %llu, block size:%llu\n", block_offset, block_size);
         }
         pi->Unref();
     }

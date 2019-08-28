@@ -324,6 +324,32 @@ no_destructor_test/fast:
 .PHONY : no_destructor_test/fast
 
 #=============================================================================
+# Target rules for targets named filter_block_test
+
+# Build rule for target.
+filter_block_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 filter_block_test
+.PHONY : filter_block_test
+
+# fast build rule for target.
+filter_block_test/fast:
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/build
+.PHONY : filter_block_test/fast
+
+#=============================================================================
+# Target rules for targets named corruption_test
+
+# Build rule for target.
+corruption_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 corruption_test
+.PHONY : corruption_test
+
+# fast build rule for target.
+corruption_test/fast:
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/build
+.PHONY : corruption_test/fast
+
+#=============================================================================
 # Target rules for targets named status_test
 
 # Build rule for target.
@@ -545,6 +571,19 @@ version_set_test/fast:
 .PHONY : version_set_test/fast
 
 #=============================================================================
+# Target rules for targets named partner_table_builder_test
+
+# Build rule for target.
+partner_table_builder_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 partner_table_builder_test
+.PHONY : partner_table_builder_test
+
+# fast build rule for target.
+partner_table_builder_test/fast:
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/build
+.PHONY : partner_table_builder_test/fast
+
+#=============================================================================
 # Target rules for targets named version_edit_test
 
 # Build rule for target.
@@ -556,32 +595,6 @@ version_edit_test: cmake_check_build_system
 version_edit_test/fast:
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/build
 .PHONY : version_edit_test/fast
-
-#=============================================================================
-# Target rules for targets named corruption_test
-
-# Build rule for target.
-corruption_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 corruption_test
-.PHONY : corruption_test
-
-# fast build rule for target.
-corruption_test/fast:
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/build
-.PHONY : corruption_test/fast
-
-#=============================================================================
-# Target rules for targets named filter_block_test
-
-# Build rule for target.
-filter_block_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 filter_block_test
-.PHONY : filter_block_test
-
-# fast build rule for target.
-filter_block_test/fast:
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/build
-.PHONY : filter_block_test/fast
 
 db/autocompact_test.o: db/autocompact_test.cc.o
 
@@ -1177,32 +1190,59 @@ db/partner_meta_test.cc.s:
 	$(MAKE) -f CMakeFiles/partner_meta_test.dir/build.make CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.s
 .PHONY : db/partner_meta_test.cc.s
 
-db/partner_table.o: db/partner_table.cc.o
+db/partner_table_builder.o: db/partner_table_builder.cc.o
 
-.PHONY : db/partner_table.o
+.PHONY : db/partner_table_builder.o
 
 # target to build an object file
-db/partner_table.cc.o:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.o
-.PHONY : db/partner_table.cc.o
+db/partner_table_builder.cc.o:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o
+.PHONY : db/partner_table_builder.cc.o
 
-db/partner_table.i: db/partner_table.cc.i
+db/partner_table_builder.i: db/partner_table_builder.cc.i
 
-.PHONY : db/partner_table.i
+.PHONY : db/partner_table_builder.i
 
 # target to preprocess a source file
-db/partner_table.cc.i:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.i
-.PHONY : db/partner_table.cc.i
+db/partner_table_builder.cc.i:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table_builder.cc.i
+.PHONY : db/partner_table_builder.cc.i
 
-db/partner_table.s: db/partner_table.cc.s
+db/partner_table_builder.s: db/partner_table_builder.cc.s
 
-.PHONY : db/partner_table.s
+.PHONY : db/partner_table_builder.s
 
 # target to generate assembly for a file
-db/partner_table.cc.s:
-	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table.cc.s
-.PHONY : db/partner_table.cc.s
+db/partner_table_builder.cc.s:
+	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/db/partner_table_builder.cc.s
+.PHONY : db/partner_table_builder.cc.s
+
+db/partner_table_builder_test.o: db/partner_table_builder_test.cc.o
+
+.PHONY : db/partner_table_builder_test.o
+
+# target to build an object file
+db/partner_table_builder_test.cc.o:
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/db/partner_table_builder_test.cc.o
+.PHONY : db/partner_table_builder_test.cc.o
+
+db/partner_table_builder_test.i: db/partner_table_builder_test.cc.i
+
+.PHONY : db/partner_table_builder_test.i
+
+# target to preprocess a source file
+db/partner_table_builder_test.cc.i:
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/db/partner_table_builder_test.cc.i
+.PHONY : db/partner_table_builder_test.cc.i
+
+db/partner_table_builder_test.s: db/partner_table_builder_test.cc.s
+
+.PHONY : db/partner_table_builder_test.s
+
+# target to generate assembly for a file
+db/partner_table_builder_test.cc.s:
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/db/partner_table_builder_test.cc.s
+.PHONY : db/partner_table_builder_test.cc.s
 
 db/recovery_test.o: db/recovery_test.cc.o
 
@@ -2680,6 +2720,8 @@ util/testharness.cc.o:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.o
@@ -2695,9 +2737,8 @@ util/testharness.cc.o:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testharness.cc.o
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testharness.cc.o
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testharness.cc.o
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.o
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.o
 .PHONY : util/testharness.cc.o
 
 util/testharness.i: util/testharness.cc.i
@@ -2718,6 +2759,8 @@ util/testharness.cc.i:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.i
@@ -2733,9 +2776,8 @@ util/testharness.cc.i:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testharness.cc.i
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testharness.cc.i
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testharness.cc.i
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.i
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.i
 .PHONY : util/testharness.cc.i
 
 util/testharness.s: util/testharness.cc.s
@@ -2756,6 +2798,8 @@ util/testharness.cc.s:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testharness.cc.s
@@ -2771,9 +2815,8 @@ util/testharness.cc.s:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testharness.cc.s
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testharness.cc.s
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testharness.cc.s
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testharness.cc.s
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testharness.cc.s
 .PHONY : util/testharness.cc.s
 
 util/testutil.o: util/testutil.cc.o
@@ -2794,6 +2837,8 @@ util/testutil.cc.o:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.o
@@ -2809,9 +2854,8 @@ util/testutil.cc.o:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testutil.cc.o
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testutil.cc.o
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testutil.cc.o
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.o
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.o
 .PHONY : util/testutil.cc.o
 
 util/testutil.i: util/testutil.cc.i
@@ -2832,6 +2876,8 @@ util/testutil.cc.i:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.i
@@ -2847,9 +2893,8 @@ util/testutil.cc.i:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testutil.cc.i
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testutil.cc.i
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testutil.cc.i
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.i
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.i
 .PHONY : util/testutil.cc.i
 
 util/testutil.s: util/testutil.cc.s
@@ -2870,6 +2915,8 @@ util/testutil.cc.s:
 	$(MAKE) -f CMakeFiles/issue200_test.dir/build.make CMakeFiles/issue200_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/no_destructor_test.dir/build.make CMakeFiles/no_destructor_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/status_test.dir/build.make CMakeFiles/status_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/env_test.dir/build.make CMakeFiles/env_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/c_test.dir/build.make CMakeFiles/c_test.dir/util/testutil.cc.s
@@ -2885,9 +2932,8 @@ util/testutil.cc.s:
 	$(MAKE) -f CMakeFiles/log_test.dir/build.make CMakeFiles/log_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/recovery_test.dir/build.make CMakeFiles/recovery_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/version_set_test.dir/build.make CMakeFiles/version_set_test.dir/util/testutil.cc.s
+	$(MAKE) -f CMakeFiles/partner_table_builder_test.dir/build.make CMakeFiles/partner_table_builder_test.dir/util/testutil.cc.s
 	$(MAKE) -f CMakeFiles/version_edit_test.dir/build.make CMakeFiles/version_edit_test.dir/util/testutil.cc.s
-	$(MAKE) -f CMakeFiles/corruption_test.dir/build.make CMakeFiles/corruption_test.dir/util/testutil.cc.s
-	$(MAKE) -f CMakeFiles/filter_block_test.dir/build.make CMakeFiles/filter_block_test.dir/util/testutil.cc.s
 .PHONY : util/testutil.cc.s
 
 # Help Target
@@ -2914,6 +2960,8 @@ help:
 	@echo "... install/strip"
 	@echo "... db_test"
 	@echo "... no_destructor_test"
+	@echo "... filter_block_test"
+	@echo "... corruption_test"
 	@echo "... status_test"
 	@echo "... env_test"
 	@echo "... leveldb"
@@ -2932,9 +2980,8 @@ help:
 	@echo "... log_test"
 	@echo "... recovery_test"
 	@echo "... version_set_test"
+	@echo "... partner_table_builder_test"
 	@echo "... version_edit_test"
-	@echo "... corruption_test"
-	@echo "... filter_block_test"
 	@echo "... db/autocompact_test.o"
 	@echo "... db/autocompact_test.i"
 	@echo "... db/autocompact_test.s"
@@ -3001,9 +3048,12 @@ help:
 	@echo "... db/partner_meta_test.o"
 	@echo "... db/partner_meta_test.i"
 	@echo "... db/partner_meta_test.s"
-	@echo "... db/partner_table.o"
-	@echo "... db/partner_table.i"
-	@echo "... db/partner_table.s"
+	@echo "... db/partner_table_builder.o"
+	@echo "... db/partner_table_builder.i"
+	@echo "... db/partner_table_builder.s"
+	@echo "... db/partner_table_builder_test.o"
+	@echo "... db/partner_table_builder_test.i"
+	@echo "... db/partner_table_builder_test.s"
 	@echo "... db/recovery_test.o"
 	@echo "... db/recovery_test.i"
 	@echo "... db/recovery_test.s"

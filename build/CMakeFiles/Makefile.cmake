@@ -70,6 +70,8 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/issue200_test.dir/DependInfo.cmake"
   "CMakeFiles/db_test.dir/DependInfo.cmake"
   "CMakeFiles/no_destructor_test.dir/DependInfo.cmake"
+  "CMakeFiles/filter_block_test.dir/DependInfo.cmake"
+  "CMakeFiles/corruption_test.dir/DependInfo.cmake"
   "CMakeFiles/status_test.dir/DependInfo.cmake"
   "CMakeFiles/env_test.dir/DependInfo.cmake"
   "CMakeFiles/leveldb.dir/DependInfo.cmake"
@@ -87,7 +89,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/log_test.dir/DependInfo.cmake"
   "CMakeFiles/recovery_test.dir/DependInfo.cmake"
   "CMakeFiles/version_set_test.dir/DependInfo.cmake"
+  "CMakeFiles/partner_table_builder_test.dir/DependInfo.cmake"
   "CMakeFiles/version_edit_test.dir/DependInfo.cmake"
-  "CMakeFiles/corruption_test.dir/DependInfo.cmake"
-  "CMakeFiles/filter_block_test.dir/DependInfo.cmake"
   )
