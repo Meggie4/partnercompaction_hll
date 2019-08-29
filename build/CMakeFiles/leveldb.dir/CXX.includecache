@@ -1019,6 +1019,8 @@ util/coding.h
 /home/meggie/文档/partnercompaction_hll/table/util/coding.h
 util/logging.h
 /home/meggie/文档/partnercompaction_hll/table/util/logging.h
+util/debug.h
+/home/meggie/文档/partnercompaction_hll/table/util/debug.h
 
 /home/meggie/文档/partnercompaction_hll/table/block_builder.cc
 table/block_builder.h
@@ -1073,6 +1075,8 @@ table/iterator_wrapper.h
 /home/meggie/文档/partnercompaction_hll/table/table/iterator_wrapper.h
 db/dbformat.h
 /home/meggie/文档/partnercompaction_hll/table/db/dbformat.h
+util/debug.h
+/home/meggie/文档/partnercompaction_hll/table/util/debug.h
 
 /home/meggie/文档/partnercompaction_hll/table/table.cc
 leveldb/table.h

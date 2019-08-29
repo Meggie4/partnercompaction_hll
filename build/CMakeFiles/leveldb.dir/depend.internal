@@ -520,6 +520,7 @@ CMakeFiles/leveldb.dir/table/block.cc.o
  ..//table/block.h
  ..//table/format.h
  ..//util/coding.h
+ ..//util/debug.h
  ..//util/logging.h
  ../include/leveldb/comparator.h
  ../include/leveldb/export.h
@@ -592,6 +593,7 @@ CMakeFiles/leveldb.dir/table/merger.cc.o
  ..//table/iterator_wrapper.h
  ..//table/merger.h
  ..//util/coding.h
+ ..//util/debug.h
  ..//util/logging.h
  ../include/leveldb/comparator.h
  ../include/leveldb/db.h

@@ -31,7 +31,7 @@ namespace leveldb {
             queue_.push_back(key.ToString());
             insertMeta();
         } else {
-            DEBUG_T("data block offset is:%llu\n", block_offset);
+            //DEBUG_T("data block offset is:%llu\n", block_offset);
             //block还没有构造完毕，加入到
             curr_blockoffset_ = block_offset;
             queue_.push_back(key.ToString());
@@ -43,7 +43,7 @@ namespace leveldb {
             return;
         for(int i = 0; i < queue_.size(); i++) {
             //一个个插入
-            DEBUG_T("insertmeta, key is %s\n", queue_[i].c_str());
+            //DEBUG_T("insertmeta, key is %s\n", queue_[i].c_str());
             meta_->Add(Slice(queue_[i]), curr_blockoffset_, curr_blocksize_);
         }
         queue_.clear();
@@ -63,5 +63,9 @@ namespace leveldb {
 
     uint64_t SinglePartnerTable::FileSize() {
         return builder_->FileSize();
+    }
+
+    size_t SinglePartnerTable::NVMSize() {
+        return meta_->ApproximateMemoryUsage();
     }
 }

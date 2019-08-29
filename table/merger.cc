@@ -9,6 +9,7 @@
 #include "table/iterator_wrapper.h"
 
 #include "db/dbformat.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -129,6 +130,7 @@ class MergingIterator : public Iterator {
 
   virtual Slice value() const {
     assert(Valid());
+    //DEBUG_T("merge iter, after assert valid\n");
     return current_->value();
   }
 
@@ -251,6 +253,7 @@ void MergingIterator::FindLargest() {
 Iterator* NewMergingIterator(const Comparator* cmp, Iterator** list, int n) {
   assert(n >= 0);
   if (n == 0) {
+    DEBUG_T("NewEmptyIterator\n");
     return NewEmptyIterator();
   } else if (n == 1) {
     return list[0];

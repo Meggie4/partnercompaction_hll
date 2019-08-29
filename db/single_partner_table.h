@@ -19,6 +19,7 @@ namespace leveldb {
             Status Finish();
             void Abandon();
             uint64_t FileSize();
+            size_t NVMSize();
             ~SinglePartnerTable();
             
         private:

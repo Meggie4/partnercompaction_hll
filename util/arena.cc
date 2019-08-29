@@ -133,6 +133,12 @@ char* Arena::AllocateNewBlock(size_t block_bytes) {
 #ifdef ENABLE_RECOVERY
 ArenaNVM::ArenaNVM(long size, std::string *filename, bool recovery)
 {
+    /*
+    最開始8个字节是alloc_bytes_remaining
+    剩下8个字节是sequence
+    接着的8个字节是m_height
+    现在需要将alloc_bytes_remaining改为已经占用的字节数
+    */
     //: memory_usage_(0)
     if (recovery) {
         mfile = *filename;
@@ -147,7 +153,7 @@ ArenaNVM::ArenaNVM(long size, std::string *filename, bool recovery)
         allocation = true;
     }
     else {
-        //memory_usage_=0;
+        memory_usage_.NoBarrier_Store(reinterpret_cast<void *>(0));
         alloc_ptr_ = NULL;  // First allocation will allocate a block
         alloc_bytes_remaining_ = 0;
         map_start_ = map_end_ = 0;
@@ -264,13 +270,6 @@ char* ArenaNVM::AllocateNVMBlock(size_t block_bytes) {
 char* ArenaNVM::AllocateFallbackNVM(size_t bytes) {
     alloc_ptr_ = AllocateNVMBlock(kSize);
     map_start_ = (void *)alloc_ptr_;
-#if defined(ENABLE_RECOVERY)
-    memory_usage_.NoBarrier_Store(
-            reinterpret_cast<void*>(MemoryUsage() + bytes + sizeof(char*)));
-#else
-    memory_usage_.NoBarrier_Store(
-            reinterpret_cast<void*>(MemoryUsage() + kSize + sizeof(char*)));
-#endif
     ////////////meggie
     //alloc_bytes_remaining_ = kSize;
     alloc_bytes_remaining_ = MEM_THRESH * kSize;
@@ -279,6 +278,13 @@ char* ArenaNVM::AllocateFallbackNVM(size_t bytes) {
     char* result = alloc_ptr_;
     alloc_ptr_ += bytes;
     alloc_bytes_remaining_ -= bytes;
+#if defined(ENABLE_RECOVERY)
+    memory_usage_.NoBarrier_Store(
+            reinterpret_cast<void*>(MemoryUsage() + bytes));
+#else
+    memory_usage_.NoBarrier_Store(
+            reinterpret_cast<void*>(MemoryUsage() + kSize + sizeof(char*)));
+#endif
     return result;
 }
 
@@ -297,16 +303,19 @@ char* ArenaNVM::AllocateAlignedNVM(size_t bytes) {
         alloc_ptr_ += needed;
         alloc_bytes_remaining_ -= needed;
         memory_usage_.NoBarrier_Store(
-                reinterpret_cast<void*>(MemoryUsage() + needed + sizeof(char*)));
+                reinterpret_cast<void*>(MemoryUsage() + needed));
+        //DEBUG_T("condition1, allocate %zu , has %zu, remaining:%zu\n", needed, MemoryUsage(), alloc_bytes_remaining_);
     } else {
         if (allocation) {
             alloc_bytes_remaining_ = 0;
             result = alloc_ptr_ + slop;
             alloc_ptr_ += needed;
             memory_usage_.NoBarrier_Store(
-                    reinterpret_cast<void*>(MemoryUsage() + needed + sizeof(char*)));
+                    reinterpret_cast<void*>(MemoryUsage() + needed));
+            //DEBUG_T("condition2, allocate %zu , has %zu, remaining:%zu\n", needed, MemoryUsage(), alloc_bytes_remaining_);
         } else {
-            result = this->AllocateFallbackNVM(bytes);
+            result = this->AllocateFallbackNVM(needed);
+            //DEBUG_T("condition3, allocate %zu , has %zu, remaining:%zu\n", needed, MemoryUsage(), alloc_bytes_remaining_);
         }
     }
     assert((reinterpret_cast<uintptr_t>(result) & (align-1)) == 0);

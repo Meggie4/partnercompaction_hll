@@ -216,6 +216,7 @@ Iterator* Table::BlockReader(void* arg,
 
   Iterator* iter;
   if (block != nullptr) {
+    //DEBUG_T("block is not nullptr\n");
     iter = block->NewIterator(table->rep_->options.comparator);
     if (cache_handle == nullptr) {
       iter->RegisterCleanup(&DeleteBlock, block, nullptr);
@@ -223,6 +224,7 @@ Iterator* Table::BlockReader(void* arg,
       iter->RegisterCleanup(&ReleaseBlock, block_cache, cache_handle);
     }
   } else {
+    DEBUG_T("block is nullptr\n");
     iter = NewErrorIterator(s);
   }
   return iter;
@@ -292,11 +294,12 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
       Iterator* block_iter = BlockReader(this, options, Slice(dst));
       block_iter->Seek(k);
       if (block_iter->Valid()) {
-        DEBUG_T("block iter is valid\n");
+        //DEBUG_T("block iter is valid\n");
         (*saver)(arg, block_iter->key(), block_iter->value());
-      } else {
-        DEBUG_T("block iter is not valid\n");
-      }
+      } 
+      // else {
+      //   DEBUG_T("block iter is not valid\n");
+      // }
       Status s = block_iter->status();
       delete block_iter;
       return s;
@@ -349,7 +352,7 @@ public:
 	}
 	Slice value() const {
     Slice block_info = meta_iter_->value();
-    DEBUG_T("block info is %s， c_str:%s\n", block_info.data(), block_info.ToString().c_str());
+    //DEBUG_T("block info is %s， c_str:%s\n", block_info.data(), block_info.ToString().c_str());
     const char* info = block_info.data();
     BlockHandle handle;
     handle.set_offset(DecodeFixed64(info));
@@ -358,6 +361,7 @@ public:
     DEBUG_T("iter value, block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
     Iterator* block_iter = BlockReader(table_, options_, Slice(), &handle);
     block_iter->Seek(meta_iter_->key());
+    DEBUG_T("seek success\n");
     return block_iter->value();
 	}
 	virtual Status status() const { return Status::OK(); }

@@ -12,6 +12,7 @@
 #include "table/format.h"
 #include "util/coding.h"
 #include "util/logging.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -133,6 +134,7 @@ class Block::Iter : public Iterator {
   }
   virtual Slice value() const {
     assert(Valid());
+    //DEBUG_T("after assert valid\n");
     return value_;
   }
 

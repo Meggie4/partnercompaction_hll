@@ -146,10 +146,11 @@ class DBImpl : public DB {
                 bool containsend, ParsedInternalKey* ikey_victim);
   void UpdateFileWithPartnerCompaction(VersionEdit* edit,
             std::vector<uint64_t>& pcompaction_files, 
-            std::vector<CompactionState*>& p_compactionstate_list);
+            std::vector<PartnerCompactionState*>& p_compactionstate_list);
   Status DealWithSingleCompaction(CompactionState* compact);
   Status OpenPartnerTable(PartnerCompactionState* compact, int input_index);
   Status FinishPartnerTable(PartnerCompactionState* compact, Iterator* input);
+  void CleanupCompaction(PartnerCompactionState* compact);
   ///////////////meggie
 
   Status OpenCompactionOutputFile(CompactionState* compact);

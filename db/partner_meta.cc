@@ -110,7 +110,7 @@ namespace leveldb {
             // offset = DecodeFixed64(key_ptr + key_length);
             // size = DecodeFixed64(key_ptr + key_length + 8); 
 
-            DEBUG_T("meta iter, offset is %llu, size is %llu, block info is %s\n", offset, size, Slice(key_ptr + key_length, 16).ToString().c_str());
+            DEBUG_T("meta iter, offset is %llu, size is %llu\n", offset, size);
             return Slice(key_ptr + key_length, 16);
         }
         //NoveLSM
@@ -157,12 +157,12 @@ namespace leveldb {
 
        char* p = EncodeVarint32(buf, key_size);
        
-       DEBUG_T("add key is %s\n", key.ToString().c_str());
+       //DEBUG_T("add key is %s\n", key.ToString().c_str());
        memcpy_persist(p, key.data(), key_size);
         
        p += key_size;
        
-       DEBUG_T("add offset is %llu, add block size is:%llu\n", block_offset, block_size);
+       //DEBUG_T("add offset is %llu, add block size is:%llu\n", block_offset, block_size);
        EncodeFixed64(p, block_offset);
        p += 8;
        EncodeFixed64(p, block_size);
@@ -179,7 +179,7 @@ namespace leveldb {
         iter.Seek(memkey.data());
         
         if(iter.Valid()) {
-            DEBUG_T("find!\n");
+            //DEBUG_T("find!\n");
 #if defined(USE_OFFSETS)
             const char* entry = reinterpret_cast<const char*>((intptr_t)iter.node_ - 
                                                 (intptr_t)iter.key_offset());
@@ -205,7 +205,7 @@ namespace leveldb {
                 }
             }
         }
-        DEBUG_T("not find!\n");
+        //DEBUG_T("not find!\n");
         return false;
     }
                 

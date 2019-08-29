@@ -120,6 +120,7 @@ struct DBImpl::PartnerCompactionState {
   uint64_t number;
   uint64_t curr_file_size;
   InternalKey curr_smallest, curr_largest;
+  uint64_t meta_number, meta_size;
   bool init;
   
   std::shared_ptr<HyperLogLog> hll;
@@ -129,13 +130,12 @@ struct DBImpl::PartnerCompactionState {
   WritableFile* outfile;
   SinglePartnerTable* partner_table;
 
-  uint64_t total_bytes;
+  uint64_t meta_usage;
 
   explicit PartnerCompactionState(Compaction* c)
       : compaction(c),
         outfile(nullptr),
         partner_table(nullptr),
-        total_bytes(0),
         init(false),
         hll(std::make_shared<HyperLogLog>(12)), 
         hll_add_count(0){
@@ -876,7 +876,7 @@ void DBImpl::BackgroundCompaction() {
         versions_->LevelSummary(&tmp));
   } else {
     ////////////meggie
-    if(c->level() >= 0) {
+    if(c->level() == 0) {
         CompactionState* compact = new CompactionState(c);
         status = DoCompactionWork(compact);
         if (!status.ok()) {
@@ -1043,7 +1043,6 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
 ////////////////meggie
 Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_index) {
     FileMetaData* fm = compact->compaction->input(1, input1_index);
-    uint64_t meta_number, meta_size;
     ArenaNVM* arena;
     PartnerMeta* pm;
     if (!fm->partners.empty()) {
@@ -1052,10 +1051,10 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->curr_largest = fm->partners[0].partner_largest;
       compact->curr_file_size = fm->partners[0].partner_size;
       compact->init = true;
-      meta_number = fm->meta_number;
-      meta_size = fm->meta_size;
-      std::string metaFile = MapFileName(dbname_nvm_, meta_number);
-      arena = new ArenaNVM(meta_size, &metaFile, true);
+      compact->meta_number = fm->partners[0].meta_number;
+      compact->meta_size = fm->partners[0].meta_size;
+      std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
+      arena = new ArenaNVM(compact->meta_size, &metaFile, true);
       arena->nvmarena_ = true;
       DEBUG_T("after get arena nvm\n");
       pm = new PartnerMeta(internal_comparator_, arena, true);
@@ -1068,10 +1067,10 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->curr_largest.Clear();
       compact->curr_file_size = 0;
       mutex_.Unlock(); 
-      meta_number = versions_->NewFileNumber();
-      meta_size = 4 << 10 << 10;
-      std::string metaFile = MapFileName(dbname_nvm_, meta_number);
-      arena = new ArenaNVM(meta_size, &metaFile, false);
+      compact->meta_number = versions_->NewFileNumber();
+      compact->meta_size = 4 << 10 << 10;
+      std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
+      arena = new ArenaNVM(compact->meta_size, &metaFile, false);
       arena->nvmarena_ = true;
       DEBUG_T("after get arena nvm\n");
       pm = new PartnerMeta(internal_comparator_, arena, false);
@@ -1085,6 +1084,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       TableBuilder* builder = new TableBuilder(options_, compact->outfile, compact->number, compact->curr_file_size);
       SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
       compact->partner_table = spt;
+      assert(compact->partner_table != nullptr);
     }
   return s;
 } 
@@ -1099,6 +1099,8 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
 
   // Check for iterator errors
   Status s = input->status();
+  DEBUG_T("to print memory usage\n");
+  DEBUG_T("after finish partner table, arena nvm need room:%zu\n", compact->partner_table->NVMSize());
   //TODO
   if (s.ok()) {
     s = compact->partner_table->Finish();
@@ -1108,7 +1110,7 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
   const uint64_t current_bytes = compact->partner_table->FileSize();
   compact->curr_file_size = current_bytes;
   
-  compact->total_bytes += current_bytes;
+  compact->meta_usage = compact->partner_table->NVMSize();
   delete compact->partner_table;
   compact->partner_table = nullptr;
 
@@ -1124,6 +1126,22 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
 
   return s;
 }
+
+void DBImpl::CleanupCompaction(PartnerCompactionState* compact) {
+  mutex_.AssertHeld();
+  if (compact->partner_table != nullptr) {
+    // May happen if we get a shutdown call in the middle of compaction
+    compact->partner_table->Abandon();
+    delete compact->partner_table;
+  } else {
+    assert(compact->outfile == nullptr);
+  }
+  delete compact->outfile;
+  //(TODO)如果真的出错了，怎么办，这样子全部丢弃partner肯定是不行的，需要再想想
+  pending_outputs_.erase(compact->number);
+  delete compact;
+}
+
 
 struct DBImpl::TraditionalCompactionArgs {
     DBImpl* db;
@@ -1171,28 +1189,53 @@ void DBImpl::AddFileWithTraditionalCompaction(VersionEdit* edit,
     DEBUG_T("\n");
 }
 
-void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit,
-        std::vector<uint64_t>& pcompaction_files, 
-        std::vector<CompactionState*>& p_compactionstate_list) {
+// void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit,
+//         std::vector<uint64_t>& pcompaction_files, 
+//         std::vector<CompactionState*>& p_compactionstate_list) {
+//    int sz1 = pcompaction_files.size();
+//    int sz2 = p_compactionstate_list.size();
+//    assert(sz1 == sz2);
+//    DEBUG_T("UpdateFileWithPartnerCompaction, size:%d\n", sz1);
+//    for(int i = 0; i < sz1; i++) {
+//        CompactionState* compact = p_compactionstate_list[i];
+//        if(compact->outputs.size() == 0)
+//            continue;
+//        std::vector<Partner> partners;
+// 	   int level = compact->compaction->level();
+//        assert(compact->outputs.size() == 1);
+//        const CompactionState::Output& out = compact->outputs[0];
+//        Partner ptner; 
+//        ptner.partner_number = out.number;
+//        ptner.partner_size = out.file_size;
+//        ptner.partner_smallest = out.smallest;
+//        ptner.partner_largest = out.largest;
+//        ptner.hll = out.hll;
+//        ptner.hll_add_count = out.hll_add_count;
+//        partners.push_back(ptner);
+//        edit->AddPartner(level + 1, pcompaction_files[i], ptner);
+//    }
+// }
+
+void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit, std::vector<uint64_t>& pcompaction_files, 
+                                            std::vector<PartnerCompactionState*>& p_compactionstate_list) {
    int sz1 = pcompaction_files.size();
    int sz2 = p_compactionstate_list.size();
    assert(sz1 == sz2);
    DEBUG_T("UpdateFileWithPartnerCompaction, size:%d\n", sz1);
    for(int i = 0; i < sz1; i++) {
-       CompactionState* compact = p_compactionstate_list[i];
-       if(compact->outputs.size() == 0)
-           continue;
+       PartnerCompactionState* compact = p_compactionstate_list[i];
        std::vector<Partner> partners;
-	   int level = compact->compaction->level();
-       assert(compact->outputs.size() == 1);
-       const CompactionState::Output& out = compact->outputs[0];
+	     int level = compact->compaction->level();
        Partner ptner; 
-       ptner.partner_number = out.number;
-       ptner.partner_size = out.file_size;
-       ptner.partner_smallest = out.smallest;
-       ptner.partner_largest = out.largest;
-       ptner.hll = out.hll;
-       ptner.hll_add_count = out.hll_add_count;
+       ptner.partner_number = compact->number;
+       ptner.partner_size = compact->curr_file_size;
+       ptner.partner_smallest = compact->curr_smallest;
+       ptner.partner_largest = compact->curr_largest;
+       ptner.meta_number = compact->meta_number;
+       ptner.meta_size = compact->meta_size;
+       ptner.meta_usage = compact->meta_usage;
+       ptner.hll = compact->hll;
+       ptner.hll_add_count = compact->hll_add_count;
        partners.push_back(ptner);
        edit->AddPartner(level + 1, pcompaction_files[i], ptner);
    }
@@ -1249,6 +1292,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
             t_sptcompaction->victim_end.Encode(), 
             t_sptcompaction->containsend);
     merge_iter->SeekToFirst();
+    DEBUG_T("after get merge iter\n");
     
     Status status;
     ParsedInternalKey ikey;
@@ -1465,6 +1509,7 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
     bool has_current_user_key = false;
     SequenceNumber last_sequence_for_key = kMaxSequenceNumber;
     InternalKey this_smallest, this_largest;
+    uint64_t entries = 0;
 
     for(; ValidAndInRange(input, victim_end, containsend, &ikey) 
                 && !shutting_down_.Acquire_Load(); ) {
@@ -1503,7 +1548,7 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         
         if(!drop) {            
             if(compact->partner_table == nullptr) {
-                DEBUG_T("to set partner table\n");
+                //DEBUG_T("to set partner table\n");
                 status = OpenPartnerTable(compact, p_sptcompaction->inputs1_index);
                 DEBUG_T("after open partner table\n");
                 if(!status.ok()) {
@@ -1512,9 +1557,9 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
                 this_smallest.DecodeFrom(key);
             }    
             this_largest.DecodeFrom(key);
-            DEBUG_T("to add key %s into partner table\n", key.ToString().c_str());
+            //DEBUG_T("to add key %s into partner table\n", key.ToString().c_str());
             compact->partner_table->Add(key, input->value());
-            DEBUG_T("after add key into partner table\n");
+            //DEBUG_T("after add key into partner table\n");
             AddKeyToHyperLogLog(compact->hll, key);
             compact->hll_add_count++;
 
@@ -1528,13 +1573,14 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         }
 
         input->Next();
+        entries++;
     }
 
     if(status.ok() && shutting_down_.Acquire_Load()) {
         status = Status::IOError("Deleting DB during compaction");
     }
    
-    DEBUG_T("after finish iter input\n");
+    DEBUG_T("after finish iter input, add entries:%llu\n", entries);
     if(status.ok() && compact->partner_table != nullptr) {
         if(!compact->init || internal_comparator_.Compare(this_smallest, compact->curr_smallest) < 0) {
           compact->curr_smallest = this_smallest;
@@ -1542,9 +1588,9 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         if(!compact->init || internal_comparator_.Compare(this_largest, compact->curr_largest) > 0) {
           compact->curr_largest = this_largest;
         }
-        DEBUG_T("before finish partner table\n");
+        //DEBUG_T("before finish partner table\n");
         status = FinishPartnerTable(compact, input);
-        DEBUG_T("push partner_size:%llu\n", compact->curr_file_size);
+        //DEBUG_T("push partner_size:%llu\n", compact->curr_file_size);
     }
     
     if(!status.ok()) {
@@ -1640,120 +1686,6 @@ Status DBImpl::DealWithSingleCompaction(CompactionState* compact) {
     return status;
 }
 
-// Status DBImpl::DoSplitCompactionWork(Compaction* c) {
-//   std::vector<SplitCompaction*> t_sptcompactions;
-//   std::vector<SplitCompaction*> p_sptcompactions;
-//   Status status;
-//   start_timer(DO_SPLITCOMPACTION_WORK); 
-//   DEBUG_T("---------------start in SplitCompaction----------------\n");
-//   versions_->GetSplitCompactions(c, t_sptcompactions,
-//                   p_sptcompactions);
-
-//   DEBUG_T("t_sptcompactions size:%d, p_sptcompaction size:%d\n",
-//           t_sptcompactions.size(), p_sptcompactions.size());
-
-//   std::vector<TSplitCompaction*> tcompactionlist; 
-//   std::vector<CompactionState*> t_compactionstate_list;
-//   std::vector<CompactionState*> p_compactionstate_list;
-//   std::vector<int> tcompaction_index;
-//   std::vector<uint64_t> pcompaction_files;
-  
-//   SequenceNumber smallest_snapshot;
-//   if (snapshots_.empty()) {
-//     smallest_snapshot = versions_->LastSequence();
-//   } else {
-//     smallest_snapshot = snapshots_.oldest()->sequence_number();
-//   }
-
-//   mutex_.Unlock();
-  
-//   if(t_sptcompactions.size() == 0 &&
-//           p_sptcompactions.size() == 0 ) {
-//       DEBUG_T("DealWithSingleCompaction, inputs1 size is 0\n");
-//       CompactionState* compact = new CompactionState(c);
-//       compact->smallest_snapshot = smallest_snapshot;
-//       status = DealWithSingleCompaction(compact);
-//       DEBUG_T("after DealWithSingleCompaction\n");
-      
-//       mutex_.Lock();
-      
-//       if(status.ok()) {
-//           status = InstallCompactionResults(compact);
-//       }
-//       CleanupCompaction(compact);
-//       DEBUG_T("after CleanupCompaction\n");
-//       return status;
-//   }
-
-//   DEBUG_T("----------traditional compaction, has----------\n");
-//   if(t_sptcompactions.size() > 0) {
-//     versions_->MergeTSplitCompaction(c, t_sptcompactions, tcompactionlist);
-//     for(int i = 0; i < t_sptcompactions.size(); i++){ 
-//             tcompaction_index.push_back(t_sptcompactions[i]->inputs1_index);
-//       delete t_sptcompactions[i];
-//         }
-//         DEBUG_T("add traditional task size %d to threadpool\n",
-//                 tcompactionlist.size());
-//     for(int i = 0; i < tcompactionlist.size(); i++) {
-//         TraditionalCompactionArgs* tcargs = new TraditionalCompactionArgs;
-//         tcargs->db = this;
-//         tcargs->compact = new CompactionState(c);
-//             tcargs->compact->smallest_snapshot = smallest_snapshot;
-//             t_compactionstate_list.push_back(tcargs->compact);
-//         tcargs->t_sptcompaction = tcompactionlist[i];
-//             thpool_->AddJob(DoTraditionCompactionWork, tcargs); 
-//         }
-//   }
-
-// 	DEBUG_T("----------partner compaction, has:----------\n");
-// 	if(p_sptcompactions.size() > 0) {
-//       for(int i = 0; i < p_sptcompactions.size(); i++) {
-// 		   FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
-// 		   int number = fm->number;
-//        pcompaction_files.push_back(number);
-//        DEBUG_T("%d, ", p_sptcompactions[i]->inputs1_index);
-// 		   PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
-// 		   pcargs->db = this;
-// 		   pcargs->compact = new CompactionState(c);
-//            pcargs->compact->smallest_snapshot = smallest_snapshot;
-//            p_compactionstate_list.push_back(pcargs->compact);
-// 		   pcargs->p_sptcompaction = p_sptcompactions[i];
-//            thpool_->AddJob(DoPartnerCompactionWork,	pcargs);
-//       }
-//   }
-//   thpool_->WaitAll();
-
-// 	DEBUG_T("---------------finish in SplitCompaction----------------\n\n");
-
-//   mutex_.Lock();
-  
-//   VersionEdit edit;
-//   versions_->AddInputDeletions(&edit, c, tcompaction_index);
-//   AddFileWithTraditionalCompaction(&edit, t_compactionstate_list);
-//   UpdateFileWithPartnerCompaction(&edit, pcompaction_files, 
-//                                           p_compactionstate_list);
-//   DEBUG_T("-------------finish delete and add-----------\n\n");
-
-//   versions_->LogAndApply(&edit, &mutex_);
-
-//   DEBUG_T("-------------finish LogAndApply-----------\n\n");
-  
-//   for(int i = 0; i < tcompactionlist.size(); i++) {
-//       delete tcompactionlist[i];
-//       CleanupCompaction(t_compactionstate_list[i]);
-//   }
-
-// 	for(int i = 0; i < p_sptcompactions.size(); i++) {
-// 		delete p_sptcompactions[i];
-//     CleanupCompaction(p_compactionstate_list[i]);
-//   }
-
-//   DEBUG_T("-------------finish DoSplitCompactionWork-----------\n\n");
-
-//   record_timer(DO_SPLITCOMPACTION_WORK); 
-// 	return Status::OK();
-// }
-
 Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   std::vector<SplitCompaction*> t_sptcompactions;
   std::vector<SplitCompaction*> p_sptcompactions;
@@ -1784,6 +1716,18 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   if(t_sptcompactions.size() == 0 &&
           p_sptcompactions.size() == 0 ) {
       DEBUG_T("DealWithSingleCompaction, inputs1 size is 0\n");
+      CompactionState* compact = new CompactionState(c);
+      compact->smallest_snapshot = smallest_snapshot;
+      status = DealWithSingleCompaction(compact);
+      DEBUG_T("after DealWithSingleCompaction\n");
+      
+      mutex_.Lock();
+      
+      if(status.ok()) {
+          status = InstallCompactionResults(compact);
+      }
+      CleanupCompaction(compact);
+      DEBUG_T("after CleanupCompaction\n");
       return status;
   }
 
@@ -1791,49 +1735,61 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   if(t_sptcompactions.size() > 0) {
     versions_->MergeTSplitCompaction(c, t_sptcompactions, tcompactionlist);
     for(int i = 0; i < t_sptcompactions.size(); i++){ 
-      tcompaction_index.push_back(t_sptcompactions[i]->inputs1_index);
-      delete t_sptcompactions[i];
+            tcompaction_index.push_back(t_sptcompactions[i]->inputs1_index);
+        delete t_sptcompactions[i];
     }
-    DEBUG_T("add traditional task size %d to threadpool\n",
-                tcompactionlist.size());
+    DEBUG_T("add traditional task size %d to threadpool\n", tcompactionlist.size());
     for(int i = 0; i < tcompactionlist.size(); i++) {
         TraditionalCompactionArgs* tcargs = new TraditionalCompactionArgs;
         tcargs->db = this;
         tcargs->compact = new CompactionState(c);
         tcargs->compact->smallest_snapshot = smallest_snapshot;
-        tcargs->t_sptcompaction = tcompactionlist[i];
         t_compactionstate_list.push_back(tcargs->compact);
-        DealWithTraditionCompaction(tcargs->compact, tcargs->t_sptcompaction);
+        tcargs->t_sptcompaction = tcompactionlist[i];
+        thpool_->AddJob(DoTraditionCompactionWork, tcargs); 
     }
   }
 
 	DEBUG_T("----------partner compaction, has:----------\n");
 	if(p_sptcompactions.size() > 0) {
       for(int i = 0; i < p_sptcompactions.size(); i++) {
-        FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
-        int number = fm->number;
-        pcompaction_files.push_back(number);
-        DEBUG_T("%d,\n", p_sptcompactions[i]->inputs1_index);
-        PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
-        pcargs->db = this;
-        pcargs->compact = new PartnerCompactionState(c);
-        pcargs->compact->smallest_snapshot = smallest_snapshot;
-        p_compactionstate_list.push_back(pcargs->compact);
-        pcargs->p_sptcompaction = p_sptcompactions[i];
-        DealWithPartnerCompaction(pcargs->compact, pcargs->p_sptcompaction);
+		   FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
+		   int number = fm->number;
+       pcompaction_files.push_back(number);
+       DEBUG_T("%d, ", p_sptcompactions[i]->inputs1_index);
+		   PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
+		   pcargs->db = this;
+		   pcargs->compact = new PartnerCompactionState(c);
+           pcargs->compact->smallest_snapshot = smallest_snapshot;
+           p_compactionstate_list.push_back(pcargs->compact);
+		   pcargs->p_sptcompaction = p_sptcompactions[i];
+           thpool_->AddJob(DoPartnerCompactionWork,	pcargs);
       }
   }
+  thpool_->WaitAll();
 
 	DEBUG_T("---------------finish in SplitCompaction----------------\n\n");
 
   mutex_.Lock();
   
+  VersionEdit edit;
+  versions_->AddInputDeletions(&edit, c, tcompaction_index);
+  AddFileWithTraditionalCompaction(&edit, t_compactionstate_list);
+  UpdateFileWithPartnerCompaction(&edit, pcompaction_files, p_compactionstate_list);
+  DEBUG_T("-------------finish delete and add-----------\n\n");
+
+  versions_->LogAndApply(&edit, &mutex_);
+
+  DEBUG_T("-------------finish LogAndApply-----------\n\n");
+  
   for(int i = 0; i < tcompactionlist.size(); i++) {
       delete tcompactionlist[i];
+      CleanupCompaction(t_compactionstate_list[i]);
   }
 
 	for(int i = 0; i < p_sptcompactions.size(); i++) {
 		delete p_sptcompactions[i];
+    CleanupCompaction(p_compactionstate_list[i]);
   }
 
   DEBUG_T("-------------finish DoSplitCompactionWork-----------\n\n");
@@ -1841,7 +1797,94 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   record_timer(DO_SPLITCOMPACTION_WORK); 
 	return Status::OK();
 }
-////////////////meggie
+
+// Status DBImpl::DoSplitCompactionWork(Compaction* c) {
+//   std::vector<SplitCompaction*> t_sptcompactions;
+//   std::vector<SplitCompaction*> p_sptcompactions;
+//   Status status;
+//   start_timer(DO_SPLITCOMPACTION_WORK); 
+//   DEBUG_T("---------------start in SplitCompaction----------------\n");
+//   versions_->GetSplitCompactions(c, t_sptcompactions,
+//                   p_sptcompactions);
+
+//   DEBUG_T("t_sptcompactions size:%d, p_sptcompaction size:%d\n",
+//           t_sptcompactions.size(), p_sptcompactions.size());
+
+//   std::vector<TSplitCompaction*> tcompactionlist; 
+//   std::vector<CompactionState*> t_compactionstate_list;
+//   std::vector<PartnerCompactionState*> p_compactionstate_list;
+//   std::vector<int> tcompaction_index;
+//   std::vector<uint64_t> pcompaction_files;
+  
+//   SequenceNumber smallest_snapshot;
+//   if (snapshots_.empty()) {
+//     smallest_snapshot = versions_->LastSequence();
+//   } else {
+//     smallest_snapshot = snapshots_.oldest()->sequence_number();
+//   }
+
+//   mutex_.Unlock();
+  
+//   if(t_sptcompactions.size() == 0 &&
+//           p_sptcompactions.size() == 0 ) {
+//       DEBUG_T("DealWithSingleCompaction, inputs1 size is 0\n");
+//       return status;
+//   }
+
+//   DEBUG_T("----------traditional compaction, has----------\n");
+//   if(t_sptcompactions.size() > 0) {
+//     versions_->MergeTSplitCompaction(c, t_sptcompactions, tcompactionlist);
+//     for(int i = 0; i < t_sptcompactions.size(); i++){ 
+//       tcompaction_index.push_back(t_sptcompactions[i]->inputs1_index);
+//       delete t_sptcompactions[i];
+//     }
+//     DEBUG_T("add traditional task size %d to threadpool\n",
+//                 tcompactionlist.size());
+//     for(int i = 0; i < tcompactionlist.size(); i++) {
+//         TraditionalCompactionArgs* tcargs = new TraditionalCompactionArgs;
+//         tcargs->db = this;
+//         tcargs->compact = new CompactionState(c);
+//         tcargs->compact->smallest_snapshot = smallest_snapshot;
+//         tcargs->t_sptcompaction = tcompactionlist[i];
+//         t_compactionstate_list.push_back(tcargs->compact);
+//         DealWithTraditionCompaction(tcargs->compact, tcargs->t_sptcompaction);
+//     }
+//   }
+
+// 	DEBUG_T("----------partner compaction, has:----------\n");
+// 	if(p_sptcompactions.size() > 0) {
+//       for(int i = 0; i < p_sptcompactions.size(); i++) {
+//         FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
+//         int number = fm->number;
+//         pcompaction_files.push_back(number);
+//         DEBUG_T("%d,\n", p_sptcompactions[i]->inputs1_index);
+//         PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
+//         pcargs->db = this;
+//         pcargs->compact = new PartnerCompactionState(c);
+//         pcargs->compact->smallest_snapshot = smallest_snapshot;
+//         p_compactionstate_list.push_back(pcargs->compact);
+//         pcargs->p_sptcompaction = p_sptcompactions[i];
+//         DealWithPartnerCompaction(pcargs->compact, pcargs->p_sptcompaction);
+//       }
+//   }
+
+// 	DEBUG_T("---------------finish in SplitCompaction----------------\n\n");
+
+//   mutex_.Lock();
+  
+//   for(int i = 0; i < tcompactionlist.size(); i++) {
+//       delete tcompactionlist[i];
+//   }
+
+// 	for(int i = 0; i < p_sptcompactions.size(); i++) {
+// 		delete p_sptcompactions[i];
+//   }
+
+//   DEBUG_T("-------------finish DoSplitCompactionWork-----------\n\n");
+
+//   record_timer(DO_SPLITCOMPACTION_WORK); 
+// 	return Status::OK();
+// }
 ////////////////meggie
 
 

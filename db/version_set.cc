@@ -348,8 +348,8 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
       
       list[i + 1] = cache->NewPartnerIterator(options,
                 file->partners[i].partner_number,
-                file->meta_number, 
-                file->meta_size);
+                file->partners[i].meta_number, 
+                file->partners[i].meta_size);
 		}
 		return NewMergingIterator(&global_icmp, list, sz);
 	}
@@ -357,6 +357,7 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 
 Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache, 
         const FileMetaData* file) {
+    DEBUG_T("NewIteratorWithPartner, partners size is %d\n", file->partners.size());
     int sz = file->partners.size() + 1;
     Iterator** list = new Iterator*[sz];
     list[0] = cache->NewIterator(ReadOptions(), file->number, file->file_size);
@@ -364,10 +365,11 @@ Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache,
         // list[i + 1] = cache->NewIterator(ReadOptions(),
         //                       file->partners[i].partner_number,
         //                       file->partners[i].partner_size);
+        DEBUG_T("NewIteratorWithPartner, partner number is:%llu\n", file->partners[i].partner_number);
         list[i + 1] = cache->NewPartnerIterator(ReadOptions(),
                               file->partners[i].partner_number,
-                              file->meta_number, 
-                              file->meta_size);
+                              file->partners[i].meta_number, 
+                              file->partners[i].meta_size);
     }
     return NewMergingIterator(&icmp_, list, sz);
 }
@@ -918,14 +920,11 @@ class VersionSet::Builder {
     }
 
     /////////////meggie
-	const VersionEdit::UpdatedFileSet upd = edit->updated_files_;
-    for (VersionEdit::UpdatedFileSet::const_iterator iter = upd.begin();
-			iter != upd.end();
-			++iter) {
-		const int level = iter->first;
-		DEBUG_T("update number:%d\n", iter->second.first);
-		levels_[level].updated_files.insert(std::make_pair(iter->second.first,
-														  iter->second.second));
+	  const VersionEdit::UpdatedFileSet upd = edit->updated_files_;
+    for (VersionEdit::UpdatedFileSet::const_iterator iter = upd.begin(); iter != upd.end(); ++iter) {
+      const int level = iter->first;
+      DEBUG_T("update number:%d\n", iter->second.first);
+      levels_[level].updated_files.insert(std::make_pair(iter->second.first, iter->second.second));
     }
     /////////////meggie
   }
@@ -983,43 +982,49 @@ class VersionSet::Builder {
   void MaybeAddFile(Version* v, int level, FileMetaData* f) {
     if (levels_[level].deleted_files.count(f->number) > 0) {
       // File is deleted: do nothing
-	//////////meggie
+	  //////////meggie
     } else if(levels_[level].updated_files.find(f->number) != 
 			 levels_[level].updated_files.end()) {
-	   std::vector<FileMetaData*>* files = &v->files_[level];
-	   FileMetaData* fm = new FileMetaData(*f);
-	   fm->refs = 1;
-	   Partner& ptner = levels_[level].updated_files[f->number];
-	   fm->partners.push_back(ptner);	   
+        std::vector<FileMetaData*>* files = &v->files_[level];
+        FileMetaData* fm = new FileMetaData(*f);
+        fm->refs = 1;
+        Partner& ptner = levels_[level].updated_files[f->number];
+        //fm->partners.push_back(ptner);
+        if(fm->partners.empty()) {
+          fm->partners.push_back(ptner);
+        } else{
+          fm->partners[0] = ptner;	   
+        }
 	   
-       DEBUG_T("add partner, origin SSTable:%d, smallest:%s, largest:%s\n", 
-               fm->number, 
-               fm->smallest.user_key().ToString().c_str(), 
-               fm->largest.user_key().ToString().c_str());
-       DEBUG_T("add partner, partner number:%d, partner_smallest:%s, partner_largest:%s\n",
-               ptner.partner_number,
-               ptner.partner_smallest.user_key().ToString().c_str(),
-               ptner.partner_largest.user_key().ToString().c_str());
-       DEBUG_T("now partners number is %d\n", fm->partners.size());
-       if(vset_->icmp_.Compare(ptner.partner_largest, fm->largest) > 0)
-           fm->largest = ptner.partner_largest;
-       if(vset_->icmp_.Compare(ptner.partner_smallest, fm->smallest) < 0)
-           fm->smallest = ptner.partner_smallest;
-       DEBUG_T("UpdateFile, smallest:%s, largest:%s\n",
-               fm->smallest.user_key().ToString().c_str(),
-               fm->largest.user_key().ToString().c_str());
-	   
-       fm->allowed_seeks = (fm->file_size / 16384);
-	   if (fm->allowed_seeks < 100) fm->allowed_seeks = 100;
-	   
-	   if (level > 0 && !files->empty()) {
-		   // Must not overlap
-		   assert(vset_->icmp_.Compare((*files)[files->size()-1]->largest,
-									   fm->smallest) < 0);
-	   }
-	   files->push_back(fm);  
-	} else {
-	//////////meggie
+        //更新FileMetadata的最小值和最大值
+        DEBUG_T("add partner, origin SSTable:%d, smallest:%s, largest:%s\n", 
+                fm->number, 
+                fm->smallest.user_key().ToString().c_str(), 
+                fm->largest.user_key().ToString().c_str());
+        DEBUG_T("add partner, partner number:%d, partner_smallest:%s, partner_largest:%s\n",
+                ptner.partner_number,
+                ptner.partner_smallest.user_key().ToString().c_str(),
+                ptner.partner_largest.user_key().ToString().c_str());
+        DEBUG_T("now partners number is %d\n", fm->partners.size());
+        if(vset_->icmp_.Compare(ptner.partner_largest, fm->largest) > 0)
+            fm->largest = ptner.partner_largest;
+        if(vset_->icmp_.Compare(ptner.partner_smallest, fm->smallest) < 0)
+            fm->smallest = ptner.partner_smallest;
+        DEBUG_T("UpdateFile, smallest:%s, largest:%s\n",
+                fm->smallest.user_key().ToString().c_str(),
+                fm->largest.user_key().ToString().c_str());
+
+        fm->allowed_seeks = (fm->file_size / 16384);
+        if (fm->allowed_seeks < 100) fm->allowed_seeks = 100;
+        
+        if (level > 0 && !files->empty()) {
+          // Must not overlap
+          assert(vset_->icmp_.Compare((*files)[files->size()-1]->largest,
+                        fm->smallest) < 0);
+        }
+        files->push_back(fm);  
+	  } else {
+	  //////////meggie
       //if(level > 1)
       //   DEBUG_T("MaybeAddFile, smallest:%s, largest:%s\n",
       //        f->smallest.user_key().ToString().c_str(),
@@ -1463,6 +1468,9 @@ void VersionSet::TestIterator(Iterator* iter, bool range, InternalKey start, Int
         iter->SeekToFirst();
         for(; iter->Valid(); iter->Next()) {
             Slice key = iter->key();
+            DEBUG_T("to get value\n");
+            Slice value = iter->value();
+            DEBUG_T("after get value\n");
             ParseInternalKey(key, &ikey);
             Slice user_key = ikey.user_key;
             DEBUG_T("user_key:%s\n", user_key.ToString().c_str());
@@ -1472,6 +1480,9 @@ void VersionSet::TestIterator(Iterator* iter, bool range, InternalKey start, Int
         iter->Seek(start.Encode());
         for(; iter->Valid(); iter->Next()) {
             Slice key = iter->key();
+            DEBUG_T("to get value\n");
+            Slice value = iter->value();
+            DEBUG_T("after get value\n");
             ParseInternalKey(key, &ikey);
             InternalKey mykey;
             mykey.SetFrom(ikey);
@@ -1505,8 +1516,8 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
         t_sptcompaction->inputs1_iter = NewIteratorWithPartner(
 											table_cache_, files1[inputs1_index]);
 
-        //DEBUG_T("test single inputs1_iter\n");
-        //TestIterator(t_sptcompaction->inputs1_iter, false, InternalKey(), InternalKey(), false);
+        DEBUG_T("test single inputs1_iter\n");
+        TestIterator(t_sptcompaction->inputs1_iter, false, InternalKey(), InternalKey(), false);
         result.push_back(t_sptcompaction);
         return;
     }
@@ -1536,10 +1547,10 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
           DEBUG_T("inputs1 index from %d~%d\n", inputs1start_index, inputs1end_index);
           inputs1_iter = GetIteratorWithPartner(files1, inputs1start_index, inputs1end_index);
                 
-                //DEBUG_T("in MergeTSplitCompaction, test inputs1_iter\n");
-                //TestIterator(inputs1_iter, false, InternalKey(), 
-                //        InternalKey(), false);
-          //
+          //DEBUG_T("in MergeTSplitCompaction, test inputs1_iter\n");
+          //TestIterator(inputs1_iter, false, InternalKey(), 
+          //        InternalKey(), false);
+        
           DEBUG_T("victims index from %d~%d\n", victimstart_index, victimend_index);
           victim_iter = GetIteratorWithPartner(files0, victimstart_index, victimend_index);
                 
@@ -1892,8 +1903,11 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         if(inputs1[i]->partners.size() > 10) {
             t_sptcompactions.push_back(sptcompaction);
             DEBUG_T("partner count more than 10\n");
-        }
-        else {
+        } else if (inputs1[i]->partners.size() > 0 && 
+                    inputs1[i]->partners[0].meta_usage > (1/2 * inputs1[i]->partners[0].meta_size)){
+            t_sptcompactions.push_back(sptcompaction);
+            DEBUG_T("partner meta usage is too large\n");
+        }  else {
             double ratio = GetOverlappingRatio_2(c, sptcompaction);
 			      DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
             if(inputs1[i]->partners.size() > 1){
