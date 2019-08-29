@@ -213,7 +213,7 @@ void TableBuilder::WriteRawBlock(const Slice& block_contents,
     r->status = r->file->Append(Slice(trailer, kBlockTrailerSize));
     if (r->status.ok()) {
       r->offset += block_contents.size() + kBlockTrailerSize;
-      DEBUG_T("after write raw block, offset is %llu\n", r->offset);
+      //DEBUG_T("after write raw block, offset is %llu\n", r->offset);
     }
   }
 }
@@ -310,7 +310,7 @@ bool TableBuilder::PartnerAdd(const Slice& key, const Slice& value, uint64_t* bl
 
   const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
   if (estimated_block_size >= r->options.block_size) {
-    Flush();
+    PartnerFlush();
     *block_size = r->pending_handle.size();
     *block_offset = r->pending_handle.offset();
   }
@@ -319,6 +319,18 @@ bool TableBuilder::PartnerAdd(const Slice& key, const Slice& value, uint64_t* bl
   *block_offset = r->offset;
   return true;
 }
+
+void TableBuilder::PartnerFlush() {
+  Rep* r = rep_;
+  assert(!r->closed);
+  if (!ok()) return;
+  if (r->data_block.empty()) return;
+  WriteBlock(&r->data_block, &r->pending_handle);
+  if (ok()) {
+    r->status = r->file->Flush();
+  }
+}
+
 //可通过nvm索引直接获取
 Status TableBuilder::PartnerFinish(uint64_t* block_size) {
   Rep* r = rep_;

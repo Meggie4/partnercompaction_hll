@@ -136,7 +136,9 @@ struct DBImpl::PartnerCompactionState {
         outfile(nullptr),
         partner_table(nullptr),
         total_bytes(0),
-        init(false) {
+        init(false),
+        hll(std::make_shared<HyperLogLog>(12)), 
+        hll_add_count(0){
   }
 };
 /////////////////meggie
@@ -323,7 +325,7 @@ void DBImpl::DeleteObsoleteFiles() {
   //////////meggie
   std::vector<std::string> filenames;
   env_->GetChildren(dbname_, &filenames);  // Ignoring errors on purpose
- //////////meggie
+  //////////meggie
   if(dbname_ != dbname_nvm_){
       env_->GetChildren(dbname_nvm_, &filenames_nvm);
       filenames.insert(filenames.end(), 
@@ -1042,35 +1044,39 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
 Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_index) {
     FileMetaData* fm = compact->compaction->input(1, input1_index);
     uint64_t meta_number, meta_size;
-    std::string metaFile = MapFileName(dbname_nvm_, meta_number);
     ArenaNVM* arena;
+    PartnerMeta* pm;
     if (!fm->partners.empty()) {
       compact->number = fm->partners[0].partner_number;
       compact->curr_smallest = fm->partners[0].partner_smallest;
       compact->curr_largest = fm->partners[0].partner_largest;
       compact->curr_file_size = fm->partners[0].partner_size;
+      compact->init = true;
       meta_number = fm->meta_number;
       meta_size = fm->meta_size;
-      compact->init = true;
+      std::string metaFile = MapFileName(dbname_nvm_, meta_number);
       arena = new ArenaNVM(meta_size, &metaFile, true);
+      arena->nvmarena_ = true;
+      DEBUG_T("after get arena nvm\n");
+      pm = new PartnerMeta(internal_comparator_, arena, true);
     } else {
       mutex_.Lock();
       uint64_t file_number = versions_->NewFileNumber();
-      meta_number = versions_->NewFileNumber();
-      meta_size = 4 << 10 << 10;
       pending_outputs_.insert(file_number);
       compact->number = file_number;
       compact->curr_smallest.Clear();
       compact->curr_largest.Clear();
       compact->curr_file_size = 0;
       mutex_.Unlock(); 
+      meta_number = versions_->NewFileNumber();
+      meta_size = 4 << 10 << 10;
+      std::string metaFile = MapFileName(dbname_nvm_, meta_number);
       arena = new ArenaNVM(meta_size, &metaFile, false);
+      arena->nvmarena_ = true;
+      DEBUG_T("after get arena nvm\n");
+      pm = new PartnerMeta(internal_comparator_, arena, false);
       //之后更新meta_number
     }
-    //get nvm skiplist
-    arena->nvmarena_ = true;
-    DEBUG_T("after get arena nvm\n");
-    PartnerMeta* pm = new PartnerMeta(internal_comparator_, arena, false);
     pm->Ref();
     // Make the output file
     std::string fname = TableFileName(dbname_, compact->number);
@@ -1078,6 +1084,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
     if (s.ok()) {
       TableBuilder* builder = new TableBuilder(options_, compact->outfile, compact->number, compact->curr_file_size);
       SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
+      compact->partner_table = spt;
     }
   return s;
 } 
@@ -1498,14 +1505,16 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
             if(compact->partner_table == nullptr) {
                 DEBUG_T("to set partner table\n");
                 status = OpenPartnerTable(compact, p_sptcompaction->inputs1_index);
+                DEBUG_T("after open partner table\n");
                 if(!status.ok()) {
                     break;
-                }
-                
+                }              
                 this_smallest.DecodeFrom(key);
             }    
             this_largest.DecodeFrom(key);
+            DEBUG_T("to add key %s into partner table\n", key.ToString().c_str());
             compact->partner_table->Add(key, input->value());
+            DEBUG_T("after add key into partner table\n");
             AddKeyToHyperLogLog(compact->hll, key);
             compact->hll_add_count++;
 
@@ -1525,13 +1534,15 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         status = Status::IOError("Deleting DB during compaction");
     }
    
+    DEBUG_T("after finish iter input\n");
     if(status.ok() && compact->partner_table != nullptr) {
-        if(internal_comparator_.Compare(this_smallest, compact->curr_smallest) < 0) {
+        if(!compact->init || internal_comparator_.Compare(this_smallest, compact->curr_smallest) < 0) {
           compact->curr_smallest = this_smallest;
         }
-        if(internal_comparator_.Compare(this_largest, compact->curr_largest) > 0) {
+        if(!compact->init || internal_comparator_.Compare(this_largest, compact->curr_largest) > 0) {
           compact->curr_largest = this_largest;
         }
+        DEBUG_T("before finish partner table\n");
         status = FinishPartnerTable(compact, input);
         DEBUG_T("push partner_size:%llu\n", compact->curr_file_size);
     }
@@ -1802,7 +1813,7 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
         FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
         int number = fm->number;
         pcompaction_files.push_back(number);
-        DEBUG_T("%d, ", p_sptcompactions[i]->inputs1_index);
+        DEBUG_T("%d,\n", p_sptcompactions[i]->inputs1_index);
         PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
         pcargs->db = this;
         pcargs->compact = new PartnerCompactionState(c);
@@ -1854,34 +1865,9 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
   }
 
   ///////////////meggie
-  /*if(compact->compaction->level() >= 1) {
-    start_timer(COMPUTE_OVERLLAP); 
-    std::vector<SplitCompaction*> t_sptcompactions;
-    std::vector<SplitCompaction*> p_sptcompactions;
-	DEBUG_T("---------------start in SplitCompaction----------------\n");
-    versions_->GetSplitCompactions(compact->compaction, t_sptcompactions,
-									 p_sptcompactions);
-    record_timer(COMPUTE_OVERLLAP);
-    std::vector<TSplitCompaction*> tcompactionlist;
-    
-    if(t_sptcompactions.size() > 0) {
-		versions_->MergeTSplitCompaction(compact->compaction, t_sptcompactions, tcompactionlist);
-    }
-    for(int i = 0; i < t_sptcompactions.size(); i++) {
-        delete t_sptcompactions[i];
-    }
-    for(int j = 0; j < p_sptcompactions.size(); j++) {
-        delete p_sptcompactions[j];
-    }
-    
-    for(int k = 0; k < tcompactionlist.size(); k++) {
-        delete tcompactionlist[k];
-    }
-	  DEBUG_T("---------------end in SplitCompaction----------------\n\n");
-  }*/
-
-  if(compact->compaction->num_input_files(1) == 0)
-      DEBUG_T("input1 size is 0\n");
+  // if(compact->compaction->level() >= 1) {
+  //   DoSplitCompactionWork(compact->compaction);
+  // }
   ///////////////meggie
 
   // Release mutex while we're actually doing the compaction work

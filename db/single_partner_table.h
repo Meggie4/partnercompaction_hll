@@ -27,7 +27,7 @@ namespace leveldb {
             PartnerMeta* meta_;
             uint64_t curr_blockoffset_;
             uint64_t curr_blocksize_;
-            std::vector<Slice> queue_;
+            std::vector<std::string> queue_;
     };
 }
 

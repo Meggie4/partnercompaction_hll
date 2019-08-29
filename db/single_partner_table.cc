@@ -28,23 +28,23 @@ namespace leveldb {
             //（3）当一个block构造完毕，那就调用insertMeta将该block中的所有键值对的元信息插入到PartnerMeta中
             curr_blockoffset_ = block_offset;
             curr_blocksize_ = block_size;
-            queue_.push_back(key);
+            queue_.push_back(key.ToString());
             insertMeta();
-
         } else {
             DEBUG_T("data block offset is:%llu\n", block_offset);
             //block还没有构造完毕，加入到
             curr_blockoffset_ = block_offset;
-            queue_.push_back(key);
+            queue_.push_back(key.ToString());
         }
     }
 
     void SinglePartnerTable::insertMeta() {
         if(queue_.empty())
             return;
-        for(auto key : queue_) {
+        for(int i = 0; i < queue_.size(); i++) {
             //一个个插入
-            meta_->Add(key, curr_blockoffset_, curr_blocksize_);
+            DEBUG_T("insertmeta, key is %s\n", queue_[i].c_str());
+            meta_->Add(Slice(queue_[i]), curr_blockoffset_, curr_blocksize_);
         }
         queue_.clear();
     }
@@ -64,5 +64,4 @@ namespace leveldb {
     uint64_t SinglePartnerTable::FileSize() {
         return builder_->FileSize();
     }
-    
 }

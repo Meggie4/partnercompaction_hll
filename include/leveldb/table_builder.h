@@ -84,6 +84,7 @@ class LEVELDB_EXPORT TableBuilder {
   //////////////meggie
   bool PartnerAdd(const Slice& key, const Slice& value, uint64_t* block_offset, uint64_t* block_size);
   Status PartnerFinish(uint64_t* block_size);
+  void PartnerFlush();
   //////////////meggie
 
  private:

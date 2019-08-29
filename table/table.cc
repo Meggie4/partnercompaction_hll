@@ -181,7 +181,7 @@ Iterator* Table::BlockReader(void* arg,
   // can add more features in the future.
 
   if (s.ok()) {
-    DEBUG_T("handle decode success\n");
+    //DEBUG_T("handle decode success\n");
     BlockContents contents;
     if (block_cache != nullptr) {
       char cache_key_buffer[16];
@@ -208,9 +208,10 @@ Iterator* Table::BlockReader(void* arg,
         block = new Block(contents);
       }
     }
-  } else {
-    DEBUG_T("handle decode failed\n");
-  }
+  } 
+  // else {
+  //   DEBUG_T("handle decode failed\n");
+  // }
 
 
   Iterator* iter;
