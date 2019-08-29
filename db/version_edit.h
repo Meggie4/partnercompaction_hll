@@ -22,10 +22,10 @@ class VersionSet;
 ///////////meggie
 struct Partner {
     uint64_t partner_number;
-	uint64_t partner_size;
+	  uint64_t partner_size;
     InternalKey partner_smallest;
     InternalKey partner_largest;
-	std::shared_ptr<HyperLogLog> hll;
+	  std::shared_ptr<HyperLogLog> hll;
     int hll_add_count;
     ///////////meggie
     Partner() : hll(std::make_shared<HyperLogLog>(12)), 
@@ -48,6 +48,8 @@ struct FileMetaData {
   std::vector<Partner> partners;
   std::shared_ptr<HyperLogLog> hll;
   int hll_add_count;
+  uint64_t meta_number;
+  uint64_t meta_size;
   //////////////meggie
   FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0),
     ///////////meggie

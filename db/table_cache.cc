@@ -8,6 +8,7 @@
 #include "leveldb/env.h"
 #include "leveldb/table.h"
 #include "util/coding.h"
+#include "db/partner_meta.h"
 
 namespace leveldb {
 
@@ -140,6 +141,29 @@ Status TableCache::Get(const ReadOptions& options,
     cache_->Release(handle);
   }
   return s;
+}
+
+Iterator* TableCache::NewPartnerIterator(const ReadOptions& options,
+                                  uint64_t file_number,
+                                  Iterator* meta_iter,
+                                  Table** tableptr) {
+  if (tableptr != nullptr) {
+    *tableptr = nullptr;
+  }
+
+  Cache::Handle* handle = nullptr;
+  Status s = FindTable(file_number, 0, &handle, true);
+  if (!s.ok()) {
+    return NewErrorIterator(s);
+  }
+
+  Table* table = reinterpret_cast<TableAndFile*>(cache_->Value(handle))->table;
+  Iterator* result = table->NewPartnerIterator(options, meta_iter);
+  result->RegisterCleanup(&UnrefEntry, cache_, handle);
+  if (tableptr != nullptr) {
+    *tableptr = table;
+  }
+  return result;
 }
 /////////////meggie
 

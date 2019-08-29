@@ -31,6 +31,7 @@ class LEVELDB_EXPORT TableBuilder {
   // caller to close the file after calling Finish().
   ////////////meggie
   TableBuilder(const Options& options, WritableFile* file, uint64_t file_number = 0);
+  TableBuilder(const Options& options, WritableFile* file, uint64_t number, uint64_t file_size);
   ////////////meggie
 
   TableBuilder(const TableBuilder&) = delete;

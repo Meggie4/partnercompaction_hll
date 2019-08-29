@@ -13,7 +13,9 @@ namespace leveldb {
 
 namespace {
 
-typedef Iterator* (*BlockFunction)(void*, const ReadOptions&, const Slice&);
+//////////meggie
+typedef Iterator* (*BlockFunction)(void*, const ReadOptions&, const Slice&, void* handle);
+////////////meggie
 
 class TwoLevelIterator: public Iterator {
  public:
@@ -163,7 +165,7 @@ void TwoLevelIterator::InitDataBlock() {
       // data_iter_ is already constructed with this iterator, so
       // no need to change anything
     } else {
-      Iterator* iter = (*block_function_)(arg_, options_, handle);
+      Iterator* iter = (*block_function_)(arg_, options_, handle, nullptr);
       data_block_handle_.assign(handle.data(), handle.size());
       SetDataIterator(iter);
     }

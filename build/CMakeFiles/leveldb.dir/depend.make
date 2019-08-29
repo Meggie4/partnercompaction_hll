@@ -53,6 +53,8 @@ CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/log_format.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/log_reader.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/log_writer.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/memtable.h
+CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/partner_meta.h
+CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/single_partner_table.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/skiplist.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/snapshot.h
 CMakeFiles/leveldb.dir/db/db_impl.cc.o: ../db/table_cache.h
@@ -377,13 +379,19 @@ CMakeFiles/leveldb.dir/db/single_partner_table.cc.o: include/port/port_config.h
 
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/dbformat.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/filename.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/partner_meta.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/skiplist.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../db/table_cache.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../port/atomic_pointer.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../port/cache_flush.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../port/thread_annotations.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../util/arena.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../util/coding.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../util/logging.h
+CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../util/random.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../include/leveldb/cache.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../include/leveldb/comparator.h
 CMakeFiles/leveldb.dir/db/table_cache.cc.o: ../include/leveldb/db.h

@@ -10,18 +10,90 @@ get offset_mem, end
 NewNode, end
 ArenaNVM, init alloc_rem, start
 data block offset is:0
-add key is abcdmykey
-add offset is 0, add block size is:42
-finish add single partner table
-memtable key is abcdmykey
+data block offset is:0
+data block offset is:0
+data block offset is:0
+data block offset is:0
+after write raw block, offset is 157
+add key is abcdmykey1
+add offset is 0, add block size is:152
+add key is abcdmykey2
+add offset is 0, add block size is:152
+add key is abcdmykey3
+add offset is 0, add block size is:152
+add key is abcdmykey4
+add offset is 0, add block size is:152
+add key is abcdmykey5
+add offset is 0, add block size is:152
+after first finish, file size is 157........
+data block offset is:157
+data block offset is:157
+data block offset is:157
+after write raw block, offset is 260
+add key is abcdmykey6
+add offset is 157, add block size is:98
+add key is abcdmykey7
+add offset is 157, add block size is:98
+add key is abcdmykey8
+add offset is 157, add block size is:98
+after second finish........
+memtable key is abcdmykey6
 find!
-offset, is 0, size:42
-offset is 0, block size:42
-internal get, block offset is:0, block_size is 42
+offset, is 157, size:98
+offset is 157, block size:98
+internal get, block offset is:157, block_size is 98
 handle decode success
-read block， block offset is:0, block_size is 42
+read block， block offset is:157, block_size is 98
 block iter is valid
-get value this is my key
+get value6 this is my key6
+meta iter, offset is 0, size is 152, block info is 
+block info is ， c_str:
+iter value, block offset is:0, block_size is 152
+handle decode success
+read block， block offset is:0, block_size is 152
+key is abcdmykey1, value is this is my key1
+meta iter, offset is 0, size is 152, block info is 
+block info is ， c_str:
+iter value, block offset is:0, block_size is 152
+handle decode success
+read block， block offset is:0, block_size is 152
+key is abcdmykey2, value is this is my key2
+meta iter, offset is 0, size is 152, block info is 
+block info is ， c_str:
+iter value, block offset is:0, block_size is 152
+handle decode success
+read block， block offset is:0, block_size is 152
+key is abcdmykey3, value is this is my key3
+meta iter, offset is 0, size is 152, block info is 
+block info is ， c_str:
+iter value, block offset is:0, block_size is 152
+handle decode success
+read block， block offset is:0, block_size is 152
+key is abcdmykey4, value is this is my key4
+meta iter, offset is 0, size is 152, block info is 
+block info is ， c_str:
+iter value, block offset is:0, block_size is 152
+handle decode success
+read block， block offset is:0, block_size is 152
+key is abcdmykey5, value is this is my key5
+meta iter, offset is 157, size is 98, block info is �
+block info is �， c_str:�
+iter value, block offset is:157, block_size is 98
+handle decode success
+read block， block offset is:157, block_size is 98
+key is abcdmykey6, value is this is my key6
+meta iter, offset is 157, size is 98, block info is �
+block info is �， c_str:�
+iter value, block offset is:157, block_size is 98
+handle decode success
+read block， block offset is:157, block_size is 98
+key is abcdmykey7, value is this is my key7
+meta iter, offset is 157, size is 98, block info is �
+block info is �， c_str:�
+iter value, block offset is:157, block_size is 98
+handle decode success
+read block， block offset is:157, block_size is 98
+key is abcdmykey8, value is this is my key8
 to delete partner meta
 before delete arena
 munmap,start, kSize:4194304, 8

@@ -159,15 +159,24 @@ static void ReleaseBlock(void* arg, void* h) {
 // into an iterator over the contents of the corresponding block.
 Iterator* Table::BlockReader(void* arg,
                              const ReadOptions& options,
-                             const Slice& index_value) {
+                             const Slice& index_value, 
+                             void* input_handle) {
   Table* table = reinterpret_cast<Table*>(arg);
   Cache* block_cache = table->rep_->options.block_cache;
   Block* block = nullptr;
   Cache::Handle* cache_handle = nullptr;
 
   BlockHandle handle;
-  Slice input = index_value;
-  Status s = handle.DecodeFrom(&input);
+  /////////////meggie
+  Status s;
+  if(input_handle != nullptr) {
+    handle = *(reinterpret_cast<BlockHandle*>(input_handle));
+    s = Status::OK();
+  } else {
+    Slice input = index_value;
+    s = handle.DecodeFrom(&input);
+  }
+  /////////////meggie
   // We intentionally allow extra stuff in index_value so that we
   // can add more features in the future.
 
@@ -274,7 +283,7 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
                           void (*saver)(void*, const Slice&, const Slice&), 
                           uint64_t block_offset, 
                           uint64_t block_size) {
- //获取data block的迭代器
+      //获取data block的迭代器
       std::string dst;
       PutVarint64(&dst, block_offset);
       PutVarint64(&dst, block_size);
@@ -295,7 +304,7 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
 Status Table::OpenPartnerTable(const Options& options,
                    RandomAccessFile* file,
                    Table** table) {
- *table = nullptr;
+  *table = nullptr;
 
   Rep* rep = new Table::Rep;
   rep->options = options;
@@ -307,6 +316,52 @@ Status Table::OpenPartnerTable(const Options& options,
   *table = new Table(rep);
 
   return Status::OK();
+}
+
+class Table::PartnerTableIterator : public Iterator {
+public:
+	PartnerTableIterator(Iterator* meta_iter, Table* table, const ReadOptions options)
+		: meta_iter_(meta_iter),
+		  table_(table),
+      options_(options)
+      {        // Marks as invalid
+	}
+	virtual bool Valid() const {
+		return meta_iter_->Valid();
+	}
+	virtual void Seek(const Slice& target) {
+		meta_iter_->Seek(target);
+	}
+	virtual void SeekToFirst() { meta_iter_->SeekToFirst(); }
+	virtual void SeekToLast() { meta_iter_->SeekToLast(); }
+	virtual void Next() {meta_iter_->Next();}
+	virtual void Prev() { meta_iter_->Prev();}
+	Slice key() const {
+		return meta_iter_->key();
+	}
+	Slice value() const {
+    Slice block_info = meta_iter_->value();
+    DEBUG_T("block info is %s， c_str:%s\n", block_info.data(), block_info.ToString().c_str());
+    const char* info = block_info.data();
+    BlockHandle handle;
+    handle.set_offset(DecodeFixed64(info));
+    handle.set_size(DecodeFixed64(info + 8));
+  
+    DEBUG_T("iter value, block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
+    Iterator* block_iter = BlockReader(table_, options_, Slice(), &handle);
+    block_iter->Seek(meta_iter_->key());
+    return block_iter->value();
+	}
+	virtual Status status() const { return Status::OK(); }
+private:
+	Iterator* meta_iter_;
+  Table* table_;
+  const ReadOptions options_;
+};
+
+
+Iterator* Table::NewPartnerIterator(const ReadOptions& options, Iterator* meta_iter) {
+  return new PartnerTableIterator(meta_iter, this, options);
 }
 ///////////////meggie
 

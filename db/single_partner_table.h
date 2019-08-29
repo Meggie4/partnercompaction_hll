@@ -10,19 +10,20 @@ namespace leveldb {
     class TableBuilder;
     class SinglePartnerTable{
         public:
-            SinglePartnerTable(uint64_t partner_number, TableBuilder* builder, PartnerMeta* meta);
+            SinglePartnerTable(TableBuilder* builder, PartnerMeta* meta);
             SinglePartnerTable(const SinglePartnerTable&) = delete;
             void operator=(const SinglePartnerTable&) = delete;
             ~SinglePartnerTable();
 
             void Add(const Slice& key, const Slice& value);
             //bool Get(const LookupKey& lkey,  std::string* value, Status* s);
-            void Finish();
+            Status Finish();
+            void Abandon();
+            uint64_t FileSize();
             
         private:
             void insertMeta();
             TableBuilder* builder_;
-            uint64_t partner_number_;
             PartnerMeta* meta_;
             uint64_t curr_blockoffset_;
             uint64_t curr_blocksize_;

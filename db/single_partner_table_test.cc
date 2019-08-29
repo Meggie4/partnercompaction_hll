@@ -62,33 +62,75 @@ namespace leveldb {
             DEBUG_T("new writable file failed\n");
         }
         Options option = leveldb::Options();
-        TableBuilder* builder = new TableBuilder(option, file, 1);
-        SinglePartnerTable* spt = new SinglePartnerTable(1, builder, pm);
-        Slice value("this is my key");
-        LookupKey lkey(Slice("abcdmykey"), 0);
-        spt->Add(lkey.internal_key(), value);
+        uint64_t file_number = 1;
+        TableBuilder* builder = new TableBuilder(option, file, file_number);
+        SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
+        Slice value1("this is my key1");
+        Slice value2("this is my key2");
+        Slice value3("this is my key3");
+        Slice value4("this is my key4");
+        Slice value5("this is my key5");
+        LookupKey lkey1(Slice("abcdmykey1"), 0);
+        LookupKey lkey2(Slice("abcdmykey2"), 0);
+        LookupKey lkey3(Slice("abcdmykey3"), 0);
+        LookupKey lkey4(Slice("abcdmykey4"), 0);
+        LookupKey lkey5(Slice("abcdmykey5"), 0);
+        spt->Add(lkey1.internal_key(), value1);
+        spt->Add(lkey2.internal_key(), value2);
+        spt->Add(lkey3.internal_key(), value3);
+        spt->Add(lkey4.internal_key(), value4);
+        spt->Add(lkey5.internal_key(), value5);
         spt->Finish();
-        DEBUG_T("finish add single partner table\n");
+        uint64_t file_size = spt->FileSize();
+        delete spt;
+        spt = nullptr;
+        DEBUG_T("after first finish, file size is %llu........\n", file_size);
+        
+        builder = new TableBuilder(option, file, file_number, file_size);
+        spt = new SinglePartnerTable(builder, pm);
+        Slice value6("this is my key6");
+        Slice value7("this is my key7");
+        Slice value8("this is my key8");
+        LookupKey lkey6(Slice("abcdmykey6"), 0);
+        LookupKey lkey7(Slice("abcdmykey7"), 0);
+        LookupKey lkey8(Slice("abcdmykey8"), 0);
+        spt->Add(lkey6.internal_key(), value6);
+        spt->Add(lkey7.internal_key(), value7);
+        spt->Add(lkey8.internal_key(), value8);
+        spt->Finish();
+        delete spt;
+        spt = nullptr;
+        DEBUG_T("after second finish........\n");
 
         //读取数据
         uint64_t block_offset, block_size;
-        bool find = pm->Get(lkey, &block_offset, &block_size, &s);
+        bool find = pm->Get(lkey6, &block_offset, &block_size, &s);
         TableCache* table_cache = new TableCache(dbname, option, option.max_open_files);
         ReadOptions roptions;
         std::string resValue;
         Saver saver;
         saver.state = kNotFound;
         saver.ucmp = cmp.user_comparator();
-        saver.user_key = lkey.user_key();
+        saver.user_key = lkey6.user_key();
         saver.value = &resValue;
         if(find) {
             DEBUG_T("offset is %llu, block size:%llu\n", block_offset, block_size);
-            s = table_cache->Get(roptions, 1, lkey.internal_key(), &saver, SaveValue, block_offset, block_size);
-            DEBUG_T("get value %s\n", (*saver.value).c_str());
+            s = table_cache->Get(roptions, file_number, lkey6.internal_key(), &saver, SaveValue, block_offset, block_size);
+            DEBUG_T("get value6 %s\n", (*saver.value).c_str());
         } else {
             DEBUG_T("cannot find key from nvm skiplist\n");
         }
-        delete spt;
+
+        //迭代器
+        
+        Iterator* iter = table_cache->NewPartnerIterator(ReadOptions(), file_number, pm->NewIterator());
+        iter->SeekToFirst();
+        while(iter->Valid()) {
+            DEBUG_T("key is %s, value is %s\n", iter->key().ToString().c_str(), iter->value().ToString().c_str());
+            iter->Next();
+        }
+        delete iter;
+        pm->Unref();
     }
 }
 

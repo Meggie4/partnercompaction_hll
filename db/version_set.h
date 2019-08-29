@@ -43,19 +43,19 @@ class WritableFile;
 //////////////meggie
 struct SplitCompaction {
     std::vector<int> victims;
-	Iterator* victim_iter;
+	  Iterator* victim_iter;
     InternalKey victim_start;
     InternalKey victim_end;
     bool containsend;
     int inputs1_index;
 	
-	SplitCompaction():
-		victim_iter(nullptr) {}
+	  SplitCompaction():
+		  victim_iter(nullptr) {}
 
-	~SplitCompaction() {
-		if(victim_iter)
-			delete victim_iter;
-	}
+	  ~SplitCompaction() {
+		  if(victim_iter)
+			  delete victim_iter;
+	  }
 };
 
 struct TSplitCompaction {

@@ -51,11 +51,16 @@ struct TableBuilder::Rep {
 
   std::string compressed_output;
 
-  Rep(const Options& opt, WritableFile* f)
+  ////////////meggie
+  Rep(const Options& opt, WritableFile* f, uint64_t file_size = 0)
+  ////////////meggie
       : options(opt),
         index_block_options(opt),
         file(f),
-        offset(0),
+        ///////////meggie
+        //offset(0),
+        offset(file_size),
+        ///////////meggie
         data_block(&options),
         index_block(&index_block_options),
         num_entries(0),
@@ -68,6 +73,11 @@ struct TableBuilder::Rep {
 };
 
 ////////////////meggie
+TableBuilder::TableBuilder(const Options& options, WritableFile* file, uint64_t number, uint64_t file_size) 
+: rep_(new Rep(options, file, file_size)), 
+  file_number(number) {
+}
+
 TableBuilder::TableBuilder(const Options& options, WritableFile* file, uint64_t number)
 ////////////////meggie
     : rep_(new Rep(options, file)), 
@@ -203,6 +213,7 @@ void TableBuilder::WriteRawBlock(const Slice& block_contents,
     r->status = r->file->Append(Slice(trailer, kBlockTrailerSize));
     if (r->status.ok()) {
       r->offset += block_contents.size() + kBlockTrailerSize;
+      DEBUG_T("after write raw block, offset is %llu\n", r->offset);
     }
   }
 }

@@ -214,7 +214,8 @@ class Version::LevelFileNumIterator : public Iterator {
 
 static Iterator* GetFileIterator(void* arg,
                                  const ReadOptions& options,
-                                 const Slice& file_value) {
+                                 const Slice& file_value, 
+                                 void* handle = nullptr) {
   TableCache* cache = reinterpret_cast<TableCache*>(arg);
   if (file_value.size() != 16) {
     return NewErrorIterator(
@@ -251,13 +252,12 @@ int FindFileWithPartner(const InternalKeyComparator& icmp,
 class Version::LevelFileNumIteratorWithPartner : public Iterator {
 public:
 	LevelFileNumIteratorWithPartner(const InternalKeyComparator& icmp,
-						 const std::vector<FileMetaData*>* flist,
-                         int start_index, int end_index)
+						 const std::vector<FileMetaData*>* flist, int start_index, int end_index)
 		: icmp_(icmp),
 		  flist_(flist),
-          index_(end_index),
+      index_(end_index),
 		  start_index_(start_index),
-          end_index_(end_index){        // Marks as invalid
+      end_index_(end_index){        // Marks as invalid
 	}
 	virtual bool Valid() const {
 		return (index_ >= start_index_ &&  
@@ -292,11 +292,11 @@ public:
 	Slice value() const {
 		assert(Valid());
 		/////////////meggie
-		uintptr_t flist_ptr = reinterpret_cast<uintptr_t>((void*)flist_);
-		//DEBUG_T("flist_ptr:%llu\n", flist_ptr);
-        EncodeFixed64(value_buf_, flist_ptr);
+		uintptr_t flist_ptr = reinterpret_cast<uintptr_t>((void*)flist_); 
+    //DEBUG_T("flist_ptr:%llu\n", flist_ptr);
+    EncodeFixed64(value_buf_, flist_ptr);
 		EncodeFixed32(value_buf_+ 8, index_);
-		uintptr_t flist_arg = DecodeFixed64(value_buf_);
+		//uintptr_t flist_arg = DecodeFixed64(value_buf_);
 		//DEBUG_T("flist_arg:%llu\n", flist_arg);
 		/////////////meggie
 		return Slice(value_buf_, sizeof(value_buf_));
@@ -305,11 +305,11 @@ public:
 private:
 	const InternalKeyComparator icmp_;
 	const std::vector<FileMetaData*>* const flist_;
-    /////////meggie
+  /////////meggie
 	uint32_t index_;
-    uint32_t start_index_;
-    uint32_t end_index_;
-    /////////meggie
+  uint32_t start_index_;
+  uint32_t end_index_;
+  /////////meggie
 
 	// Backing store for value().  Holds the file number and size.
 	/////////////meggie
@@ -321,7 +321,8 @@ static InternalKeyComparator global_icmp(BytewiseComparator());
 
 static Iterator* GetFileIteratorWithPartner(void* arg,
                                  const ReadOptions& options,
-                                 const Slice& file_value) {
+                                 const Slice& file_value, 
+                                 void* handle = nullptr) {
 	TableCache* cache = reinterpret_cast<TableCache*>(arg);
 	//delete args;
     if (file_value.size() != 12) {
@@ -329,17 +330,12 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 				   Status::Corruption("FileReader invoked with unexpected value"));
 	} else {
 		uintptr_t flist_arg = DecodeFixed64(file_value.data());
-
-		const std::vector<FileMetaData*>* flist = (const std::vector<FileMetaData*>*)(
-					reinterpret_cast<void*>(flist_arg));
+		const std::vector<FileMetaData*>* flist = (const std::vector<FileMetaData*>*)(reinterpret_cast<void*>(flist_arg));
 		uint32_t index = DecodeFixed32(file_value.data() + 8);
-        //DEBUG_T("GetFileIteratorWithPartner, index:%d, flist_arg:%llu\n", 
-          //      index, flist_arg);
-
+    //DEBUG_T("GetFileIteratorWithPartner, index:%d, flist_arg:%llu\n", 
+    //      index, flist_arg);
 		FileMetaData* file = (*flist)[index];
-		
-        //DEBUG_T("file->number:%lld\n", file->number);
-
+    //DEBUG_T("file->number:%lld\n", file->number);
 		int sz = file->partners.size() + 1;
 		Iterator** list = new Iterator*[sz];
 		list[0] = cache->NewIterator(options, file->number, file->file_size);
@@ -1414,8 +1410,7 @@ const char* VersionSet::LevelSummary(LevelSummaryStorage* scratch) const {
 
 ////////////////////meggie
 ////针对的是victim inputs没有partner的情况, 获取traditional compaction 
-void VersionSet::AddInputDeletions(VersionEdit* edit, Compaction* c, 
-                                std::vector<int> tcompaction_index) {
+void VersionSet::AddInputDeletions(VersionEdit* edit, Compaction* c, std::vector<int> tcompaction_index) {
     const std::vector<FileMetaData*>& files0 = c->inputs_[0];
     const std::vector<FileMetaData*>& files1 = c->inputs_[1];
     int level = c->level();
@@ -1434,17 +1429,14 @@ void VersionSet::AddInputDeletions(VersionEdit* edit, Compaction* c,
     DEBUG_T("\n");
 }
 
-Iterator* VersionSet::GetIteratorWithPartner(
-                    const std::vector<FileMetaData*>& files,
-					        int start_index, int end_index) {
-	ReadOptions options;
+Iterator* VersionSet::GetIteratorWithPartner(const std::vector<FileMetaData*>& files, int start_index, int end_index) {
+	  ReadOptions options;
     options.verify_checksums = options_->paranoid_checks;
     options.fill_cache = false;
     //options.comparator = &icmp_;
    
     return NewTwoLevelIterator(new Version::LevelFileNumIteratorWithPartner(icmp_, &files, 
-							start_index, end_index), &GetFileIteratorWithPartner, 
-							table_cache_, options);
+							start_index, end_index), &GetFileIteratorWithPartner, table_cache_, options);
 }
 
 Iterator* VersionSet::GetSingleCompactionIterator(Compaction* c) {
@@ -1489,14 +1481,14 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
 	
     const std::vector<FileMetaData*>& files0 = c->inputs_[0];
     const std::vector<FileMetaData*>& files1 = c->inputs_[1];
-	int sz = t_sptcompactions.size();
+	  int sz = t_sptcompactions.size();
     bool containsend;
 
     if(sz == 1) {
         TSplitCompaction* t_sptcompaction = new TSplitCompaction;
-		int inputs1_index = t_sptcompactions[0]->inputs1_index;
+		    int inputs1_index = t_sptcompactions[0]->inputs1_index;
         t_sptcompaction->victim_iter = t_sptcompactions[0]->victim_iter;
-		t_sptcompactions[0]->victim_iter = nullptr;
+		    t_sptcompactions[0]->victim_iter = nullptr;
         t_sptcompaction->victim_start = t_sptcompactions[0]->victim_start;
         t_sptcompaction->victim_end = t_sptcompactions[0]->victim_end;
         t_sptcompaction->containsend = t_sptcompactions[0]->containsend;
@@ -1509,45 +1501,44 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
         return;
     }
     
-	std::vector<SplitCompaction*> tmpt_sptcompactions;
-	tmpt_sptcompactions.push_back(t_sptcompactions[0]);
-	SplitCompaction* pre = t_sptcompactions[0];
-	int count = 1;
+    std::vector<SplitCompaction*> tmpt_sptcompactions;
+    tmpt_sptcompactions.push_back(t_sptcompactions[0]);
+    SplitCompaction* pre = t_sptcompactions[0];
+    int count = 1;
 	
     TSplitCompaction* t_sptcompaction = new TSplitCompaction;
-	//DEBUG_T("traditional compaction:\n");
+	  //DEBUG_T("traditional compaction:\n");
 	
     for(int i = 1; i <= sz; i++) {
-        if(((i == sz) ||
-				t_sptcompactions[i]->inputs1_index - pre->inputs1_index > 1)) {
-			Iterator* victim_iter, *inputs1_iter;
-			t_sptcompaction->victim_start = tmpt_sptcompactions[0]->victim_start;
-			t_sptcompaction->victim_end = tmpt_sptcompactions[count - 1]->victim_end;
-			t_sptcompaction->containsend = tmpt_sptcompactions[count - 1]->containsend;
-			
-			int victimstart_index = tmpt_sptcompactions[0]->victims[0];
-			int victimsz = tmpt_sptcompactions[count - 1]->victims.size();
-			int victimend_index = tmpt_sptcompactions[count - 1]->victims[victimsz - 1];
-			
-			int inputs1start_index = tmpt_sptcompactions[0]->inputs1_index;
-			int inputs1end_index = tmpt_sptcompactions[count - 1]->inputs1_index;		
-			
-            DEBUG_T("inputs1 index from %d~%d\n", inputs1start_index, inputs1end_index);
-			inputs1_iter = GetIteratorWithPartner(files1, inputs1start_index, inputs1end_index);
-            
-            //DEBUG_T("in MergeTSplitCompaction, test inputs1_iter\n");
-            //TestIterator(inputs1_iter, false, InternalKey(), 
-            //        InternalKey(), false);
-			//
-            DEBUG_T("victims index from %d~%d\n", victimstart_index, victimend_index);
-			victim_iter = GetIteratorWithPartner(files0, victimstart_index, victimend_index);
-            
-            DEBUG_T("in MergeTSplitCompaction, test victim_iter\n");
+        if(((i == sz) || t_sptcompactions[i]->inputs1_index - pre->inputs1_index > 1)) {
+          Iterator* victim_iter, *inputs1_iter;
+          t_sptcompaction->victim_start = tmpt_sptcompactions[0]->victim_start;
+          t_sptcompaction->victim_end = tmpt_sptcompactions[count - 1]->victim_end;
+          t_sptcompaction->containsend = tmpt_sptcompactions[count - 1]->containsend;
+          
+          int victimstart_index = tmpt_sptcompactions[0]->victims[0];
+          int victimsz = tmpt_sptcompactions[count - 1]->victims.size();
+          int victimend_index = tmpt_sptcompactions[count - 1]->victims[victimsz - 1];
+          
+          int inputs1start_index = tmpt_sptcompactions[0]->inputs1_index;
+          int inputs1end_index = tmpt_sptcompactions[count - 1]->inputs1_index;		
+          
+          DEBUG_T("inputs1 index from %d~%d\n", inputs1start_index, inputs1end_index);
+          inputs1_iter = GetIteratorWithPartner(files1, inputs1start_index, inputs1end_index);
+                
+                //DEBUG_T("in MergeTSplitCompaction, test inputs1_iter\n");
+                //TestIterator(inputs1_iter, false, InternalKey(), 
+                //        InternalKey(), false);
+          //
+          DEBUG_T("victims index from %d~%d\n", victimstart_index, victimend_index);
+          victim_iter = GetIteratorWithPartner(files0, victimstart_index, victimend_index);
+                
+          DEBUG_T("in MergeTSplitCompaction, test victim_iter\n");
             //TestIterator(victim_iter, true, 
             //       t_sptcompaction->victim_start, 
             //       t_sptcompaction->victim_end, 
             //       t_sptcompaction->containsend);
-		    //TestIterator(victim_iter);
+		      //TestIterator(victim_iter);
 
             /*
             Iterator* list[2];
@@ -1574,21 +1565,21 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
             //delete merge_iter;
             //DEBUG_T("after delete merge_iter\n");
 
-            t_sptcompaction->victim_iter = victim_iter;
-			t_sptcompaction->inputs1_iter = inputs1_iter;
-			result.push_back(t_sptcompaction);
+          t_sptcompaction->victim_iter = victim_iter;
+          t_sptcompaction->inputs1_iter = inputs1_iter;
+          result.push_back(t_sptcompaction);
 
-			if(i < sz) {
-                tmpt_sptcompactions.clear();
-                t_sptcompaction = new TSplitCompaction;
-				tmpt_sptcompactions.push_back(t_sptcompactions[i]);
-				pre = t_sptcompactions[i];
-			    count = 1;
-			}
-		} else {
-			tmpt_sptcompactions.push_back(t_sptcompactions[i]);
-			pre = t_sptcompactions[i];
-			count++;
+          if(i < sz) {
+                    tmpt_sptcompactions.clear();
+                    t_sptcompaction = new TSplitCompaction;
+            tmpt_sptcompactions.push_back(t_sptcompactions[i]);
+            pre = t_sptcompactions[i];
+              count = 1;
+          }
+        } else {
+          tmpt_sptcompactions.push_back(t_sptcompactions[i]);
+          pre = t_sptcompactions[i];
+          count++;
         }
     }
 }
@@ -1765,7 +1756,7 @@ double VersionSet::GetOverlappingRatio_2(Compaction* c,
 }
 
 double VersionSet::GetGlobalOverlappingRatio(Compaction* c) {
-	std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
+	  std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
     std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
 
     uint64_t total_keys = 0; 
@@ -1799,7 +1790,16 @@ double VersionSet::GetGlobalOverlappingRatio(Compaction* c) {
 
     return ratio;
 }
-
+/*
+1.inputs[0]可能含有多个不重叠的文件; 遍历inputs1， 针对每个inputs1中的sstable，都拥有一个SplitCompaction对象；对SplitCompaction赋值：
+  * InternalKey victim_start， victim_end; 记录了该sstable与inputs[0]重叠的键范围
+  * 以及其在inputs1中的索引inputs1_index;
+  * 与inputs[0]重叠的victims，
+  * 并获取重叠的victims的迭代器，包含了partner
+2.根据两种情况选择进行traditional compaction:
+ * 该sstable中的partner数量过多
+ * 该sstable与partner的重叠率过高
+*/
 void VersionSet::GetSplitCompactions(Compaction* c, 
 						std::vector<SplitCompaction*>& t_sptcompactions,
 						std::vector<SplitCompaction*>& p_sptcompactions) {
@@ -1831,7 +1831,7 @@ void VersionSet::GetSplitCompactions(Compaction* c,
     int i = 0, j = 0;
     for(; i < sz1; i++) {
         SplitCompaction* sptcompaction =  new SplitCompaction;
-		std::set<int> victims;
+		    std::set<int> victims;
         //inputs1的sstable的最小值是否小于inputs0当前的sstable的最大值， 
         //inputs1的sstable的最大值是否大于inputs0下一个的sstable的最小值，如果是的，那结束的位置就是当前的sstable,
         //并且compaction的范围需要选定，
@@ -1860,17 +1860,14 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         else 
             sptcompaction->containsend = true;
 		
-		for(auto iter = victims.begin(); iter != victims.end(); iter++) 
-			sptcompaction->victims.push_back(*iter);
+		    for(auto iter = victims.begin(); iter != victims.end(); iter++) 
+			      sptcompaction->victims.push_back(*iter);
         
         int victimsz = sptcompaction->victims.size();
         int victimstart_index = sptcompaction->victims[0];
         int victimend_index = sptcompaction->victims[victimsz - 1];
         DEBUG_T("in GetSplitCompactions\n");
-		sptcompaction->victim_iter = 
-                GetIteratorWithPartner(inputs0, 
-                    victimstart_index, victimend_index); 
-        
+		    sptcompaction->victim_iter = GetIteratorWithPartner(inputs0, victimstart_index, victimend_index); 
         //DEBUG_T("in GetSplitCompactions, test victim_iter\n");
         //TestIterator(sptcompaction->victim_iter, true, 
         //        sptcompaction->victim_start, 
@@ -1888,7 +1885,7 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         }
         else {
             double ratio = GetOverlappingRatio_2(c, sptcompaction);
-			DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
+			      DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
             if(inputs1[i]->partners.size() > 1){
                 if(global_ratio > 0.2 && ratio > 0.15) {
                     DEBUG_T("global_ratio greater than 0.2, ratio greater than 0.15, partner count is:%d\n", 

@@ -52,7 +52,11 @@ class TableCache {
                        void (*saver)(void*, const Slice&, const Slice&), 
                        uint64_t block_offset, 
                        uint64_t block_size);
-  //////////////meggie
+  Iterator* NewPartnerIterator(const ReadOptions& options,
+                        uint64_t file_number,
+                        Iterator* meta_iter,
+                        Table** tableptr = nullptr);
+//////////////meggie
 
   // Evict any entry for the specified file number
   void Evict(uint64_t file_number);

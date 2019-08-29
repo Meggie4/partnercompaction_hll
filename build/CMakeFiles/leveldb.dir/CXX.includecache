@@ -697,6 +697,8 @@ util/timer.h
 /home/meggie/文档/partnercompaction_hll/db/util/timer.h
 util/threadpool_new.h
 /home/meggie/文档/partnercompaction_hll/db/util/threadpool_new.h
+db/single_partner_table.h
+/home/meggie/文档/partnercompaction_hll/db/db/single_partner_table.h
 
 /home/meggie/文档/partnercompaction_hll/db/db_iter.cc
 db/db_iter.h
@@ -919,6 +921,8 @@ leveldb/table.h
 /home/meggie/文档/partnercompaction_hll/db/leveldb/table.h
 util/coding.h
 /home/meggie/文档/partnercompaction_hll/db/util/coding.h
+db/partner_meta.h
+/home/meggie/文档/partnercompaction_hll/db/db/partner_meta.h
 
 /home/meggie/文档/partnercompaction_hll/db/version_edit.cc
 db/version_edit.h

@@ -18,6 +18,7 @@ struct Options;
 class RandomAccessFile;
 struct ReadOptions;
 class TableCache;
+class PartnerMeta;
 
 // A Table is a sorted map from strings to strings.  Tables are
 // immutable and persistent.  A Table may be safely accessed from
@@ -45,6 +46,8 @@ class LEVELDB_EXPORT Table {
   static Status OpenPartnerTable(const Options& options,
                      RandomAccessFile* file,
                      Table** table);
+  class PartnerTableIterator;
+  Iterator* NewPartnerIterator(const ReadOptions& options, Iterator* meta_iter);
   ////////////////meggie
 
   Table(const Table&) = delete;
@@ -70,7 +73,9 @@ class LEVELDB_EXPORT Table {
   Rep* rep_;
 
   explicit Table(Rep* rep) { rep_ = rep; }
-  static Iterator* BlockReader(void*, const ReadOptions&, const Slice&);
+  //////////////meggie
+  static Iterator* BlockReader(void*, const ReadOptions&, const Slice&, void* handle = nullptr);
+  ////////////meggie
 
   // Calls (*handle_result)(arg, ...) with the entry found after a call
   // to Seek(key).  May not make such a call if filter policy says

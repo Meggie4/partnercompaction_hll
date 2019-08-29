@@ -36,7 +36,7 @@ class FileMetaData;
 
 class DBImpl : public DB {
  public:
-  DBImpl(const Options& options, const std::string& dbname);
+  DBImpl(const Options& options, const std::string& dbname,const std::string& dbname_nvm = "");
   virtual ~DBImpl();
 
   // Implementations of the DB interface
@@ -79,6 +79,7 @@ class DBImpl : public DB {
   friend class DB;
   struct CompactionState;
   //////////////meggie
+  struct PartnerCompactionState;
   struct TraditionalCompactionArgs;
   struct PartnerCompactionArgs;
   /////////////meggie
@@ -130,13 +131,15 @@ class DBImpl : public DB {
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   ///////////////meggie
+  const std::string dbname_nvm_;
   Status DoSplitCompactionWork(Compaction* c);
   static void DoTraditionCompactionWork(void* args);
   static void DoPartnerCompactionWork(void* args);
   void DealWithTraditionCompaction(CompactionState* compact, 
                         TSplitCompaction* t_sptcompaction);
-  void DealWithPartnerCompaction(CompactionState* compact, 
-                            SplitCompaction* p_sptcompaction);
+  // void DealWithPartnerCompaction(CompactionState* compact, 
+  //                           SplitCompaction* p_sptcompaction);
+  void DealWithPartnerCompaction(PartnerCompactionState* compact, SplitCompaction* p_sptcompaction);
   void AddFileWithTraditionalCompaction(VersionEdit* edit, 
         std::vector<CompactionState*>& t_compactionstate_list);
   bool ValidAndInRange(Iterator* iter, InternalKey end, 
@@ -145,6 +148,8 @@ class DBImpl : public DB {
             std::vector<uint64_t>& pcompaction_files, 
             std::vector<CompactionState*>& p_compactionstate_list);
   Status DealWithSingleCompaction(CompactionState* compact);
+  Status OpenPartnerTable(PartnerCompactionState* compact, int input_index);
+  Status FinishPartnerTable(PartnerCompactionState* compact, Iterator* input);
   ///////////////meggie
 
   Status OpenCompactionOutputFile(CompactionState* compact);
@@ -243,7 +248,8 @@ class DBImpl : public DB {
 Options SanitizeOptions(const std::string& db,
                         const InternalKeyComparator* icmp,
                         const InternalFilterPolicy* ipolicy,
-                        const Options& src);
+                        const Options& src,
+                        const std::string& dbname_nvm = "");
 
 }  // namespace leveldb
 

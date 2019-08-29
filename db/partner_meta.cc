@@ -89,12 +89,30 @@ namespace leveldb {
         virtual Slice key() const { return GetLengthPrefixedSlice(iter_.key()); }
 #endif
         virtual Slice value() const {
+// #if defined(USE_OFFSETS)
+//             Slice key_slice = GetLengthPrefixedSlice(reinterpret_cast<const char *>((intptr_t)iter_.node_ - (intptr_t)iter_.key_offset()));
+// #else
+//             Slice key_slice = GetLengthPrefixedSlice(iter_.key());
+// #endif
+//             return Slice(key_slice.data() + key_slice.size(), 16);
+            uint32_t key_length;
 #if defined(USE_OFFSETS)
-            Slice key_slice = GetLengthPrefixedSlice(reinterpret_cast<const char *>((intptr_t)iter_.node_ - (intptr_t)iter_.key_offset()));
-#else
-            Slice key_slice = GetLengthPrefixedSlice(iter_.key());
+            const char* entry = reinterpret_cast<const char*>((intptr_t)iter_.node_ - 
+                                                (intptr_t)iter_.key_offset());
+                                                #else 
+            const char* entry = iter_.key();
 #endif
-            return Slice(key_slice.data() + key_slice.size(), 8);
+            const char* key_ptr = GetVarint32Ptr(entry, entry + 5, &key_length);
+            uint64_t offset, size;
+            offset = DecodeFixed64(key_ptr + key_length);
+            size = DecodeFixed64(key_ptr + key_length + 8); 
+
+            // Slice encode = Slice(key_ptr + key_length, 16);
+            // offset = DecodeFixed64(key_ptr + key_length);
+            // size = DecodeFixed64(key_ptr + key_length + 8); 
+
+            DEBUG_T("meta iter, offset is %llu, size is %llu, block info is %s\n", offset, size, Slice(key_ptr + key_length, 16).ToString().c_str());
+            return Slice(key_ptr + key_length, 16);
         }
         //NoveLSM
         //virtual void SetHead(void *ptr) { iter_.SetHead(ptr); }

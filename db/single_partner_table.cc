@@ -7,15 +7,14 @@
 
 namespace leveldb {
     //针对读取partner的情况，通过meta获取到data block以及offset， 通过table cache获取相应的数据， 传入block offset以及block size
-    SinglePartnerTable::SinglePartnerTable(uint64_t partner_number, TableBuilder* builder, PartnerMeta* meta)
-    : partner_number_(partner_number),
-      builder_(builder), 
+    SinglePartnerTable::SinglePartnerTable(TableBuilder* builder, PartnerMeta* meta)
+    : builder_(builder), 
       meta_(meta){
     }
 
     SinglePartnerTable::~SinglePartnerTable() {
         delete builder_;
-        meta_->Unref();
+        //meta_->Unref();
     }
 
     void SinglePartnerTable::Add(const Slice& key, const Slice& value) {
@@ -50,11 +49,20 @@ namespace leveldb {
         queue_.clear();
     }
 
-    void SinglePartnerTable::Finish() {
+    Status SinglePartnerTable::Finish() {
         uint64_t block_size = 0;
-        builder_->PartnerFinish(&block_size);
+        Status s = builder_->PartnerFinish(&block_size);
         curr_blocksize_ = block_size;
         insertMeta();
+        return s;
     }
 
+    void SinglePartnerTable::Abandon() {
+        builder_->Abandon();
+    }
+
+    uint64_t SinglePartnerTable::FileSize() {
+        return builder_->FileSize();
+    }
+    
 }

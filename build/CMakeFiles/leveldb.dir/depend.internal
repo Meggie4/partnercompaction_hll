@@ -54,6 +54,8 @@ CMakeFiles/leveldb.dir/db/db_impl.cc.o
  ..//db/log_reader.h
  ..//db/log_writer.h
  ..//db/memtable.h
+ ..//db/partner_meta.h
+ ..//db/single_partner_table.h
  ..//db/skiplist.h
  ..//db/snapshot.h
  ..//db/table_cache.h
@@ -378,13 +380,19 @@ CMakeFiles/leveldb.dir/db/single_partner_table.cc.o
 CMakeFiles/leveldb.dir/db/table_cache.cc.o
  ..//db/dbformat.h
  ..//db/filename.h
+ ..//db/partner_meta.h
+ ..//db/skiplist.h
  ..//db/table_cache.h
  ..//port/atomic_pointer.h
+ ..//port/cache_flush.h
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/arena.h
  ..//util/coding.h
+ ..//util/debug.h
  ..//util/logging.h
+ ..//util/random.h
  ../include/leveldb/cache.h
  ../include/leveldb/comparator.h
  ../include/leveldb/db.h
