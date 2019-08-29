@@ -19,6 +19,7 @@
 #include "util/logging.h"
 
 #include "util/debug.h"
+#include "db/partner_meta.h"
 
 namespace leveldb {
 
@@ -339,11 +340,16 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 		int sz = file->partners.size() + 1;
 		Iterator** list = new Iterator*[sz];
 		list[0] = cache->NewIterator(options, file->number, file->file_size);
-        DEBUG_T("in GetFileIterator, partner count is:%d\n", file->partners.size());
+    DEBUG_T("in GetFileIterator, partner count is:%d\n", file->partners.size());
 		for(int i = 0; i < sz - 1; i++) {
-			list[i + 1] = cache->NewIterator(options,
-								  file->partners[i].partner_number,
-								  file->partners[i].partner_size);
+			// list[i + 1] = cache->NewIterator(options,
+			// 					  file->partners[i].partner_number,
+			// 					  file->partners[i].partner_size);
+      
+      list[i + 1] = cache->NewPartnerIterator(options,
+                file->partners[i].partner_number,
+                file->meta_number, 
+                file->meta_size);
 		}
 		return NewMergingIterator(&global_icmp, list, sz);
 	}
@@ -355,9 +361,13 @@ Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache,
     Iterator** list = new Iterator*[sz];
     list[0] = cache->NewIterator(ReadOptions(), file->number, file->file_size);
     for(int i = 0; i < sz - 1; i++) {
-        list[i + 1] = cache->NewIterator(ReadOptions(),
+        // list[i + 1] = cache->NewIterator(ReadOptions(),
+        //                       file->partners[i].partner_number,
+        //                       file->partners[i].partner_size);
+        list[i + 1] = cache->NewPartnerIterator(ReadOptions(),
                               file->partners[i].partner_number,
-                              file->partners[i].partner_size);
+                              file->meta_number, 
+                              file->meta_size);
     }
     return NewMergingIterator(&icmp_, list, sz);
 }

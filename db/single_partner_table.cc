@@ -14,7 +14,7 @@ namespace leveldb {
 
     SinglePartnerTable::~SinglePartnerTable() {
         delete builder_;
-        //meta_->Unref();
+        meta_->Unref();
     }
 
     void SinglePartnerTable::Add(const Slice& key, const Slice& value) {

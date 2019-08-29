@@ -326,6 +326,13 @@ public:
       options_(options)
       {        // Marks as invalid
 	}
+
+  ~PartnerTableIterator() {
+    if(meta_iter_ != nullptr) {
+      delete meta_iter_;
+    }
+  }
+
 	virtual bool Valid() const {
 		return meta_iter_->Valid();
 	}

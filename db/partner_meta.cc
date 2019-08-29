@@ -69,7 +69,6 @@ namespace leveldb {
     class PartnerMetaIterator: public Iterator {
     public:
         explicit PartnerMetaIterator(PartnerMeta::Meta* meta) : iter_(meta) { }
-
         virtual bool Valid() const { return iter_.Valid(); }
         virtual void Seek(const Slice& k) { iter_.Seek(EncodeKey(&tmp_, k)); }
         virtual void SeekToFirst() { iter_.SeekToFirst(); }

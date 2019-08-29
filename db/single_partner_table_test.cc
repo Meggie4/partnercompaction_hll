@@ -45,10 +45,10 @@ namespace leveldb {
         Env* env = Env::Default();
         std::string nvm_path;
         env->GetMEMDirectory(&nvm_path);
-        std::string indexFile = MapFileName(nvm_path, 1);
-        size_t indexFileSize = (4 << 10) << 10;
+        uint64_t meta_number= 1, meta_size = (4 << 10) << 10;
+        std::string indexFile = MapFileName(nvm_path, meta_number);
         DEBUG_T("after get mapfilename:%s\n", indexFile.c_str());
-        ArenaNVM* arena = new ArenaNVM(indexFileSize, &indexFile, false);
+        ArenaNVM* arena = new ArenaNVM(meta_size, &indexFile, false);
         arena->nvmarena_ = true;
         DEBUG_T("after get arena nvm\n");
         PartnerMeta* pm = new PartnerMeta(cmp, arena, false);
@@ -66,16 +66,17 @@ namespace leveldb {
         TableBuilder* builder = new TableBuilder(option, file, file_number);
         SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
         Slice value1("this is my key1");
-        Slice value2("this is my key2");
+        Slice value2("this is my key1 again");
         Slice value3("this is my key3");
         Slice value4("this is my key4");
         Slice value5("this is my key5");
         LookupKey lkey1(Slice("abcdmykey1"), 0);
-        LookupKey lkey2(Slice("abcdmykey2"), 0);
+        LookupKey lkey2(Slice("abcdmykey1"), 1);
         LookupKey lkey3(Slice("abcdmykey3"), 0);
         LookupKey lkey4(Slice("abcdmykey4"), 0);
         LookupKey lkey5(Slice("abcdmykey5"), 0);
         spt->Add(lkey1.internal_key(), value1);
+        //更新
         spt->Add(lkey2.internal_key(), value2);
         spt->Add(lkey3.internal_key(), value3);
         spt->Add(lkey4.internal_key(), value4);
@@ -86,6 +87,9 @@ namespace leveldb {
         spt = nullptr;
         DEBUG_T("after first finish, file size is %llu........\n", file_size);
         
+        arena = new ArenaNVM(meta_size, &indexFile, true);
+        pm = new PartnerMeta(cmp, arena, true);
+        pm->Ref();
         builder = new TableBuilder(option, file, file_number, file_size);
         spt = new SinglePartnerTable(builder, pm);
         Slice value6("this is my key6");
@@ -103,9 +107,13 @@ namespace leveldb {
         DEBUG_T("after second finish........\n");
 
         //读取数据
+        //(TODO)可以把pm保存在filemetadata中，避免频繁地创建释放
         uint64_t block_offset, block_size;
+        arena = new ArenaNVM(meta_size, &indexFile, true);
+        pm = new PartnerMeta(cmp, arena, true);
+        pm->Ref();
         bool find = pm->Get(lkey6, &block_offset, &block_size, &s);
-        TableCache* table_cache = new TableCache(dbname, option, option.max_open_files);
+        TableCache* table_cache = new TableCache(dbname, option, option.max_open_files, nvm_path);
         ReadOptions roptions;
         std::string resValue;
         Saver saver;
@@ -116,21 +124,22 @@ namespace leveldb {
         if(find) {
             DEBUG_T("offset is %llu, block size:%llu\n", block_offset, block_size);
             s = table_cache->Get(roptions, file_number, lkey6.internal_key(), &saver, SaveValue, block_offset, block_size);
+            pm->Unref();
             DEBUG_T("get value6 %s\n", (*saver.value).c_str());
         } else {
             DEBUG_T("cannot find key from nvm skiplist\n");
         }
 
+        DEBUG_T("after get key6......\n");
+
         //迭代器
-        
-        Iterator* iter = table_cache->NewPartnerIterator(ReadOptions(), file_number, pm->NewIterator());
+        Iterator* iter = table_cache->NewPartnerIterator(ReadOptions(), file_number, meta_number, meta_size);
         iter->SeekToFirst();
         while(iter->Valid()) {
             DEBUG_T("key is %s, value is %s\n", iter->key().ToString().c_str(), iter->value().ToString().c_str());
             iter->Next();
         }
         delete iter;
-        pm->Unref();
     }
 }
 

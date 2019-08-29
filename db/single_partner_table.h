@@ -13,13 +13,13 @@ namespace leveldb {
             SinglePartnerTable(TableBuilder* builder, PartnerMeta* meta);
             SinglePartnerTable(const SinglePartnerTable&) = delete;
             void operator=(const SinglePartnerTable&) = delete;
-            ~SinglePartnerTable();
 
             void Add(const Slice& key, const Slice& value);
             //bool Get(const LookupKey& lkey,  std::string* value, Status* s);
             Status Finish();
             void Abandon();
             uint64_t FileSize();
+            ~SinglePartnerTable();
             
         private:
             void insertMeta();

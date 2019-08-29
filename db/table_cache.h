@@ -20,7 +20,7 @@ class Env;
 
 class TableCache {
  public:
-  TableCache(const std::string& dbname, const Options& options, int entries);
+  TableCache(const std::string& dbname, const Options& options, int entries, const std::string& dbname_nvm = "");
   ~TableCache();
 
   // Return an iterator for the specified file number (the corresponding
@@ -54,7 +54,8 @@ class TableCache {
                        uint64_t block_size);
   Iterator* NewPartnerIterator(const ReadOptions& options,
                         uint64_t file_number,
-                        Iterator* meta_iter,
+                        uint64_t meta_number, 
+                        uint64_t meta_size,
                         Table** tableptr = nullptr);
 //////////////meggie
 
@@ -64,6 +65,9 @@ class TableCache {
  private:
   Env* const env_;
   const std::string dbname_;
+  ///////////meggie
+  const std::string dbname_nvm_;
+  //////////meggie
   const Options& options_;
   Cache* cache_;
 

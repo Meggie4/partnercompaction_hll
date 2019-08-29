@@ -963,6 +963,8 @@ util/logging.h
 /home/meggie/文档/partnercompaction_hll/db/util/logging.h
 util/debug.h
 /home/meggie/文档/partnercompaction_hll/db/util/debug.h
+db/partner_meta.h
+/home/meggie/文档/partnercompaction_hll/db/db/partner_meta.h
 
 /home/meggie/文档/partnercompaction_hll/db/write_batch.cc
 leveldb/write_batch.h

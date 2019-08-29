@@ -436,6 +436,7 @@ CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/log_format.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/log_reader.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/log_writer.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/memtable.h
+CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/partner_meta.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/skiplist.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/table_cache.h
 CMakeFiles/leveldb.dir/db/version_set.cc.o: ../db/version_edit.h

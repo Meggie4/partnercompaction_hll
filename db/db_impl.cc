@@ -210,7 +210,7 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname,const std::
       ///////////meggie
       dbname_nvm_(dbname_nvm),
       ///////////meggie
-      table_cache_(new TableCache(dbname_, options_, TableCacheSize(options_))),
+      table_cache_(new TableCache(dbname_, options_, TableCacheSize(options_), dbname_nvm_)),
       db_lock_(nullptr),
       shutting_down_(nullptr),
       background_work_finished_signal_(&mutex_),
@@ -1042,6 +1042,8 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
 Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_index) {
     FileMetaData* fm = compact->compaction->input(1, input1_index);
     uint64_t meta_number, meta_size;
+    std::string metaFile = MapFileName(dbname_nvm_, meta_number);
+    ArenaNVM* arena;
     if (!fm->partners.empty()) {
       compact->number = fm->partners[0].partner_number;
       compact->curr_smallest = fm->partners[0].partner_smallest;
@@ -1050,6 +1052,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       meta_number = fm->meta_number;
       meta_size = fm->meta_size;
       compact->init = true;
+      arena = new ArenaNVM(meta_size, &metaFile, true);
     } else {
       mutex_.Lock();
       uint64_t file_number = versions_->NewFileNumber();
@@ -1061,14 +1064,14 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->curr_largest.Clear();
       compact->curr_file_size = 0;
       mutex_.Unlock(); 
+      arena = new ArenaNVM(meta_size, &metaFile, false);
       //之后更新meta_number
     }
     //get nvm skiplist
-    std::string metaFile = MapFileName(dbname_nvm_, meta_number);
-    ArenaNVM* arena = new ArenaNVM(meta_size, &metaFile, false);
     arena->nvmarena_ = true;
     DEBUG_T("after get arena nvm\n");
     PartnerMeta* pm = new PartnerMeta(internal_comparator_, arena, false);
+    pm->Ref();
     // Make the output file
     std::string fname = TableFileName(dbname_, compact->number);
     Status s = env_->NewWritableFile(fname, &compact->outfile);
@@ -1849,6 +1852,37 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
   } else {
     compact->smallest_snapshot = snapshots_.oldest()->sequence_number();
   }
+
+  ///////////////meggie
+  /*if(compact->compaction->level() >= 1) {
+    start_timer(COMPUTE_OVERLLAP); 
+    std::vector<SplitCompaction*> t_sptcompactions;
+    std::vector<SplitCompaction*> p_sptcompactions;
+	DEBUG_T("---------------start in SplitCompaction----------------\n");
+    versions_->GetSplitCompactions(compact->compaction, t_sptcompactions,
+									 p_sptcompactions);
+    record_timer(COMPUTE_OVERLLAP);
+    std::vector<TSplitCompaction*> tcompactionlist;
+    
+    if(t_sptcompactions.size() > 0) {
+		versions_->MergeTSplitCompaction(compact->compaction, t_sptcompactions, tcompactionlist);
+    }
+    for(int i = 0; i < t_sptcompactions.size(); i++) {
+        delete t_sptcompactions[i];
+    }
+    for(int j = 0; j < p_sptcompactions.size(); j++) {
+        delete p_sptcompactions[j];
+    }
+    
+    for(int k = 0; k < tcompactionlist.size(); k++) {
+        delete tcompactionlist[k];
+    }
+	  DEBUG_T("---------------end in SplitCompaction----------------\n\n");
+  }*/
+
+  if(compact->compaction->num_input_files(1) == 0)
+      DEBUG_T("input1 size is 0\n");
+  ///////////////meggie
 
   // Release mutex while we're actually doing the compaction work
   mutex_.Unlock();

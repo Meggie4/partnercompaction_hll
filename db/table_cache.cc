@@ -32,11 +32,13 @@ static void UnrefEntry(void* arg1, void* arg2) {
 
 TableCache::TableCache(const std::string& dbname,
                        const Options& options,
-                       int entries)
+                       int entries, 
+                       const std::string& dbname_nvm)
     : env_(options.env),
       dbname_(dbname),
       options_(options),
-      cache_(NewLRUCache(entries)) {
+      cache_(NewLRUCache(entries)), 
+      dbname_nvm_(dbname_nvm) {
 }
 
 TableCache::~TableCache() {
@@ -126,6 +128,11 @@ Status TableCache::Get(const ReadOptions& options,
 }
 
 //////////////meggie
+static void UnrefPartnerMeta(void* arg1, void* arg2) {
+  PartnerMeta* pm = reinterpret_cast<PartnerMeta*>(arg1);
+  pm->Unref();
+}
+
 Status TableCache::Get(const ReadOptions& options,
                        uint64_t file_number,
                        const Slice& k,
@@ -145,11 +152,21 @@ Status TableCache::Get(const ReadOptions& options,
 
 Iterator* TableCache::NewPartnerIterator(const ReadOptions& options,
                                   uint64_t file_number,
-                                  Iterator* meta_iter,
-                                  Table** tableptr) {
+                                  uint64_t meta_number, 
+                                  uint64_t meta_size,
+                                  Table** tableptr) {                              
   if (tableptr != nullptr) {
     *tableptr = nullptr;
   }
+
+  std::string metaFile = MapFileName(dbname_nvm_, meta_number);  
+  ArenaNVM* arena = new ArenaNVM(meta_size, &metaFile, true);
+  arena->nvmarena_ = true;
+  DEBUG_T("after get arena nvm\n");
+  PartnerMeta* pm = new PartnerMeta(*(reinterpret_cast<const InternalKeyComparator *>(options_.comparator)), arena, true);
+  Iterator* meta_iter = pm->NewIterator();
+  meta_iter->RegisterCleanup(&UnrefPartnerMeta, pm, nullptr);
+  pm->Ref();
 
   Cache::Handle* handle = nullptr;
   Status s = FindTable(file_number, 0, &handle, true);
