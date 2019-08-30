@@ -200,18 +200,21 @@ Iterator* Table::BlockReader(void* arg,
             cache_handle = block_cache->Insert(
                 key, block, block->size(), &DeleteCachedBlock);
           }
+        } else {
+          DEBUG_T("condition1, read block failed, status: %s\n", s.ToString().c_str());
         }
       }
     } else {
       s = ReadBlock(table->rep_->file, options, handle, &contents);
       if (s.ok()) {
         block = new Block(contents);
+      } else {
+        DEBUG_T("condition2, read block failed\n");
       }
     }
-  } 
-  // else {
-  //   DEBUG_T("handle decode failed\n");
-  // }
+  } else {
+    DEBUG_T("handle decode failed\n");
+  }
 
 
   Iterator* iter;
@@ -290,7 +293,7 @@ Status Table::InternalGet(const ReadOptions& options, const Slice& k,
       std::string dst;
       PutVarint64(&dst, block_offset);
       PutVarint64(&dst, block_size);
-      DEBUG_T("internal get, block offset is:%llu, block_size is %llu\n", block_offset, block_size);
+      //DEBUG_T("internal get, block offset is:%llu, block_size is %llu\n", block_offset, block_size);
       Iterator* block_iter = BlockReader(this, options, Slice(dst));
       block_iter->Seek(k);
       if (block_iter->Valid()) {
@@ -361,7 +364,10 @@ public:
     DEBUG_T("iter value, block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
     Iterator* block_iter = BlockReader(table_, options_, Slice(), &handle);
     block_iter->Seek(meta_iter_->key());
-    DEBUG_T("seek success\n");
+    // if(!block_iter->Valid())
+    //   DEBUG_T("block iter is unvalid\n");
+    // DEBUG_T("value is %s\n", block_iter->value().ToString().c_str());
+    // DEBUG_T("after get value\n");
     return block_iter->value();
 	}
 	virtual Status status() const { return Status::OK(); }

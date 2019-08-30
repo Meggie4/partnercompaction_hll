@@ -73,9 +73,10 @@ class LEVELDB_EXPORT Env {
   // returns non-OK.
   //
   // The returned file will only be accessed by one thread at a time.
+  //////////////meggie
   virtual Status NewWritableFile(const std::string& fname,
-                                 WritableFile** result) = 0;
-
+                                 WritableFile** result, bool append = false) = 0;
+  ///////////meggie
   // Create an object that either appends to an existing file, or
   // writes to a new file (if the file does not exist to begin with).
   // On success, stores a pointer to the new file in *result and
@@ -303,9 +304,11 @@ class LEVELDB_EXPORT EnvWrapper : public Env {
                              RandomAccessFile** r) override {
     return target_->NewRandomAccessFile(f, r);
   }
-  Status NewWritableFile(const std::string& f, WritableFile** r) override {
-    return target_->NewWritableFile(f, r);
+  ////////////meggie
+  Status NewWritableFile(const std::string& f, WritableFile** r, bool append = false) override {
+    return target_->NewWritableFile(f, r, append);
   }
+  ////////////meggie
   Status NewAppendableFile(const std::string& f, WritableFile** r) override {
     return target_->NewAppendableFile(f, r);
   }

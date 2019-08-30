@@ -257,12 +257,15 @@ class Block::Iter : public Iterator {
 
 Iterator* Block::NewIterator(const Comparator* cmp) {
   if (size_ < sizeof(uint32_t)) {
+    DEBUG_T("in Block::NewIterator, bad block contents....\n");
     return NewErrorIterator(Status::Corruption("bad block contents"));
   }
   const uint32_t num_restarts = NumRestarts();
   if (num_restarts == 0) {
+    DEBUG_T("in Block::NewIterator, get empty iterator....\n");
     return NewEmptyIterator();
   } else {
+    //DEBUG_T("in Block::NewIterator, get normal iterator....\n");
     return new Iter(cmp, data_, restart_offset_, num_restarts);
   }
 }

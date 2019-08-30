@@ -80,6 +80,7 @@ Status ReadBlock(RandomAccessFile* file,
   Status s = file->Read(handle.offset(), n + kBlockTrailerSize, &contents, buf);
   if (!s.ok()) {
     delete[] buf;
+    DEBUG_T("readblock, file read failed\n");
     return s;
   }
   if (contents.size() != n + kBlockTrailerSize) {

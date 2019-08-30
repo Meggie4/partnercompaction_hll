@@ -340,12 +340,11 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 		int sz = file->partners.size() + 1;
 		Iterator** list = new Iterator*[sz];
 		list[0] = cache->NewIterator(options, file->number, file->file_size);
-    DEBUG_T("in GetFileIterator, partner count is:%d\n", file->partners.size());
 		for(int i = 0; i < sz - 1; i++) {
 			// list[i + 1] = cache->NewIterator(options,
 			// 					  file->partners[i].partner_number,
 			// 					  file->partners[i].partner_size);
-      
+      DEBUG_T("in GetFileIterator, partner number is:%llu\n", file->partners[i].partner_number);
       list[i + 1] = cache->NewPartnerIterator(options,
                 file->partners[i].partner_number,
                 file->partners[i].meta_number, 
@@ -357,7 +356,7 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
 
 Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache, 
         const FileMetaData* file) {
-    DEBUG_T("NewIteratorWithPartner, partners size is %d\n", file->partners.size());
+    //DEBUG_T("NewIteratorWithPartner, partners size is %d\n", file->partners.size());
     int sz = file->partners.size() + 1;
     Iterator** list = new Iterator*[sz];
     list[0] = cache->NewIterator(ReadOptions(), file->number, file->file_size);
@@ -1516,8 +1515,8 @@ void VersionSet::MergeTSplitCompaction(Compaction* c,
         t_sptcompaction->inputs1_iter = NewIteratorWithPartner(
 											table_cache_, files1[inputs1_index]);
 
-        DEBUG_T("test single inputs1_iter\n");
-        TestIterator(t_sptcompaction->inputs1_iter, false, InternalKey(), InternalKey(), false);
+        // DEBUG_T("test single inputs1_iter\n");
+        // TestIterator(t_sptcompaction->inputs1_iter, false, InternalKey(), InternalKey(), false);
         result.push_back(t_sptcompaction);
         return;
     }
@@ -1836,6 +1835,12 @@ void VersionSet::GetSplitCompactions(Compaction* c,
                 inputs0[i]->number, 
                 inputs0[i]->smallest.user_key().ToString().c_str(),
                 inputs0[i]->largest.user_key().ToString().c_str());
+        if(!inputs0[i]->partners.empty()) {
+          DEBUG_T("partnernumber:%lld, smallest%s, largest:%s\n",
+                inputs0[i]->partners[0].partner_number,
+                inputs0[i]->partners[0].partner_smallest.user_key().ToString().c_str(),
+                inputs0[i]->partners[0].partner_largest.user_key().ToString().c_str());
+        }
     }
     
     DEBUG_T("sz1:%d, inputs1 info:\n", sz1);
@@ -1844,6 +1849,12 @@ void VersionSet::GetSplitCompactions(Compaction* c,
                 inputs1[j]->number, 
                 inputs1[j]->smallest.user_key().ToString().c_str(),
                 inputs1[j]->largest.user_key().ToString().c_str());
+        if(!inputs1[j]->partners.empty()) {
+          DEBUG_T("partnernumber:%lld, smallest%s, largest:%s\n",
+                inputs1[j]->partners[0].partner_number,
+                inputs1[j]->partners[0].partner_smallest.user_key().ToString().c_str(),
+                inputs1[j]->partners[0].partner_largest.user_key().ToString().c_str());
+        }
     }
 
 
@@ -1904,9 +1915,11 @@ void VersionSet::GetSplitCompactions(Compaction* c,
             t_sptcompactions.push_back(sptcompaction);
             DEBUG_T("partner count more than 10\n");
         } else if (inputs1[i]->partners.size() > 0 && 
-                    inputs1[i]->partners[0].meta_usage > (1/2 * inputs1[i]->partners[0].meta_size)){
+                    //inputs1[i]->partners[0].meta_usage > (inputs1[i]->partners[0].meta_size >> 1)){
+                    inputs1[i]->partners[0].meta_usage > (3 << 10 << 10)) {
             t_sptcompactions.push_back(sptcompaction);
-            DEBUG_T("partner meta usage is too large\n");
+            DEBUG_T("partner meta usage is too large, meta_usage:%llu, meta_size:%llu, partner_size:%llu\n", inputs1[i]->partners[0].meta_usage, 
+                        inputs1[i]->partners[0].meta_size, inputs1[i]->partners[0].partner_size);
         }  else {
             double ratio = GetOverlappingRatio_2(c, sptcompaction);
 			      DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
@@ -1981,7 +1994,8 @@ void VersionSet::AddLiveFiles(std::set<uint64_t>* live) {
         for(int j = 0; j < files[i]->partners.size(); j++) {
             //DEBUG_T("AddLiveFiles, partner number%d\n", 
             //        files[i]->partners[j].partner_number);
-            live->insert(files[i]->partners[j].partner_number); 
+            live->insert(files[i]->partners[j].partner_number);
+            live->insert(files[i]->partners[j].meta_number); 
             partner_size += files[i]->partners[j].partner_size;
         }
         /////////meggie

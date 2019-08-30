@@ -307,16 +307,14 @@ bool TableBuilder::PartnerAdd(const Slice& key, const Slice& value, uint64_t* bl
   r->num_entries++;
   DEBUG_H_("to add kv to data block\n");
   r->data_block.Add(key, value);
-
+  *block_offset = r->offset;
   const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
   if (estimated_block_size >= r->options.block_size) {
     PartnerFlush();
     *block_size = r->pending_handle.size();
-    *block_offset = r->pending_handle.offset();
   }
   //flush之后可以通过r->pending_handle得到data offset以及data size
   //其中offset为r->offset
-  *block_offset = r->offset;
   return true;
 }
 

@@ -67,7 +67,7 @@ NUMTHREAD=1
 #BENCHMARKS="loadzipfian100_25000k,readzipfian100_25000k"
 #BENCHMARKS="loadzipfian100_30000k,readzipfian100_30000k"
 
-BENCHMARKS="loadzipfian100_10000k"
+BENCHMARKS="loadzipfian100_5000k"
 
 #BENCHMARKS="fillrandom,readrandom"
 #BENCHMARKS="fillrandom"

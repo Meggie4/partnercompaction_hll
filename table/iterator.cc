@@ -3,6 +3,7 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 #include "leveldb/iterator.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -52,7 +53,7 @@ class EmptyIterator : public Iterator {
   void Next() override { assert(false); }
   void Prev() override { assert(false); }
   Slice key() const override { assert(false); return Slice(); }
-  Slice value() const override { assert(false); return Slice(); }
+  Slice value() const override { DEBUG_T("it's a EMPTY iter\n");assert(false); return Slice(); }
   Status status() const override { return status_; }
 
  private:

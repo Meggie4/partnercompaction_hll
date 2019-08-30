@@ -110,7 +110,7 @@ namespace leveldb {
             // offset = DecodeFixed64(key_ptr + key_length);
             // size = DecodeFixed64(key_ptr + key_length + 8); 
 
-            DEBUG_T("meta iter, offset is %llu, size is %llu\n", offset, size);
+            //DEBUG_T("meta iter, offset is %llu, size is %llu\n", offset, size);
             return Slice(key_ptr + key_length, 16);
         }
         //NoveLSM

@@ -886,6 +886,7 @@ class Benchmark {
       }
       ////////////meggie
       db_->PrintTimerAudit();
+      DEBUG_T("after PrintTimeAudit.....\n");
       DEBUG_T("use_origin_victim_num:%d, partner_compaction_num:%d\n", 
               use_origin_victim_num, partner_compaction_num);
       DEBUG_T("Generate partner:%d, details like this:\n", partner_size.size());

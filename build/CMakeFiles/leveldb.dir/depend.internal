@@ -579,6 +579,7 @@ CMakeFiles/leveldb.dir/table/format.cc.o
  /home/meggie/文档/partnercompaction_hll/table/format.cc
  include/port/port_config.h
 CMakeFiles/leveldb.dir/table/iterator.cc.o
+ ..//util/debug.h
  ../include/leveldb/export.h
  ../include/leveldb/iterator.h
  ../include/leveldb/slice.h
@@ -751,6 +752,7 @@ CMakeFiles/leveldb.dir/util/env_posix.cc.o
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/debug.h
  ..//util/env_posix_test_helper.h
  ..//util/posix_logger.h
  ../include/leveldb/env.h

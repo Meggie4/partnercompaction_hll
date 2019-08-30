@@ -29,6 +29,7 @@ namespace leveldb {
             curr_blockoffset_ = block_offset;
             curr_blocksize_ = block_size;
             queue_.push_back(key.ToString());
+            DEBUG_T("flush block, offset:%llu, size:%llu\n", curr_blockoffset_, curr_blocksize_);
             insertMeta();
         } else {
             //DEBUG_T("data block offset is:%llu\n", block_offset);

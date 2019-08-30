@@ -34,6 +34,7 @@
 #include "port/thread_annotations.h"
 #include "util/posix_logger.h"
 #include "util/env_posix_test_helper.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -535,8 +536,19 @@ class PosixEnv : public Env {
   }
 
   Status NewWritableFile(const std::string& filename,
-                         WritableFile** result) override {
-    int fd = ::open(filename.c_str(), O_TRUNC | O_WRONLY | O_CREAT, 0644);
+                         WritableFile** result, bool append = false) override {
+    int fd;
+    ///////////////meggie
+    if(append) {
+      DEBUG_T("append write\n");
+      ///│O_TRUNC │若文件存在，则长度被截为0，属性不变
+      //https://www.cnblogs.com/leaven/archive/2010/05/26/1744274.html │
+      fd = ::open(filename.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
+    } else {
+      DEBUG_T("override write\n");
+      fd = ::open(filename.c_str(), O_TRUNC | O_WRONLY | O_CREAT, 0644);
+    }
+    //////////meggie
     if (fd < 0) {
       *result = nullptr;
       return PosixError(filename, errno);

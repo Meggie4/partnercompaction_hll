@@ -320,7 +320,7 @@ void DBImpl::DeleteObsoleteFiles() {
   // Make a set of all of the live files
   std::set<uint64_t> live = pending_outputs_;
   versions_->AddLiveFiles(&live);
-   //////////meggie
+  //////////meggie
   std::vector<std::string> filenames_nvm;
   //////////meggie
   std::vector<std::string> filenames;
@@ -342,6 +342,11 @@ void DBImpl::DeleteObsoleteFiles() {
           keep = ((number >= versions_->LogNumber()) ||
                   (number == versions_->PrevLogNumber()));
           break;
+        ////////////////meggie
+        case kMapFile:
+          keep = (live.find(number) != live.end());
+          break;
+        ////////////////meggie
         case kDescriptorFile:
           // Keep my manifest file, and any newer incarnations'
           // (in case there is a race that allows other incarnations)
@@ -1056,7 +1061,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
       arena = new ArenaNVM(compact->meta_size, &metaFile, true);
       arena->nvmarena_ = true;
-      DEBUG_T("after get arena nvm\n");
+      //DEBUG_T("after get arena nvm\n");
       pm = new PartnerMeta(internal_comparator_, arena, true);
     } else {
       mutex_.Lock();
@@ -1072,14 +1077,14 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
       arena = new ArenaNVM(compact->meta_size, &metaFile, false);
       arena->nvmarena_ = true;
-      DEBUG_T("after get arena nvm\n");
+      //DEBUG_T("open new nvm file number: %llu, after get arena nvm\n", file_number);
       pm = new PartnerMeta(internal_comparator_, arena, false);
       //之后更新meta_number
     }
     pm->Ref();
     // Make the output file
     std::string fname = TableFileName(dbname_, compact->number);
-    Status s = env_->NewWritableFile(fname, &compact->outfile);
+    Status s = env_->NewWritableFile(fname, &compact->outfile, true);
     if (s.ok()) {
       TableBuilder* builder = new TableBuilder(options_, compact->outfile, compact->number, compact->curr_file_size);
       SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
@@ -1099,8 +1104,6 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
 
   // Check for iterator errors
   Status s = input->status();
-  DEBUG_T("to print memory usage\n");
-  DEBUG_T("after finish partner table, arena nvm need room:%zu\n", compact->partner_table->NVMSize());
   //TODO
   if (s.ok()) {
     s = compact->partner_table->Finish();
@@ -1111,6 +1114,9 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
   compact->curr_file_size = current_bytes;
   
   compact->meta_usage = compact->partner_table->NVMSize();
+  DEBUG_T("to print memory usage\n");
+  DEBUG_T("after finish partner table number:%llu, partner size: %llu, arena nvm need room:%zu\n",
+        compact->number, compact->curr_file_size, compact->meta_usage);
   delete compact->partner_table;
   compact->partner_table = nullptr;
 
@@ -1292,7 +1298,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
             t_sptcompaction->victim_end.Encode(), 
             t_sptcompaction->containsend);
     merge_iter->SeekToFirst();
-    DEBUG_T("after get merge iter\n");
+    //DEBUG_T("after get merge iter\n");
     
     Status status;
     ParsedInternalKey ikey;
@@ -1301,6 +1307,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
     bool has_current_user_key = false;
     SequenceNumber last_sequence_for_key = kMaxSequenceNumber;
 
+    DEBUG_T("in traditional compaction, after seek iter\n");
     for(; merge_iter->Valid() && !shutting_down_.Acquire_Load(); ) {
         Slice key = merge_iter->key();
         bool drop = false;
@@ -1511,6 +1518,7 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
     InternalKey this_smallest, this_largest;
     uint64_t entries = 0;
 
+    DEBUG_T("in partner compaction, after seek iter\n");
     for(; ValidAndInRange(input, victim_end, containsend, &ikey) 
                 && !shutting_down_.Acquire_Load(); ) {
         //DEBUG_T("partner compaction, user_key:%s\n",
@@ -1550,7 +1558,7 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
             if(compact->partner_table == nullptr) {
                 //DEBUG_T("to set partner table\n");
                 status = OpenPartnerTable(compact, p_sptcompaction->inputs1_index);
-                DEBUG_T("after open partner table\n");
+                DEBUG_T("after open partner table, partner number:%llu\n", compact->number);
                 if(!status.ok()) {
                     break;
                 }              
@@ -2569,16 +2577,19 @@ Status DestroyDB(const std::string& dbname, const Options& options,const std::st
   //////////////meggie
   std::vector<std::string> filenames_nvm;
   //////////////meggie
+  //获取dbname目录下的所有文件
   Status result = env->GetChildren(dbname, &filenames);
   if (!result.ok()) {
     // Ignore error in case directory does not exist
     return Status::OK();
   }
 
-  //////////////meggie
+  //////////////meggie、
+  //获取dbname_nvm目录下的1所有文件
   result = env->GetChildren(dbname_nvm, &filenames_nvm);
   if(!result.ok())
         return Status::OK();
+  //两个目录下的文件合在一起
   filenames.insert(filenames.end(), filenames_nvm.begin(), 
           filenames_nvm.end());
   //////////////meggie
@@ -2590,6 +2601,7 @@ Status DestroyDB(const std::string& dbname, const Options& options,const std::st
     uint64_t number;
     FileType type;
     for (size_t i = 0; i < filenames.size(); i++) {
+      //遍历两个目录下的文件，如果满足后缀（.map, .ldb等）， 那就在相应目录下删除
       if (ParseFileName(filenames[i], &number, &type) &&
           type != kDBLockFile) {  // Lock file will be deleted at end
         Status del;

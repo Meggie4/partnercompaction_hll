@@ -578,6 +578,7 @@ CMakeFiles/leveldb.dir/table/format.cc.o: ../include/leveldb/table_builder.h
 CMakeFiles/leveldb.dir/table/format.cc.o: ../table/format.cc
 CMakeFiles/leveldb.dir/table/format.cc.o: include/port/port_config.h
 
+CMakeFiles/leveldb.dir/table/iterator.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/table/iterator.cc.o: ../include/leveldb/export.h
 CMakeFiles/leveldb.dir/table/iterator.cc.o: ../include/leveldb/iterator.h
 CMakeFiles/leveldb.dir/table/iterator.cc.o: ../include/leveldb/slice.h
@@ -750,6 +751,7 @@ CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../port/atomic_pointer.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../port/port.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../port/port_stdcxx.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../port/thread_annotations.h
+CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../util/debug.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../util/env_posix_test_helper.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../util/posix_logger.h
 CMakeFiles/leveldb.dir/util/env_posix.cc.o: ../include/leveldb/env.h

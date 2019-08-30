@@ -24,7 +24,10 @@ enum FileType {
   kDescriptorFile,
   kCurrentFile,
   kTempFile,
-  kInfoLogFile  // Either the current one, or an old one
+  kInfoLogFile,  // Either the current one, or an old one
+  //////////////////meggie
+  kMapFile
+  //////////////////meggie
 };
 
 // Return the name of the log file with the specified number

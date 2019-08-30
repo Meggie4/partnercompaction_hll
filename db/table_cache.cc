@@ -162,7 +162,7 @@ Iterator* TableCache::NewPartnerIterator(const ReadOptions& options,
   std::string metaFile = MapFileName(dbname_nvm_, meta_number);  
   ArenaNVM* arena = new ArenaNVM(meta_size, &metaFile, true);
   arena->nvmarena_ = true;
-  DEBUG_T("after get arena nvm\n");
+  //DEBUG_T("after get arena nvm\n");
   PartnerMeta* pm = new PartnerMeta(*(reinterpret_cast<const InternalKeyComparator *>(options_.comparator)), arena, true);
   Iterator* meta_iter = pm->NewIterator();
   meta_iter->RegisterCleanup(&UnrefPartnerMeta, pm, nullptr);
