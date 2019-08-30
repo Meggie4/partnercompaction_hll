@@ -83,10 +83,10 @@ struct DBImpl::CompactionState {
     uint64_t file_size;
     InternalKey smallest, largest;
     /////////////meggie
-    std::shared_ptr<HyperLogLog> hll;
-    int hll_add_count;
-    Output() : hll(std::make_shared<HyperLogLog>(12)), 
-               hll_add_count(0){}
+    // std::shared_ptr<HyperLogLog> hll;
+    // int hll_add_count;
+    // Output() : hll(std::make_shared<HyperLogLog>(12)), 
+    //            hll_add_count(0){}
     /////////////meggie
   };
   std::vector<Output> outputs;
@@ -123,8 +123,8 @@ struct DBImpl::PartnerCompactionState {
   uint64_t meta_number, meta_size;
   bool init;
   
-  std::shared_ptr<HyperLogLog> hll;
-  int hll_add_count;
+  // std::shared_ptr<HyperLogLog> hll;
+  // int hll_add_count;
 
   // State kept for output being generated
   WritableFile* outfile;
@@ -136,9 +136,10 @@ struct DBImpl::PartnerCompactionState {
       : compaction(c),
         outfile(nullptr),
         partner_table(nullptr),
-        init(false),
-        hll(std::make_shared<HyperLogLog>(12)), 
-        hll_add_count(0){
+        init(false)
+        // hll(std::make_shared<HyperLogLog>(12)), 
+        // hll_add_count(0)
+        {
   }
 };
 /////////////////meggie
@@ -652,7 +653,7 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
     }
 	///////////////meggie
     edit->AddFile(level, meta.number, meta.file_size,
-                  meta.smallest, meta.largest, meta.hll, meta.hll_add_count);
+                  meta.smallest, meta.largest);
     DEBUG_T("WriteLevel0Table, AddFile, file_number:%lld, smallest:%s, largest:%s\n", 
             meta.number, meta.smallest.user_key().ToString().c_str(), 
             meta.largest.user_key().ToString().c_str());
@@ -863,10 +864,10 @@ void DBImpl::BackgroundCompaction() {
         DEBUG_T("file%d trivial move to level+1\n", f->number);
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
                        f->smallest, f->largest, f->origin_smallest, 
-                       f->origin_largest, f->partners, f->hll, f->hll_add_count);
+                       f->origin_largest, f->partners);
     } else 
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
-                       f->smallest, f->largest, f->hll, f->hll_add_count);
+                       f->smallest, f->largest);
     ////////////meggie
     status = versions_->LogAndApply(c->edit(), &mutex_);
     if (!status.ok()) {
@@ -1036,7 +1037,7 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
     compact->compaction->edit()->AddFile(
         level + 1,
         out.number, out.file_size, out.smallest, 
-        out.largest, out.hll, out.hll_add_count);
+        out.largest);
     DEBUG_T("InstallCompactionResults, AddFile, file_number:%lld, smallest:%s, largest:%s\n", 
             out.number, out.smallest.user_key().ToString().c_str(), 
             out.largest.user_key().ToString().c_str());
@@ -1189,7 +1190,7 @@ void DBImpl::AddFileWithTraditionalCompaction(VersionEdit* edit,
            const CompactionState::Output& out = compact->outputs[j];
            DEBUG_T("%d, ", out.number);
            edit->AddFile(level + 1, out.number, out.file_size
-                   , out.smallest, out.largest, out.hll, out.hll_add_count);
+                   , out.smallest, out.largest);
        }
     }
     DEBUG_T("\n");
@@ -1240,8 +1241,6 @@ void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit, std::vector<uint
        ptner.meta_number = compact->meta_number;
        ptner.meta_size = compact->meta_size;
        ptner.meta_usage = compact->meta_usage;
-       ptner.hll = compact->hll;
-       ptner.hll_add_count = compact->hll_add_count;
        partners.push_back(ptner);
        edit->AddPartner(level + 1, pcompaction_files[i], ptner);
    }
@@ -1348,8 +1347,8 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
 
             compact->current_output()->largest.DecodeFrom(key);
             compact->builder->Add(key, merge_iter->value());
-            AddKeyToHyperLogLog(compact->current_output()->hll, key);
-            compact->current_output()->hll_add_count++;
+            // AddKeyToHyperLogLog(compact->current_output()->hll, key);
+            // compact->current_output()->hll_add_count++;
 
             if(compact->builder->FileSize() >= 
                     compact->compaction->MaxOutputFileSize()) {
@@ -1568,8 +1567,8 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
             //DEBUG_T("to add key %s into partner table\n", key.ToString().c_str());
             compact->partner_table->Add(key, input->value());
             //DEBUG_T("after add key into partner table\n");
-            AddKeyToHyperLogLog(compact->hll, key);
-            compact->hll_add_count++;
+            // AddKeyToHyperLogLog(compact->hll, key);
+            // compact->hll_add_count++;
 
             //if(compact->builder->FileSize() >= 
             //        compact->compaction->MaxOutputFileSize()) {
@@ -1664,8 +1663,8 @@ Status DBImpl::DealWithSingleCompaction(CompactionState* compact) {
 
             compact->current_output()->largest.DecodeFrom(key);
             compact->builder->Add(key, input->value());
-            AddKeyToHyperLogLog(compact->current_output()->hll, key);
-            compact->current_output()->hll_add_count++;
+            // AddKeyToHyperLogLog(compact->current_output()->hll, key);
+            // compact->current_output()->hll_add_count++;
 
             if(compact->builder->FileSize() >= 
                     compact->compaction->MaxOutputFileSize()) {
@@ -2015,8 +2014,8 @@ Status DBImpl::DoCompactionWork(CompactionState* compact) {
       compact->current_output()->largest.DecodeFrom(key);
       compact->builder->Add(key, input->value());
 	    ////////////meggie
-      AddKeyToHyperLogLog(compact->current_output()->hll, key);
-      compact->current_output()->hll_add_count++;
+      // AddKeyToHyperLogLog(compact->current_output()->hll, key);
+      // compact->current_output()->hll_add_count++;
 	    ////////////meggie
 
       // Close output file if it is big enough

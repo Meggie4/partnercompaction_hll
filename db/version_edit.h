@@ -20,6 +20,7 @@ namespace leveldb {
 class VersionSet;
 
 ///////////meggie
+class PartnerMeta;
 struct Partner {
     uint64_t partner_number;
 	  uint64_t partner_size;
@@ -28,12 +29,11 @@ struct Partner {
     uint64_t meta_number;
     uint64_t meta_size;
     uint64_t meta_usage;
-	  std::shared_ptr<HyperLogLog> hll;
-    int hll_add_count;
-    ///////////meggie
-    Partner() : hll(std::make_shared<HyperLogLog>(12)), 
-                hll_add_count(0) {}
-    ///////////meggie
+    PartnerMeta* pm;
+	  // std::shared_ptr<HyperLogLog> hll;
+    // int hll_add_count;
+    // Partner() : hll(std::make_shared<HyperLogLog>(12)), 
+    //             hll_add_count(0) {}
 };
 ///////////meggie
 
@@ -49,13 +49,13 @@ struct FileMetaData {
   InternalKey origin_smallest;
   InternalKey origin_largest;
   std::vector<Partner> partners;
-  std::shared_ptr<HyperLogLog> hll;
-  int hll_add_count;
+  // std::shared_ptr<HyperLogLog> hll;
+  // int hll_add_count;
   //////////////meggie
-  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0),
+  FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0)
     ///////////meggie
-    hll(std::make_shared<HyperLogLog>(12)), 
-    hll_add_count(0)
+    // hll(std::make_shared<HyperLogLog>(12)), 
+    // hll_add_count(0)
     ///////////meggie
     { }
 };
@@ -111,23 +111,24 @@ class VersionEdit {
   }
   
   ///////////////meggie
-  void AddFile(int level, uint64_t file,
-               uint64_t file_size,
-               const InternalKey& smallest,
-               const InternalKey& largest, 
-			         const std::shared_ptr<HyperLogLog>& hll, 
-               int hll_add_count) {
-	  FileMetaData f;
-	  f.number = file;
-	  f.file_size = file_size;
-	  f.smallest = smallest;
-	  f.largest = largest;
-	  f.origin_smallest = smallest;
-	  f.origin_largest = largest;
-	  f.hll = hll;
-    f.hll_add_count = hll_add_count;
-	  new_files_.push_back(std::make_pair(level, f));
-  }
+  // void AddFile(int level, uint64_t file,
+  //              uint64_t file_size,
+  //              const InternalKey& smallest,
+  //              const InternalKey& largest
+	// 		         //const std::shared_ptr<HyperLogLog>& hll, 
+  //              //int hll_add_count
+  //              ) {
+	//   FileMetaData f;
+	//   f.number = file;
+	//   f.file_size = file_size;
+	//   f.smallest = smallest;
+	//   f.largest = largest;
+	//   f.origin_smallest = smallest;
+	//   f.origin_largest = largest;
+	//   // f.hll = hll;
+  //   // f.hll_add_count = hll_add_count;
+	//   new_files_.push_back(std::make_pair(level, f));
+  // }
   
   void AddFile(int level, uint64_t file,
                uint64_t file_size,
@@ -147,27 +148,28 @@ class VersionEdit {
     new_files_.push_back(std::make_pair(level, f));
   }
   
-  void AddFile(int level, uint64_t file,
-               uint64_t file_size,
-               const InternalKey& smallest,
-               const InternalKey& largest,
-               const InternalKey& origin_smallest,
-               const InternalKey& origin_largest, 
-               std::vector<Partner>& partners,
-			         const std::shared_ptr<HyperLogLog>& hll, 
-               int hll_add_count) {
-	  FileMetaData f;
-	  f.number = file;
-	  f.file_size = file_size;
-	  f.smallest = smallest;
-	  f.largest = largest;
-	  f.origin_smallest = origin_smallest;
-	  f.origin_largest = origin_largest;
-	  f.partners.assign(partners.begin(), partners.end());
-	  f.hll = hll;
-    f.hll_add_count = hll_add_count;
-	  new_files_.push_back(std::make_pair(level, f));
-  }
+  // void AddFile(int level, uint64_t file,
+  //              uint64_t file_size,
+  //              const InternalKey& smallest,
+  //              const InternalKey& largest,
+  //              const InternalKey& origin_smallest,
+  //              const InternalKey& origin_largest, 
+  //              std::vector<Partner>& partners
+	// 		         //const std::shared_ptr<HyperLogLog>& hll, 
+  //              //int hll_add_count
+  //              ) {
+	//   FileMetaData f;
+	//   f.number = file;
+	//   f.file_size = file_size;
+	//   f.smallest = smallest;
+	//   f.largest = largest;
+	//   f.origin_smallest = origin_smallest;
+	//   f.origin_largest = origin_largest;
+	//   f.partners.assign(partners.begin(), partners.end());
+	//   // f.hll = hll;
+  //   // f.hll_add_count = hll_add_count;
+	//   new_files_.push_back(std::make_pair(level, f));
+  // }
   ///////////////meggie
 
   // Delete the specified "file" from the specified "level".

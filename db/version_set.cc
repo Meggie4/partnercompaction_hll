@@ -1713,103 +1713,103 @@ double VersionSet::GetOverlappingRatio(Compaction* c,
 	return (overlapsz  + 1.0) / inputs1[inputs1_index]->file_size;
 }
 
-double VersionSet::GetOverlappingRatio_1(Compaction* c, 
-								SplitCompaction* sptcompaction) {
-	std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
-    std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
-	std::vector<int>& victims = sptcompaction->victims;
-    std::vector<HyperLogLog*> v;
-    uint64_t total_keys = 0; 
-    uint64_t selected_total_keys = 0;
-    for(int i = 0; i < inputs0.size(); i++) {
-        FileMetaData* f = inputs0[i];
-        v.push_back(f->hll.get());
-        total_keys += f->hll_add_count;
-        for(auto partner : f->partners) {
-            v.push_back(partner.hll.get());
-            total_keys += partner.hll_add_count;
-        }
-    }
+// double VersionSet::GetOverlappingRatio_1(Compaction* c, 
+// 								SplitCompaction* sptcompaction) {
+// 	std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
+//     std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
+// 	std::vector<int>& victims = sptcompaction->victims;
+//     std::vector<HyperLogLog*> v;
+//     uint64_t total_keys = 0; 
+//     uint64_t selected_total_keys = 0;
+//     for(int i = 0; i < inputs0.size(); i++) {
+//         FileMetaData* f = inputs0[i];
+//         v.push_back(f->hll.get());
+//         total_keys += f->hll_add_count;
+//         for(auto partner : f->partners) {
+//             v.push_back(partner.hll.get());
+//             total_keys += partner.hll_add_count;
+//         }
+//     }
  
-    FileMetaData* selected_file = inputs1[sptcompaction->inputs1_index];
-    v.push_back(selected_file->hll.get());
-    total_keys += selected_file->hll_add_count;
-    selected_total_keys += selected_file->hll_add_count;
-    for(auto partner : selected_file->partners) {
-        v.push_back(partner.hll.get());
-        total_keys += partner.hll_add_count;
-        selected_total_keys += partner.hll_add_count;
-    }
+//     FileMetaData* selected_file = inputs1[sptcompaction->inputs1_index];
+//     v.push_back(selected_file->hll.get());
+//     total_keys += selected_file->hll_add_count;
+//     selected_total_keys += selected_file->hll_add_count;
+//     for(auto partner : selected_file->partners) {
+//         v.push_back(partner.hll.get());
+//         total_keys += partner.hll_add_count;
+//         selected_total_keys += partner.hll_add_count;
+//     }
 
-    uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
-    uint64_t overlapped_nums = total_keys - distinct_nums;
-    DEBUG_T("distinct_nums:%lld, total_keys:%lld\n", 
-            distinct_nums, selected_total_keys);
+//     uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
+//     uint64_t overlapped_nums = total_keys - distinct_nums;
+//     DEBUG_T("distinct_nums:%lld, total_keys:%lld\n", 
+//             distinct_nums, selected_total_keys);
 
-    double ratio = (overlapped_nums * 1.0) / selected_total_keys;
-    return ratio;
-}
+//     double ratio = (overlapped_nums * 1.0) / selected_total_keys;
+//     return ratio;
+// }
 
-double VersionSet::GetOverlappingRatio_2(Compaction* c, 
-								SplitCompaction* sptcompaction) {
-    std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
-    std::vector<HyperLogLog*> v;
-    uint64_t selected_total_keys = 0;
+// double VersionSet::GetOverlappingRatio_2(Compaction* c, 
+// 								SplitCompaction* sptcompaction) {
+//     std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
+//     std::vector<HyperLogLog*> v;
+//     uint64_t selected_total_keys = 0;
     
-    FileMetaData* selected_file = inputs1[sptcompaction->inputs1_index];
-    v.push_back(selected_file->hll.get());
-    selected_total_keys += selected_file->hll_add_count;
-    for(auto partner : selected_file->partners) {
-        v.push_back(partner.hll.get());
-        selected_total_keys += partner.hll_add_count;
-    }
+//     FileMetaData* selected_file = inputs1[sptcompaction->inputs1_index];
+//     v.push_back(selected_file->hll.get());
+//     selected_total_keys += selected_file->hll_add_count;
+//     for(auto partner : selected_file->partners) {
+//         v.push_back(partner.hll.get());
+//         selected_total_keys += partner.hll_add_count;
+//     }
 
-    uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
+//     uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
 
-    DEBUG_T("distinct_nums:%lld, total_keys:%lld\n", 
-            distinct_nums, selected_total_keys);
+//     DEBUG_T("distinct_nums:%lld, total_keys:%lld\n", 
+//             distinct_nums, selected_total_keys);
 
-    uint64_t overlapped_nums = selected_total_keys - distinct_nums;
+//     uint64_t overlapped_nums = selected_total_keys - distinct_nums;
 
-    double ratio = (overlapped_nums * 1.0) / selected_total_keys;
-    return ratio;
-}
+//     double ratio = (overlapped_nums * 1.0) / selected_total_keys;
+//     return ratio;
+// }
 
-double VersionSet::GetGlobalOverlappingRatio(Compaction* c) {
-	  std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
-    std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
+// double VersionSet::GetGlobalOverlappingRatio(Compaction* c) {
+// 	  std::vector<FileMetaData*>& inputs0 = c->inputs_[0];
+//     std::vector<FileMetaData*>& inputs1 = c->inputs_[1];
 
-    uint64_t total_keys = 0; 
-    std::vector<HyperLogLog*> v;
+//     uint64_t total_keys = 0; 
+//     std::vector<HyperLogLog*> v;
 
-    for(int i = 0; i < inputs0.size(); i++) {
-        FileMetaData* f = inputs0[i];
-        v.push_back(f->hll.get());
-        total_keys += f->hll_add_count;
-        for(auto partner : f->partners) {
-            v.push_back(partner.hll.get());
-            total_keys += partner.hll_add_count;
-        }
-    }
+//     for(int i = 0; i < inputs0.size(); i++) {
+//         FileMetaData* f = inputs0[i];
+//         v.push_back(f->hll.get());
+//         total_keys += f->hll_add_count;
+//         for(auto partner : f->partners) {
+//             v.push_back(partner.hll.get());
+//             total_keys += partner.hll_add_count;
+//         }
+//     }
     
-    for(int j = 0; j < inputs1.size(); j++) {
-        FileMetaData* f = inputs1[j];
-        v.push_back(f->hll.get());
-        total_keys += f->hll_add_count;
-        for(auto partner : f->partners) {
-            v.push_back(partner.hll.get());
-            total_keys += partner.hll_add_count;
-        }
-    }
+//     for(int j = 0; j < inputs1.size(); j++) {
+//         FileMetaData* f = inputs1[j];
+//         v.push_back(f->hll.get());
+//         total_keys += f->hll_add_count;
+//         for(auto partner : f->partners) {
+//             v.push_back(partner.hll.get());
+//             total_keys += partner.hll_add_count;
+//         }
+//     }
 
-    uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
-    DEBUG_T("global distinct_nums:%lld, global total_keys:%lld\n", 
-            distinct_nums, total_keys);
-    uint64_t overlapped_nums = total_keys - distinct_nums;
-    double ratio = (overlapped_nums * 1.0) / total_keys;
+//     uint64_t distinct_nums = HyperLogLog::MergedEstimate(v);
+//     DEBUG_T("global distinct_nums:%lld, global total_keys:%lld\n", 
+//             distinct_nums, total_keys);
+//     uint64_t overlapped_nums = total_keys - distinct_nums;
+//     double ratio = (overlapped_nums * 1.0) / total_keys;
 
-    return ratio;
-}
+//     return ratio;
+// }
 /*
 1.inputs[0]可能含有多个不重叠的文件; 遍历inputs1， 针对每个inputs1中的sstable，都拥有一个SplitCompaction对象；对SplitCompaction赋值：
   * InternalKey victim_start， victim_end; 记录了该sstable与inputs[0]重叠的键范围
@@ -1858,7 +1858,7 @@ void VersionSet::GetSplitCompactions(Compaction* c,
     }
 
 
-    double global_ratio = GetGlobalOverlappingRatio(c);
+    //double global_ratio = GetGlobalOverlappingRatio(c);
 
     int i = 0, j = 0;
     for(; i < sz1; i++) {
@@ -1921,24 +1921,28 @@ void VersionSet::GetSplitCompactions(Compaction* c,
             DEBUG_T("partner meta usage is too large, meta_usage:%llu, meta_size:%llu, partner_size:%llu\n", inputs1[i]->partners[0].meta_usage, 
                         inputs1[i]->partners[0].meta_size, inputs1[i]->partners[0].partner_size);
         }  else {
-            double ratio = GetOverlappingRatio_2(c, sptcompaction);
-			      DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
-            if(inputs1[i]->partners.size() > 1){
-                if(global_ratio > 0.2 && ratio > 0.15) {
-                    DEBUG_T("global_ratio greater than 0.2, ratio greater than 0.15, partner count is:%d\n", 
-                        inputs1[i]->partners.size());
-                    t_sptcompactions.push_back(sptcompaction);
-                } else if(ratio > 2.0){
-                    DEBUG_T("global_ratio less than 0.2, ratio greater than 0.20, partner count is:%d\n", 
-                        inputs1[i]->partners.size());
-                    t_sptcompactions.push_back(sptcompaction);
-                } else {
-                    p_sptcompactions.push_back(sptcompaction);
-                }
-            } else {
-                p_sptcompactions.push_back(sptcompaction);
-            }
-        } 
+            p_sptcompactions.push_back(sptcompaction);
+        }
+        
+        // else {
+        //     double ratio = GetOverlappingRatio_2(c, sptcompaction);
+			  //     DEBUG_T("in GetSplitCompactions, ratio:%lf\n", ratio);
+        //     if(inputs1[i]->partners.size() > 1){
+        //         if(global_ratio > 0.2 && ratio > 0.15) {
+        //             DEBUG_T("global_ratio greater than 0.2, ratio greater than 0.15, partner count is:%d\n", 
+        //                 inputs1[i]->partners.size());
+        //             t_sptcompactions.push_back(sptcompaction);
+        //         } else if(ratio > 2.0){
+        //             DEBUG_T("global_ratio less than 0.2, ratio greater than 0.20, partner count is:%d\n", 
+        //                 inputs1[i]->partners.size());
+        //             t_sptcompactions.push_back(sptcompaction);
+        //         } else {
+        //             p_sptcompactions.push_back(sptcompaction);
+        //         }
+        //     } else {
+        //         p_sptcompactions.push_back(sptcompaction);
+        //     }
+        // } 
     }
 }
 ////////////////////meggie
