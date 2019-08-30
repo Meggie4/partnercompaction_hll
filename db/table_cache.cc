@@ -128,11 +128,6 @@ Status TableCache::Get(const ReadOptions& options,
 }
 
 //////////////meggie
-static void UnrefPartnerMeta(void* arg1, void* arg2) {
-  PartnerMeta* pm = reinterpret_cast<PartnerMeta*>(arg1);
-  pm->Unref();
-}
-
 Status TableCache::Get(const ReadOptions& options,
                        uint64_t file_number,
                        const Slice& k,
@@ -150,23 +145,28 @@ Status TableCache::Get(const ReadOptions& options,
   return s;
 }
 
+// static void UnrefPm(void* arg1, void* arg2) {
+//   PartnerMeta* pm = reinterpret_cast<PartnerMeta*> (arg1);
+//   pm->Unref();
+// }
+ 
 Iterator* TableCache::NewPartnerIterator(const ReadOptions& options,
                                   uint64_t file_number,
-                                  uint64_t meta_number, 
-                                  uint64_t meta_size,
+                                  PartnerMeta* pm,
+                                  // uint64_t meta_number, 
+                                  // uint64_t meta_size,
                                   Table** tableptr) {                              
   if (tableptr != nullptr) {
     *tableptr = nullptr;
   }
 
-  std::string metaFile = MapFileName(dbname_nvm_, meta_number);  
-  ArenaNVM* arena = new ArenaNVM(meta_size, &metaFile, true);
-  arena->nvmarena_ = true;
-  //DEBUG_T("after get arena nvm\n");
-  PartnerMeta* pm = new PartnerMeta(*(reinterpret_cast<const InternalKeyComparator *>(options_.comparator)), arena, true);
+  // std::string metaFile = MapFileName(dbname_nvm_, meta_number);
+  // ArenaNVM* arena = new ArenaNVM(meta_size, &metaFile, false);
+  // arena->nvmarena_ = true;
+  // PartnerMeta* pm = new PartnerMeta(*(reinterpret_cast<const InternalKeyComparator*> (options_.comparator)), arena, false);
+  // pm->Ref();
   Iterator* meta_iter = pm->NewIterator();
-  meta_iter->RegisterCleanup(&UnrefPartnerMeta, pm, nullptr);
-  pm->Ref();
+  // meta_iter->RegisterCleanup(&UnrefPm, pm, nullptr);
 
   Cache::Handle* handle = nullptr;
   Status s = FindTable(file_number, 0, &handle, true);

@@ -287,6 +287,12 @@ inline const Key& SkipList<Key,Comparator>::Iterator::key_offset() const {
 #endif
         assert(Valid());
 #if defined(USE_OFFSETS)
+        //DEBUG_T("before get node_ key offset\n");
+        // if(node_ != nullptr) {
+        //     //DEBUG_T("node_ is not nullptr\n");
+        // } else {
+        //     DEBUG_T("node is nullptr\n");
+        // }
         return node_->key_offset;
 #else
         return node_->key;

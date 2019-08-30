@@ -17,6 +17,7 @@
 namespace leveldb {
 
 class Env;
+class PartnerMeta;
 
 class TableCache {
  public:
@@ -54,8 +55,9 @@ class TableCache {
                        uint64_t block_size);
   Iterator* NewPartnerIterator(const ReadOptions& options,
                         uint64_t file_number,
-                        uint64_t meta_number, 
-                        uint64_t meta_size,
+                        PartnerMeta* pm,
+                        // uint64_t meta_number,
+                        // uint64_t meta_size,
                         Table** tableptr = nullptr);
 //////////////meggie
 

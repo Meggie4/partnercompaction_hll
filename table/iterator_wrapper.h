@@ -7,6 +7,7 @@
 
 #include "leveldb/iterator.h"
 #include "leveldb/slice.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -45,14 +46,21 @@ class IteratorWrapper {
   void Next()               { assert(iter_); iter_->Next();        Update(); }
   void Prev()               { assert(iter_); iter_->Prev();        Update(); }
   void Seek(const Slice& k) { assert(iter_); iter_->Seek(k);       Update(); }
-  void SeekToFirst()        { assert(iter_); iter_->SeekToFirst(); Update(); }
+  void SeekToFirst()        { 
+    assert(iter_); iter_->SeekToFirst(); 
+    //DEBUG_T("before update\n"); 
+    Update(); 
+    //DEBUG_T("after update\n"); 
+    }
   void SeekToLast()         { assert(iter_); iter_->SeekToLast();  Update(); }
 
  private:
   void Update() {
     valid_ = iter_->Valid();
     if (valid_) {
+      //DEBUG_T("in update, before get key\n");
       key_ = iter_->key();
+      //DEBUG_T("in update, after get key\n");
     }
   }
 

@@ -13,6 +13,7 @@
 #include "util/murmurhash.h"
 #include <memory>
 #include "util/hyperloglog.h"
+#include "db/partner_meta.h"
 //////////meggie
 
 namespace leveldb {
@@ -58,6 +59,20 @@ struct FileMetaData {
     // hll_add_count(0)
     ///////////meggie
     { }
+
+  // FileMetaData(const FileMetaData& f) {
+  //    if(!partners.empty()) {
+  //     DEBUG_T("copy filemeta number:%llu, ref pm %p\n", number, partners[0].pm);
+  //     partners[0].pm->Ref();
+  //   }
+  // }
+
+  ~FileMetaData() {
+    if(!partners.empty()) {
+      DEBUG_T("delete filemeta number:%llu, unref pm %p\n", number, partners[0].pm);
+      partners[0].pm->Unref();
+    }
+  }
 };
 
 class VersionEdit {
@@ -144,7 +159,9 @@ class VersionEdit {
     f.largest = largest;
 	  f.origin_smallest = origin_smallest;
     f.origin_largest = origin_largest;
-    f.partners.assign(partners.begin(), partners.end());
+    //f.partners.assign(partners.begin(), partners.end());
+    f.partners.push_back(partners[0]);
+    f.partners[0].pm->Ref();
     new_files_.push_back(std::make_pair(level, f));
   }
   

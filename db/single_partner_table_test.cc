@@ -124,7 +124,7 @@ namespace leveldb {
         if(find) {
             DEBUG_T("offset is %llu, block size:%llu\n", block_offset, block_size);
             s = table_cache->Get(roptions, file_number, lkey6.internal_key(), &saver, SaveValue, block_offset, block_size);
-            pm->Unref();
+            //pm->Unref();
             DEBUG_T("get value6 %s\n", (*saver.value).c_str());
         } else {
             DEBUG_T("cannot find key from nvm skiplist\n");
@@ -133,13 +133,14 @@ namespace leveldb {
         DEBUG_T("after get key6......\n");
 
         //迭代器
-        Iterator* iter = table_cache->NewPartnerIterator(ReadOptions(), file_number, meta_number, meta_size);
-        iter->SeekToFirst();
-        while(iter->Valid()) {
-            DEBUG_T("key is %s, value is %s\n", iter->key().ToString().c_str(), iter->value().ToString().c_str());
-            iter->Next();
-        }
-        delete iter;
+        // Iterator* iter = table_cache->NewPartnerIterator(ReadOptions(), file_number, pm);
+        // iter->SeekToFirst();
+        // while(iter->Valid()) {
+        //     DEBUG_T("key is %s, value is %s\n", iter->key().ToString().c_str(), iter->value().ToString().c_str());
+        //     iter->Next();
+        // }
+        // pm->Unref();
+        // delete iter;
     }
 }
 

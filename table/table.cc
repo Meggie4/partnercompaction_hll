@@ -179,7 +179,6 @@ Iterator* Table::BlockReader(void* arg,
   /////////////meggie
   // We intentionally allow extra stuff in index_value so that we
   // can add more features in the future.
-
   if (s.ok()) {
     //DEBUG_T("handle decode success\n");
     BlockContents contents;
@@ -346,12 +345,24 @@ public:
 	virtual void Seek(const Slice& target) {
 		meta_iter_->Seek(target);
 	}
-	virtual void SeekToFirst() { meta_iter_->SeekToFirst(); }
+	virtual void SeekToFirst() { 
+    // if(meta_iter_ == nullptr) {
+    //   DEBUG_T("meta iter is nullptr\n");
+    // } else {
+    //   //DEBUG_T("meta iter is not nullptr\n");
+    // }
+    meta_iter_->SeekToFirst(); 
+    //DEBUG_T("after meta_iter_ seek to first, %p\n", this);
+    //DEBUG_T("after again\n");
+  }
 	virtual void SeekToLast() { meta_iter_->SeekToLast(); }
 	virtual void Next() {meta_iter_->Next();}
 	virtual void Prev() { meta_iter_->Prev();}
 	Slice key() const {
-		return meta_iter_->key();
+    //DEBUG_T("before partner table  iter get key\n");
+	  Slice res = meta_iter_->key();
+    //DEBUG_T("partner table  iter get key\n");
+    return res;
 	}
 	Slice value() const {
     Slice block_info = meta_iter_->value();
@@ -361,7 +372,7 @@ public:
     handle.set_offset(DecodeFixed64(info));
     handle.set_size(DecodeFixed64(info + 8));
   
-    DEBUG_T("iter value, block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
+    //DEBUG_T("iter value, block offset is:%llu, block_size is %llu\n", handle.offset(), handle.size());
     Iterator* block_iter = BlockReader(table_, options_, Slice(), &handle);
     block_iter->Seek(meta_iter_->key());
     // if(!block_iter->Valid())

@@ -8,6 +8,7 @@
 #include "table/block.h"
 #include "table/format.h"
 #include "table/iterator_wrapper.h"
+#include "util/debug.h"
 
 namespace leveldb {
 
@@ -99,6 +100,7 @@ void TwoLevelIterator::Seek(const Slice& target) {
 }
 
 void TwoLevelIterator::SeekToFirst() {
+  //DEBUG_T("TwoLevelIterator:%p\n", this);
   index_iter_.SeekToFirst();
   InitDataBlock();
   if (data_iter_.iter() != nullptr) data_iter_.SeekToFirst();

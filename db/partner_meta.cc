@@ -71,7 +71,11 @@ namespace leveldb {
         explicit PartnerMetaIterator(PartnerMeta::Meta* meta) : iter_(meta) { }
         virtual bool Valid() const { return iter_.Valid(); }
         virtual void Seek(const Slice& k) { iter_.Seek(EncodeKey(&tmp_, k)); }
-        virtual void SeekToFirst() { iter_.SeekToFirst(); }
+        virtual void SeekToFirst() { 
+            //DEBUG_T("before PartnerMetaIterator seek to first\n");
+            iter_.SeekToFirst(); 
+            //DEBUG_T("after PartnerMetaIterator seek to first\n");
+        }
         virtual void SeekToLast() { iter_.SeekToLast(); }
         virtual void Next() { iter_.Next(); }
         virtual void Prev() { iter_.Prev(); }
@@ -83,7 +87,16 @@ namespace leveldb {
 #endif
 
 #if defined(USE_OFFSETS)
-        virtual Slice key() const { return GetLengthPrefixedSlice(reinterpret_cast<const char *>((intptr_t)iter_.node_ - (intptr_t)iter_.key_offset())); }
+        virtual Slice key() const { 
+            //DEBUG_T("partner meta before get inode\n");
+            intptr_t inode = (intptr_t)iter_.node_;
+            //DEBUG_T("partner meta after get inode\n");
+            intptr_t ioffset = (intptr_t)iter_.key_offset();
+            //DEBUG_T("partner meta after get key offset\n");
+            intptr_t skey =  inode - ioffset;
+            //DEBUG_T("partner meta after get skey\n");
+            return GetLengthPrefixedSlice(reinterpret_cast<const char *>(skey)); 
+        }
 #else
         virtual Slice key() const { return GetLengthPrefixedSlice(iter_.key()); }
 #endif
@@ -196,7 +209,7 @@ namespace leveldb {
                 case kTypeValue: {
                     *block_offset = DecodeFixed64(key_ptr + key_length);
                     *block_size = DecodeFixed64(key_ptr + key_length + 8); 
-                    DEBUG_T("offset, is %d, size:%llu\n", *block_offset, *block_size);
+                    //DEBUG_T("offset, is %d, size:%llu\n", *block_offset, *block_size);
                     return true;
                 }
                 case kTypeDeletion:

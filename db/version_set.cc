@@ -80,6 +80,7 @@ Version::~Version() {
       assert(f->refs > 0);
       f->refs--;
       if (f->refs <= 0) {
+        DEBUG_T("in ~version, to delete filemetadata:%p, file_number:%llu\n", f, f->number);
         delete f;
       }
     }
@@ -347,8 +348,10 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
       DEBUG_T("in GetFileIterator, partner number is:%llu\n", file->partners[i].partner_number);
       list[i + 1] = cache->NewPartnerIterator(options,
                 file->partners[i].partner_number,
-                file->partners[i].meta_number, 
-                file->partners[i].meta_size);
+                file->partners[i].pm
+                // file->partners[i].meta_number,
+                // file->partners[i].meta_size
+                );
 		}
 		return NewMergingIterator(&global_icmp, list, sz);
 	}
@@ -365,10 +368,17 @@ Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache,
         //                       file->partners[i].partner_number,
         //                       file->partners[i].partner_size);
         DEBUG_T("NewIteratorWithPartner, partner number is:%llu\n", file->partners[i].partner_number);
+        // if(file->partners[i].pm != nullptr) {
+        //   DEBUG_T("partners is not nullptr:%p\n", file->partners[i].pm);
+        // } else {
+        //   DEBUG_T("partners is nullptr\n");
+        // }
         list[i + 1] = cache->NewPartnerIterator(ReadOptions(),
                               file->partners[i].partner_number,
-                              file->partners[i].meta_number, 
-                              file->partners[i].meta_size);
+                              file->partners[i].pm
+                              // file->partners[i].meta_number,
+                              // file->partners[i].meta_size
+                              );
     }
     return NewMergingIterator(&icmp_, list, sz);
 }
@@ -866,6 +876,7 @@ class VersionSet::Builder {
         FileMetaData* f = to_unref[i];
         f->refs--;
         if (f->refs <= 0) {
+          DEBUG_T("in ~builder,to delete filemetadata:%p, number:%llu\n", f, f->number);
           delete f;
         }
       }
@@ -897,6 +908,11 @@ class VersionSet::Builder {
       const int level = edit->new_files_[i].first;
       FileMetaData* f = new FileMetaData(edit->new_files_[i].second);
       f->refs = 1;
+      ///////////meggie
+      if(!f->partners.empty()) {
+        f->partners[0].pm->Ref();
+      }
+      ////////////meggie
 
       // We arrange to automatically compact this file after
       // a certain number of seeks.  Let's assume:
@@ -992,6 +1008,8 @@ class VersionSet::Builder {
         if(fm->partners.empty()) {
           fm->partners.push_back(ptner);
         } else{
+          //增加引用计数
+          ptner.pm->Ref();
           fm->partners[0] = ptner;	   
         }
 	   
@@ -1104,10 +1122,12 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
   {
     Builder builder(this, current_);
     builder.Apply(edit);
+    DEBUG_T("after apply\n");
     builder.SaveTo(v);
+    DEBUG_T("after save to\n");
   }
   Finalize(v);
-
+  DEBUG_T("after finalize v\n");
   // Initialize new descriptor log file if necessary by creating
   // a temporary file that contains a snapshot of the current version.
   std::string new_manifest_file;
@@ -1157,6 +1177,7 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
     log_number_ = edit->log_number_;
     prev_log_number_ = edit->prev_log_number_;
   } else {
+    DEBUG_T("to delete version\n");
     delete v;
     if (!new_manifest_file.empty()) {
       delete descriptor_log_;
@@ -1464,8 +1485,13 @@ void VersionSet::TestIterator(Iterator* iter, bool range, InternalKey start, Int
     DEBUG_T("test iterator\n");
     ParsedInternalKey ikey;
     if(!range) {
+        DEBUG_T("before TestIterator seek to first\n");
+        if(iter == nullptr)
+          DEBUG_T("iter is nullptr\n");
         iter->SeekToFirst();
+        DEBUG_T("after TestIterator seek to first\n");
         for(; iter->Valid(); iter->Next()) {
+            DEBUG_T("before get key\n");
             Slice key = iter->key();
             DEBUG_T("to get value\n");
             Slice value = iter->value();
@@ -1477,7 +1503,9 @@ void VersionSet::TestIterator(Iterator* iter, bool range, InternalKey start, Int
         DEBUG_T("\n");
     } else {
         iter->Seek(start.Encode());
+        DEBUG_T("before get key\n");
         for(; iter->Valid(); iter->Next()) {
+            DEBUG_T("before get key\n");
             Slice key = iter->key();
             DEBUG_T("to get value\n");
             Slice value = iter->value();
@@ -1911,12 +1939,12 @@ void VersionSet::GetSplitCompactions(Compaction* c,
         DEBUG_T("inputs1[%d], sptcompaction:", i);
         PrintSplitCompaction(sptcompaction);
        
-        if(inputs1[i]->partners.size() > 10) {
+        if((victimend_index - victimstart_index + 1) > 2) {
             t_sptcompactions.push_back(sptcompaction);
-            DEBUG_T("partner count more than 10\n");
+            DEBUG_T("victim count more than 2\n");
         } else if (inputs1[i]->partners.size() > 0 && 
                     //inputs1[i]->partners[0].meta_usage > (inputs1[i]->partners[0].meta_size >> 1)){
-                    inputs1[i]->partners[0].meta_usage > (3 << 10 << 10)) {
+                    inputs1[i]->partners[0].meta_usage > (12 << 10 << 10)) {
             t_sptcompactions.push_back(sptcompaction);
             DEBUG_T("partner meta usage is too large, meta_usage:%llu, meta_size:%llu, partner_size:%llu\n", inputs1[i]->partners[0].meta_usage, 
                         inputs1[i]->partners[0].meta_size, inputs1[i]->partners[0].partner_size);

@@ -121,6 +121,7 @@ struct DBImpl::PartnerCompactionState {
   uint64_t curr_file_size;
   InternalKey curr_smallest, curr_largest;
   uint64_t meta_number, meta_size;
+  PartnerMeta* pm;
   bool init;
   
   // std::shared_ptr<HyperLogLog> hll;
@@ -865,10 +866,12 @@ void DBImpl::BackgroundCompaction() {
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
                        f->smallest, f->largest, f->origin_smallest, 
                        f->origin_largest, f->partners);
+        DEBUG_T("after addfile\n");
     } else 
         c->edit()->AddFile(c->level() + 1, f->number, f->file_size,
                        f->smallest, f->largest);
     ////////////meggie
+    DEBUG_T("before logandapply\n");
     status = versions_->LogAndApply(c->edit(), &mutex_);
     if (!status.ok()) {
       RecordBackgroundError(status);
@@ -1050,7 +1053,7 @@ Status DBImpl::InstallCompactionResults(CompactionState* compact) {
 Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_index) {
     FileMetaData* fm = compact->compaction->input(1, input1_index);
     ArenaNVM* arena;
-    PartnerMeta* pm;
+    DEBUG_T("to open partner table\n");
     if (!fm->partners.empty()) {
       compact->number = fm->partners[0].partner_number;
       compact->curr_smallest = fm->partners[0].partner_smallest;
@@ -1059,11 +1062,8 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->init = true;
       compact->meta_number = fm->partners[0].meta_number;
       compact->meta_size = fm->partners[0].meta_size;
-      std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
-      arena = new ArenaNVM(compact->meta_size, &metaFile, true);
-      arena->nvmarena_ = true;
-      //DEBUG_T("after get arena nvm\n");
-      pm = new PartnerMeta(internal_comparator_, arena, true);
+      compact->pm = fm->partners[0].pm;
+      DEBUG_T("number:%llu, get old pm:%p\n", compact->number, compact->pm);
     } else {
       mutex_.Lock();
       uint64_t file_number = versions_->NewFileNumber();
@@ -1074,21 +1074,27 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->curr_file_size = 0;
       mutex_.Unlock(); 
       compact->meta_number = versions_->NewFileNumber();
-      compact->meta_size = 4 << 10 << 10;
+      compact->meta_size = 12 << 10 << 10;
       std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
       arena = new ArenaNVM(compact->meta_size, &metaFile, false);
       arena->nvmarena_ = true;
-      //DEBUG_T("open new nvm file number: %llu, after get arena nvm\n", file_number);
-      pm = new PartnerMeta(internal_comparator_, arena, false);
+      compact->pm = new PartnerMeta(internal_comparator_, arena, false);
+      DEBUG_T("open new partner number: %llu, meta nvm number:%llu, pm:%p after get arena nvm\n", file_number, compact->meta_number, compact->pm);
+      compact->pm->Ref();
       //之后更新meta_number
     }
-    pm->Ref();
+    // std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
+    // arena = new ArenaNVM(compact->meta_size, &metaFile, false);
+    // arena->nvmarena_ = true;
+    // compact->pm = new PartnerMeta(internal_comparator_, arena, false);
+    // DEBUG_T("open new partner number: %llu, meta nvm number:%llu, pm:%p after get arena nvm\n", compact->meta_number, compact->meta_number, compact->pm);
+    // compact->pm->Ref();
     // Make the output file
     std::string fname = TableFileName(dbname_, compact->number);
     Status s = env_->NewWritableFile(fname, &compact->outfile, true);
     if (s.ok()) {
       TableBuilder* builder = new TableBuilder(options_, compact->outfile, compact->number, compact->curr_file_size);
-      SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
+      SinglePartnerTable* spt = new SinglePartnerTable(builder, compact->pm);
       compact->partner_table = spt;
       assert(compact->partner_table != nullptr);
     }
@@ -1130,7 +1136,6 @@ Status DBImpl::FinishPartnerTable(PartnerCompactionState* compact, Iterator* inp
   }
   delete compact->outfile;
   compact->outfile = nullptr;
-
   return s;
 }
 
@@ -1241,6 +1246,7 @@ void DBImpl::UpdateFileWithPartnerCompaction(VersionEdit* edit, std::vector<uint
        ptner.meta_number = compact->meta_number;
        ptner.meta_size = compact->meta_size;
        ptner.meta_usage = compact->meta_usage;
+       ptner.pm = compact->pm;
        partners.push_back(ptner);
        edit->AddPartner(level + 1, pcompaction_files[i], ptner);
    }
@@ -1290,15 +1296,16 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
     //(TODO)这两个迭代器要重新获取
     list[0] = t_sptcompaction->victim_iter;
     list[1] = t_sptcompaction->inputs1_iter;
+    DEBUG_T("before get merge iter\n");
     Iterator* merge_iter = NewMergingIterator(&internal_comparator_,
             list, 2);
+    DEBUG_T("after get merge iter\n");
     merge_iter->SetChildRange(0, 
             t_sptcompaction->victim_start.Encode(),
             t_sptcompaction->victim_end.Encode(), 
             t_sptcompaction->containsend);
+    DEBUG_T("after set child range\n");
     merge_iter->SeekToFirst();
-    //DEBUG_T("after get merge iter\n");
-    
     Status status;
     ParsedInternalKey ikey;
     Iterator* current_iter;
@@ -1597,7 +1604,6 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         }
         //DEBUG_T("before finish partner table\n");
         status = FinishPartnerTable(compact, input);
-        //DEBUG_T("push partner_size:%llu\n", compact->curr_file_size);
     }
     
     if(!status.ok()) {
@@ -1794,7 +1800,15 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
       CleanupCompaction(t_compactionstate_list[i]);
   }
 
+
 	for(int i = 0; i < p_sptcompactions.size(); i++) {
+    // Iterator* iter = versions_->NewIteratorWithPartner(
+		// 									table_cache_, c->input(1, p_sptcompactions[i]->inputs1_index));
+
+    // DEBUG_T("after finish doandlogapply, test inputs1_iter\n");
+    // iter->SeekToFirst();
+    // DEBUG_T("after finish doandlogapply seek to first\n");
+
 		delete p_sptcompactions[i];
     CleanupCompaction(p_compactionstate_list[i]);
   }

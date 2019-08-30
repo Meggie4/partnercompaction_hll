@@ -40,15 +40,21 @@ class MergingIterator : public Iterator {
 
   virtual void SeekToFirst() {
     for (int i = 0; i < n_; i++) {
-        //////////////meggie
-        if(set_range_ && i == range_index_) {
-            children_[i].Seek(range_start_);
-        }
-        else 
-        //////////////meggie
-            children_[i].SeekToFirst();
+      //////////////meggie
+      if(set_range_ && i == range_index_) {
+          children_[i].Seek(range_start_);
+      }
+      else {
+      //////////////meggie
+          // DEBUG_T("MergingIterator, before seek to first\n");
+          // DEBUG_T("this iter:%p\n", children_[i]);
+          children_[i].SeekToFirst();
+          //DEBUG_T("MergingIterator, after seek to first\n");
+      }
     }
+    //DEBUG_T("to find smallest\n");
     FindSmallest();
+    //DEBUG_T("after find smallest\n");
     direction_ = kForward;
   }
 

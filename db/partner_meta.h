@@ -24,6 +24,7 @@ namespace leveldb {
 
             void Unref() {
                 --refs_;
+                DEBUG_T("partner meta ref:%d\n", refs_);
                 assert(refs_ >= 0);
                 if (refs_ <= 0) {
                     DEBUG_T("to delete partner meta\n");

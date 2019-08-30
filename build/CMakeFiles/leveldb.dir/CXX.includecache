@@ -193,6 +193,8 @@ memory
 -
 util/hyperloglog.h
 ../db/util/hyperloglog.h
+db/partner_meta.h
+../db/db/partner_meta.h
 
 ..//db/version_set.h
 map
@@ -323,6 +325,8 @@ leveldb/iterator.h
 ../table/leveldb/iterator.h
 leveldb/slice.h
 ../table/leveldb/slice.h
+util/debug.h
+../table/util/debug.h
 
 ..//table/merger.h
 
@@ -1147,6 +1151,8 @@ table/format.h
 /home/meggie/文档/partnercompaction_hll/table/table/format.h
 table/iterator_wrapper.h
 /home/meggie/文档/partnercompaction_hll/table/table/iterator_wrapper.h
+util/debug.h
+/home/meggie/文档/partnercompaction_hll/table/util/debug.h
 
 /home/meggie/文档/partnercompaction_hll/util/BloomFilter.cc
 BloomFilter.h

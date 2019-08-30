@@ -7,15 +7,20 @@ CMakeFiles/db_test.dir/db/db_test.cc.o
  ..//db/filename.h
  ..//db/log_format.h
  ..//db/log_writer.h
+ ..//db/partner_meta.h
+ ..//db/skiplist.h
  ..//db/snapshot.h
  ..//db/version_edit.h
  ..//db/version_set.h
  ..//db/write_batch_internal.h
  ..//port/atomic_pointer.h
+ ..//port/cache_flush.h
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/arena.h
  ..//util/coding.h
+ ..//util/debug.h
  ..//util/hash.h
  ..//util/hyperloglog.h
  ..//util/logging.h

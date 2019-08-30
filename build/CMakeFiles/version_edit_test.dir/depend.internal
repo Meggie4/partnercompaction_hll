@@ -3,15 +3,21 @@
 
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o
  ..//db/dbformat.h
+ ..//db/partner_meta.h
+ ..//db/skiplist.h
  ..//db/version_edit.h
  ..//port/atomic_pointer.h
+ ..//port/cache_flush.h
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/arena.h
  ..//util/coding.h
+ ..//util/debug.h
  ..//util/hyperloglog.h
  ..//util/logging.h
  ..//util/murmurhash.h
+ ..//util/random.h
  ..//util/testharness.h
  ../include/leveldb/comparator.h
  ../include/leveldb/db.h
