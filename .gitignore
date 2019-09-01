@@ -1,2 +1,4 @@
 mylog.txt
 valgrind
+outputLoad.txt
+*.udb
