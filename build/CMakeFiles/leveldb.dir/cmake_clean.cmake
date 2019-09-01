@@ -14,7 +14,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/leveldb.dir/db/version_edit.cc.o"
   "CMakeFiles/leveldb.dir/db/version_set.cc.o"
   "CMakeFiles/leveldb.dir/db/write_batch.cc.o"
-  "CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o"
   "CMakeFiles/leveldb.dir/db/single_partner_table.cc.o"
   "CMakeFiles/leveldb.dir/db/partner_meta.cc.o"
   "CMakeFiles/leveldb.dir/table/block_builder.cc.o"

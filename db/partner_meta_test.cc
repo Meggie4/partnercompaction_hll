@@ -6,6 +6,7 @@
 #include "util/debug.h"
 #include "leveldb/env.h"
 #include <stdint.h>
+#include <memory>
 
 namespace leveldb {
     class PartnerMetaTest{};
@@ -23,9 +24,9 @@ namespace leveldb {
         ArenaNVM* arena = new ArenaNVM(metaFileSize, &metaFile, false);
         arena->nvmarena_ = true;
         DEBUG_T("after get arena nvm\n");
-        PartnerMeta* pi = new PartnerMeta(cmp, arena, false);
+        std::shared_ptr<PartnerMeta> pi = std::make_shared<PartnerMeta>(cmp, arena, false);
         DEBUG_T("after get partner Meta\n");
-        pi->Ref();
+        //pi->Ref();
         LookupKey lkey(Slice("00000000mykey"), 0);
         pi->Add(lkey.internal_key(), 1, 0);
         DEBUG_T("after add key\n");
@@ -37,7 +38,7 @@ namespace leveldb {
         if(find) {
             DEBUG_T("offset is %llu, block size:%llu\n", block_offset, block_size);
         }
-        pi->Unref();
+        //pi->Unref();
     }
 }
 

@@ -139,8 +139,8 @@ target_sources(leveldb
     "${PROJECT_SOURCE_DIR}/db/write_batch_internal.h"
     "${PROJECT_SOURCE_DIR}/db/write_batch.cc"
     ##############meggie
-    "${PROJECT_SOURCE_DIR}/db/partner_table_builder.cc"
-    "${PROJECT_SOURCE_DIR}/db/partner_table_builder.h"
+    #"${PROJECT_SOURCE_DIR}/db/partner_table_builder.cc"
+    #"${PROJECT_SOURCE_DIR}/db/partner_table_builder.h"
     "${PROJECT_SOURCE_DIR}/db/single_partner_table.cc"
     "${PROJECT_SOURCE_DIR}/db/single_partner_table.h"
     "${PROJECT_SOURCE_DIR}/db/partner_meta.cc"
@@ -342,7 +342,7 @@ if(LEVELDB_BUILD_TESTS)
     #leveldb_test("${PROJECT_SOURCE_DIR}/db/skiplist_test.cc")
     ##########meggie
     leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_meta_test.cc")
-    leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_table_builder_test.cc")
+    #leveldb_test("${PROJECT_SOURCE_DIR}/db/partner_table_builder_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/db/single_partner_table_test.cc")
     #########meggie 
     leveldb_test("${PROJECT_SOURCE_DIR}/db/version_edit_test.cc")

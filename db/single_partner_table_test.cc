@@ -10,6 +10,7 @@
 #include "db/db_impl.h"
 #include "db/table_cache.h"
 #include "leveldb/slice.h"
+#include <memory>
 
 namespace leveldb {
     class SinglePartnerTableTest {};
@@ -51,8 +52,7 @@ namespace leveldb {
         ArenaNVM* arena = new ArenaNVM(meta_size, &indexFile, false);
         arena->nvmarena_ = true;
         DEBUG_T("after get arena nvm\n");
-        PartnerMeta* pm = new PartnerMeta(cmp, arena, false);
-        pm->Ref();
+        std::shared_ptr<PartnerMeta> pm = std::make_shared<PartnerMeta>(cmp, arena, false);
         std::string dbname;
         env->GetTestDirectory(&dbname);
         std::string fname = TableFileName(dbname, 1);
@@ -64,7 +64,7 @@ namespace leveldb {
         Options option = leveldb::Options();
         uint64_t file_number = 1;
         TableBuilder* builder = new TableBuilder(option, file, file_number);
-        SinglePartnerTable* spt = new SinglePartnerTable(builder, pm);
+        SinglePartnerTable* spt = new SinglePartnerTable(builder, pm.get());
         Slice value1("this is my key1");
         Slice value2("this is my key1 again");
         Slice value3("this is my key3");
@@ -87,11 +87,8 @@ namespace leveldb {
         spt = nullptr;
         DEBUG_T("after first finish, file size is %llu........\n", file_size);
         
-        arena = new ArenaNVM(meta_size, &indexFile, true);
-        pm = new PartnerMeta(cmp, arena, true);
-        pm->Ref();
         builder = new TableBuilder(option, file, file_number, file_size);
-        spt = new SinglePartnerTable(builder, pm);
+        spt = new SinglePartnerTable(builder, pm.get());
         Slice value6("this is my key6");
         Slice value7("this is my key7");
         Slice value8("this is my key8");
@@ -109,9 +106,6 @@ namespace leveldb {
         //读取数据
         //(TODO)可以把pm保存在filemetadata中，避免频繁地创建释放
         uint64_t block_offset, block_size;
-        arena = new ArenaNVM(meta_size, &indexFile, true);
-        pm = new PartnerMeta(cmp, arena, true);
-        pm->Ref();
         bool find = pm->Get(lkey6, &block_offset, &block_size, &s);
         TableCache* table_cache = new TableCache(dbname, option, option.max_open_files, nvm_path);
         ReadOptions roptions;

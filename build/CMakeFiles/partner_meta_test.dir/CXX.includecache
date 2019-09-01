@@ -271,6 +271,8 @@ leveldb/env.h
 /home/meggie/文档/partnercompaction_hll/db/leveldb/env.h
 stdint.h
 -
+memory
+-
 
 /home/meggie/文档/partnercompaction_hll/util/testharness.cc
 util/testharness.h

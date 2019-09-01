@@ -289,34 +289,6 @@ CMakeFiles/leveldb.dir/db/partner_meta.cc.o: ../include/leveldb/table_builder.h
 CMakeFiles/leveldb.dir/db/partner_meta.cc.o: ../db/partner_meta.cc
 CMakeFiles/leveldb.dir/db/partner_meta.cc.o: include/port/port_config.h
 
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/dbformat.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/filename.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/partner_meta.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/partner_table_builder.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/skiplist.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../port/atomic_pointer.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../port/cache_flush.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../port/port.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../port/port_stdcxx.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../port/thread_annotations.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../util/arena.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../util/coding.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../util/debug.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../util/logging.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../util/random.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/comparator.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/db.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/env.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/export.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/filter_policy.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/iterator.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/options.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/slice.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/status.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../include/leveldb/table_builder.h
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: ../db/partner_table_builder.cc
-CMakeFiles/leveldb.dir/db/partner_table_builder.cc.o: include/port/port_config.h
-
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/builder.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/db_impl.h
 CMakeFiles/leveldb.dir/db/repair.cc.o: ../db/dbformat.h

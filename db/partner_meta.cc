@@ -34,13 +34,11 @@ namespace leveldb {
     PartnerMeta::PartnerMeta(const InternalKeyComparator& cmp, 
         ArenaNVM* arena, bool recovery) 
         : comparator_(cmp), 
-          refs_(0), 
           arena_(arena), 
           meta_(comparator_, arena, recovery){          
     }
 
     PartnerMeta::~PartnerMeta() {
-        assert(refs_ == 0);
         if(arena_){
             DEBUG_T("before delete arena\n");
             delete arena_;

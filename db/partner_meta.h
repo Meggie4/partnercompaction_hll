@@ -17,21 +17,7 @@ namespace leveldb {
             void operator delete(void* ptr);
             void *operator new[](std::size_t sz);
             PartnerMeta(const InternalKeyComparator& comparator, ArenaNVM* arena, bool recovery);
-            
-            void Ref() {
-                ++refs_;
-            } 
-
-            void Unref() {
-                --refs_;
-                DEBUG_T("partner meta ref:%d\n", refs_);
-                assert(refs_ >= 0);
-                if (refs_ <= 0) {
-                    DEBUG_T("to delete partner meta\n");
-                    delete this;
-                    DEBUG_T("after delete partner meta\n");
-                } 
-            }
+            ~PartnerMeta();
             
             void Add(const Slice& key, uint64_t block_offset_, uint64_t block_size);
             bool Get(const LookupKey& key, uint64_t* block_offset, uint64_t* block_size, Status* s);
@@ -41,7 +27,6 @@ namespace leveldb {
             Arena* arena_;
             
         private:
-            ~PartnerMeta();
             struct KeyComparator {
                 const InternalKeyComparator comparator;
                 explicit KeyComparator(const InternalKeyComparator& c) : comparator(c) {  }
@@ -52,7 +37,6 @@ namespace leveldb {
             typedef SkipList<const char*, KeyComparator> Meta;
             
             KeyComparator comparator_;
-            int refs_;
             Meta meta_;
 
             PartnerMeta(const PartnerMeta&);

@@ -30,7 +30,7 @@ struct Partner {
     uint64_t meta_number;
     uint64_t meta_size;
     uint64_t meta_usage;
-    PartnerMeta* pm;
+    std::shared_ptr<PartnerMeta> pm;
 	  // std::shared_ptr<HyperLogLog> hll;
     // int hll_add_count;
     // Partner() : hll(std::make_shared<HyperLogLog>(12)), 
@@ -67,12 +67,12 @@ struct FileMetaData {
   //   }
   // }
 
-  ~FileMetaData() {
-    if(!partners.empty()) {
-      DEBUG_T("delete filemeta number:%llu, unref pm %p\n", number, partners[0].pm);
-      partners[0].pm->Unref();
-    }
-  }
+  // ~FileMetaData() {
+  //   if(!partners.empty()) {
+  //     DEBUG_T("delete filemeta number:%llu, unref pm %p\n", number, partners[0].pm);
+  //     partners[0].pm->Unref();
+  //   }
+  // }
 };
 
 class VersionEdit {
@@ -161,7 +161,6 @@ class VersionEdit {
     f.origin_largest = origin_largest;
     //f.partners.assign(partners.begin(), partners.end());
     f.partners.push_back(partners[0]);
-    f.partners[0].pm->Ref();
     new_files_.push_back(std::make_pair(level, f));
   }
   

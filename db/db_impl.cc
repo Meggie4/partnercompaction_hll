@@ -121,7 +121,7 @@ struct DBImpl::PartnerCompactionState {
   uint64_t curr_file_size;
   InternalKey curr_smallest, curr_largest;
   uint64_t meta_number, meta_size;
-  PartnerMeta* pm;
+  std::shared_ptr<PartnerMeta> pm;
   bool init;
   
   // std::shared_ptr<HyperLogLog> hll;
@@ -1078,9 +1078,9 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
       arena = new ArenaNVM(compact->meta_size, &metaFile, false);
       arena->nvmarena_ = true;
-      compact->pm = new PartnerMeta(internal_comparator_, arena, false);
+      //compact->pm = new PartnerMeta(internal_comparator_, arena, false);
+      compact->pm = std::make_shared<PartnerMeta>(internal_comparator_, arena, false);
       DEBUG_T("open new partner number: %llu, meta nvm number:%llu, pm:%p after get arena nvm\n", file_number, compact->meta_number, compact->pm);
-      compact->pm->Ref();
       //之后更新meta_number
     }
     // std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
@@ -1094,7 +1094,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
     Status s = env_->NewWritableFile(fname, &compact->outfile, true);
     if (s.ok()) {
       TableBuilder* builder = new TableBuilder(options_, compact->outfile, compact->number, compact->curr_file_size);
-      SinglePartnerTable* spt = new SinglePartnerTable(builder, compact->pm);
+      SinglePartnerTable* spt = new SinglePartnerTable(builder, compact->pm.get());
       compact->partner_table = spt;
       assert(compact->partner_table != nullptr);
     }

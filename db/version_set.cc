@@ -348,7 +348,7 @@ static Iterator* GetFileIteratorWithPartner(void* arg,
       DEBUG_T("in GetFileIterator, partner number is:%llu\n", file->partners[i].partner_number);
       list[i + 1] = cache->NewPartnerIterator(options,
                 file->partners[i].partner_number,
-                file->partners[i].pm
+                file->partners[i].pm.get()
                 // file->partners[i].meta_number,
                 // file->partners[i].meta_size
                 );
@@ -375,7 +375,7 @@ Iterator* VersionSet::NewIteratorWithPartner(TableCache* cache,
         // }
         list[i + 1] = cache->NewPartnerIterator(ReadOptions(),
                               file->partners[i].partner_number,
-                              file->partners[i].pm
+                              file->partners[i].pm.get()
                               // file->partners[i].meta_number,
                               // file->partners[i].meta_size
                               );
@@ -908,11 +908,6 @@ class VersionSet::Builder {
       const int level = edit->new_files_[i].first;
       FileMetaData* f = new FileMetaData(edit->new_files_[i].second);
       f->refs = 1;
-      ///////////meggie
-      if(!f->partners.empty()) {
-        f->partners[0].pm->Ref();
-      }
-      ////////////meggie
 
       // We arrange to automatically compact this file after
       // a certain number of seeks.  Let's assume:
@@ -1008,8 +1003,6 @@ class VersionSet::Builder {
         if(fm->partners.empty()) {
           fm->partners.push_back(ptner);
         } else{
-          //增加引用计数
-          ptner.pm->Ref();
           fm->partners[0] = ptner;	   
         }
 	   
