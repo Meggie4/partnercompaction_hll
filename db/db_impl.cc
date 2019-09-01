@@ -652,13 +652,13 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit,
     if (base != nullptr) {
       level = base->PickLevelForMemTableOutput(min_user_key, max_user_key);
     }
-	///////////////meggie
+	  ///////////////meggie
     edit->AddFile(level, meta.number, meta.file_size,
                   meta.smallest, meta.largest);
     DEBUG_T("WriteLevel0Table, AddFile, file_number:%lld, smallest:%s, largest:%s\n", 
             meta.number, meta.smallest.user_key().ToString().c_str(), 
             meta.largest.user_key().ToString().c_str());
-	///////////////meggie
+	  ///////////////meggie
   }
 
   CompactionStats stats;
@@ -1074,7 +1074,7 @@ Status DBImpl::OpenPartnerTable(PartnerCompactionState* compact, int input1_inde
       compact->curr_file_size = 0;
       mutex_.Unlock(); 
       compact->meta_number = versions_->NewFileNumber();
-      compact->meta_size = 12 << 10 << 10;
+      compact->meta_size = 16 << 10 << 10;
       std::string metaFile = MapFileName(dbname_nvm_, compact->meta_number);
       arena = new ArenaNVM(compact->meta_size, &metaFile, false);
       arena->nvmarena_ = true;

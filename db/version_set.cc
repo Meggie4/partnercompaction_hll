@@ -1937,7 +1937,7 @@ void VersionSet::GetSplitCompactions(Compaction* c,
             DEBUG_T("victim count more than 2\n");
         } else if (inputs1[i]->partners.size() > 0 && 
                     //inputs1[i]->partners[0].meta_usage > (inputs1[i]->partners[0].meta_size >> 1)){
-                    inputs1[i]->partners[0].meta_usage > (12 << 10 << 10)) {
+                    inputs1[i]->partners[0].meta_usage > (16 << 10 << 10)) {
             t_sptcompactions.push_back(sptcompaction);
             DEBUG_T("partner meta usage is too large, meta_usage:%llu, meta_size:%llu, partner_size:%llu\n", inputs1[i]->partners[0].meta_usage, 
                         inputs1[i]->partners[0].meta_size, inputs1[i]->partners[0].partner_size);
