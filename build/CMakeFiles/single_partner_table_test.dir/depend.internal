@@ -17,6 +17,7 @@ CMakeFiles/single_partner_table_test.dir/db/single_partner_table_test.cc.o
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/BloomFilter.h
  ..//util/arena.h
  ..//util/coding.h
  ..//util/debug.h

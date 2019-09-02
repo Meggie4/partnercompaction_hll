@@ -17,6 +17,7 @@ CMakeFiles/db_test.dir/db/db_test.cc.o: ../port/cache_flush.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../port/port.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/db_test.dir/db/db_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../util/arena.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../util/coding.h
 CMakeFiles/db_test.dir/db/db_test.cc.o: ../util/debug.h

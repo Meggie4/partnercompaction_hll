@@ -237,6 +237,7 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname,const std::
 }
 
 DBImpl::~DBImpl() {
+  //在db_bench中benchmark的析构函数中，会调用dbimpl的析构函数
   // Wait for background work to finish
   mutex_.Lock();
   shutting_down_.Release_Store(this);  // Any non-null value is ok
@@ -255,7 +256,9 @@ DBImpl::~DBImpl() {
   delete tmp_batch_;
   delete log_;
   delete logfile_;
+  DEBUG_T("in ~dbimpl, to delete table_cache_\n");
   delete table_cache_;
+  DEBUG_T("in ~dbimpl, after delete table_cache_\n");
   ////////////meggie
   delete timer;
   delete thpool_;
@@ -265,7 +268,9 @@ DBImpl::~DBImpl() {
     delete options_.info_log;
   }
   if (owns_cache_) {
+    DEBUG_T("in ~dbimpl, to delete block_cache_\n");
     delete options_.block_cache;
+    DEBUG_T("in ~dbimpl, after delete block_cache_\n");
   }
 }
 
@@ -1596,13 +1601,18 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
    
     DEBUG_T("after finish iter input, add entries:%llu\n", entries);
     if(status.ok() && compact->partner_table != nullptr) {
+       DEBUG_T("before finish partner table, this_smallest user key is %s, this_largest user key is:%s\n", 
+              this_smallest.user_key().ToString().c_str(), 
+              this_largest.user_key().ToString().c_str());
         if(!compact->init || internal_comparator_.Compare(this_smallest, compact->curr_smallest) < 0) {
           compact->curr_smallest = this_smallest;
         }
         if(!compact->init || internal_comparator_.Compare(this_largest, compact->curr_largest) > 0) {
           compact->curr_largest = this_largest;
         }
-        //DEBUG_T("before finish partner table\n");
+        DEBUG_T("before finish partner table, smallest user key is %s, largest user key is:%s\n", 
+              compact->curr_smallest.user_key().ToString().c_str(), 
+              compact->curr_largest.user_key().ToString().c_str());
         status = FinishPartnerTable(compact, input);
     }
     

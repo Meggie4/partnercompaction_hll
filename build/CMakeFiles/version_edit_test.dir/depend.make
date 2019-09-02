@@ -10,6 +10,7 @@ CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../port/cache_flush.
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../port/port.h
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../util/arena.h
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../util/coding.h
 CMakeFiles/version_edit_test.dir/db/version_edit_test.cc.o: ../util/debug.h

@@ -64,7 +64,7 @@ class LEVELDB_EXPORT Env {
   //
   // The returned file may be concurrently accessed by multiple threads.
   virtual Status NewRandomAccessFile(const std::string& fname,
-                                     RandomAccessFile** result) = 0;
+                                     RandomAccessFile** result, bool partner = false) = 0;
 
   // Create an object that writes to a new file with the specified
   // name.  Deletes any existing file with the same name and creates a
@@ -301,8 +301,8 @@ class LEVELDB_EXPORT EnvWrapper : public Env {
     return target_->NewSequentialFile(f, r);
   }
   Status NewRandomAccessFile(const std::string& f,
-                             RandomAccessFile** r) override {
-    return target_->NewRandomAccessFile(f, r);
+                             RandomAccessFile** r, bool partner = false) override {
+    return target_->NewRandomAccessFile(f, r, partner);
   }
   ////////////meggie
   Status NewWritableFile(const std::string& f, WritableFile** r, bool append = false) override {

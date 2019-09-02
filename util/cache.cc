@@ -206,6 +206,7 @@ LRUCache::LRUCache()
 }
 
 LRUCache::~LRUCache() {
+  //当在使用中的handle链表为空的时候，那就可以调用LRU cache的析构函数
   assert(in_use_.next == &in_use_);  // Error if caller has an unreleased handle
   for (LRUHandle* e = lru_.next; e != &lru_; ) {
     LRUHandle* next = e->next;

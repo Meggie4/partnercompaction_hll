@@ -17,6 +17,7 @@ CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../port/cache_flush.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../port/port.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../util/arena.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../util/coding.h
 CMakeFiles/recovery_test.dir/db/recovery_test.cc.o: ../util/debug.h

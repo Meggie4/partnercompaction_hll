@@ -21,6 +21,15 @@
 #include "util/debug.h"
 #include "db/partner_meta.h"
 
+////////////meggie
+int searching_partner = 0;
+int found_searching_partner = 0;
+int not_found_searching_partner = 0;
+int searching_not_found_partner = 0;
+int predict_not_in_partner = 0;
+int searching_found_partner = 0;
+int searching_found_sstable = 0;
+////////////meggie
 namespace leveldb {
 
 static size_t TargetFileSize(const Options* options) {
@@ -592,24 +601,51 @@ Status Version::Get(const ReadOptions& options,
           bool search_partner = false;
           for(int j = f->partners.size() - 1; j >= 0; j--) {
               Partner ptner = f->partners[j];
-              DEBUG_T("search partner, number:%d, smallest:%s, largest:%s\n",
-                      ptner.partner_number,
-                      ptner.partner_smallest.user_key().ToString().c_str(),
-                      ptner.partner_largest.user_key().ToString().c_str());
               if((ucmp->Compare(user_key, ptner.partner_smallest.user_key()) >= 0) 
-                      && (ucmp->Compare(user_key, ptner.partner_largest.user_key()) <= 0)){   
+                      && (ucmp->Compare(user_key, ptner.partner_largest.user_key()) <= 0)){  
                   search_partner = true;
+                  //首先看partner中是否存在要找的key
+                  uint64_t block_offset, block_size;
+                  searching_partner++;
+                  // char *keystr = (char*)user_key.data();
+                  // keystr[user_key.size()]=0;
+                  // bool predict = f->partners[0].pm->CheckPredictIndex(&f->partners[0].pm->predict_set_,
+                  //                   (const uint8_t*)keystr);
+                  // if (!predict) {
+                  //     predict_not_in_partner++;
+                  //     goto search_sstable;
+                  // }
+                  const uint64_t partner_read_micros_start = vset_->env_->NowMicros();
+                  bool find = f->partners[0].pm->Get(k, &block_offset, &block_size, &s);
+                  const uint64_t partnermeta_read_micros_need = vset_->env_->NowMicros() - partner_read_micros_start;
+                  DEBUG_T("partner meta read need time:%llu\n", partnermeta_read_micros_need);
+                  if(!find) {
+                      not_found_searching_partner++;
+                      goto search_sstable;
+                  }
+                  found_searching_partner++;
+                  // DEBUG_T("find, search partner, number:%d, smallest:%s, largest:%s\n",
+                  //     ptner.partner_number,
+                  //     ptner.partner_smallest.user_key().ToString().c_str(),
+                  //     ptner.partner_largest.user_key().ToString().c_str());
+                  // DEBUG_T("table cache get, sstable numner:%llu, partner number:%llu, meta number:%llu, block offset:%llu, block size:%llu\n", 
+                  //     f->number, f->partners[0].partner_number, f->partners[0].meta_number, block_offset, block_size);
                   s = vset_->table_cache_->Get(options, ptner.partner_number, 
-                                        ptner.partner_size, ikey, &saver, SaveValue);
+                                        ikey, &saver, SaveValue, block_offset, block_size);
                   if(!s.ok()){
                       DEBUG_T("partner table_cache get failed\n");
                       return s;
                   }
+                  const uint64_t partner_read_micros_need = vset_->env_->NowMicros() - partner_read_micros_start;
+                  DEBUG_T("partner read need time:%llu, partnerdata read need time:%llu\n", partner_read_micros_need, 
+                                                  partner_read_micros_need - partnermeta_read_micros_need);
                   switch (saver.state) {
                     case kNotFound:
                         DEBUG_T("NotFound in partner\n");
+                        searching_not_found_partner++;
                         break;// Keep searching in origin sstable
                     case kFound:
+                        searching_found_partner++;
                       return s;
                     case kDeleted:
                       s = Status::NotFound(Slice());  // Use empty error message for speed
@@ -621,8 +657,12 @@ Status Version::Get(const ReadOptions& options,
               }
         }
       }
+search_sstable:
+      const uint64_t sstable_read_micros_start = vset_->env_->NowMicros();
       s = vset_->table_cache_->Get(options, f->number, f->file_size,
                                    ikey, &saver, SaveValue);
+      const uint64_t sstable_read_micros_need = vset_->env_->NowMicros() - sstable_read_micros_start;
+      DEBUG_T("sstable read need time:%llu\n", sstable_read_micros_need);
       ///////////meggie
 
       if (!s.ok()) {
@@ -632,6 +672,7 @@ Status Version::Get(const ReadOptions& options,
         case kNotFound:
           break;      // Keep searching in other files
         case kFound:
+          searching_found_sstable++;
           return s;
         case kDeleted:
           s = Status::NotFound(Slice());  // Use empty error message for speed
@@ -1024,7 +1065,8 @@ class VersionSet::Builder {
                 fm->smallest.user_key().ToString().c_str(),
                 fm->largest.user_key().ToString().c_str());
 
-        fm->allowed_seeks = (fm->file_size / 16384);
+        //fm->allowed_seeks = (fm->file_size / 16384);
+        fm->allowed_seeks = ((fm->file_size + fm->partners[0].partner_size) / 16384);
         if (fm->allowed_seeks < 100) fm->allowed_seeks = 100;
         
         if (level > 0 && !files->empty()) {

@@ -16,6 +16,7 @@ CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../port/cache_
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../port/port.h
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../util/arena.h
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../util/coding.h
 CMakeFiles/fault_injection_test.dir/db/fault_injection_test.cc.o: ../util/debug.h

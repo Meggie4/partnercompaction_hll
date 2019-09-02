@@ -171,6 +171,7 @@ class PosixRandomAccessFile final : public RandomAccessFile {
     if (!has_permanent_fd_) {
       fd = ::open(filename_.c_str(), O_RDONLY);
       if (fd < 0) {
+        DEBUG_T("file open failed\n");
         return PosixError(filename_, errno);
       }
     }
@@ -178,6 +179,7 @@ class PosixRandomAccessFile final : public RandomAccessFile {
     assert(fd != -1);
 
     Status status;
+    
     ssize_t read_size = ::pread(fd, scratch, n, static_cast<off_t>(offset));
     *result = Slice(scratch, (read_size < 0) ? 0 : read_size);
     if (read_size < 0) {
@@ -225,6 +227,9 @@ class PosixMmapReadableFile final : public RandomAccessFile {
 
   Status Read(uint64_t offset, size_t n, Slice* result,
               char* scratch) const override {
+    /////////////meggie
+    //DEBUG_T("PosixMmapReadableFile read, offset:%llu, n:%llu, length:%zu\n", offset, n, length_);
+    //////////meggie
     if (offset + n > length_) {
       *result = Slice();
       return PosixError(filename_, EINVAL);
@@ -503,33 +508,44 @@ class PosixEnv : public Env {
   }
 
   Status NewRandomAccessFile(const std::string& filename,
-                             RandomAccessFile** result) override {
+                             RandomAccessFile** result, bool partner = false) override {
+    //传入文件名， 获取RandomAccessFile对象
     *result = nullptr;
+    //首先打开文件
     int fd = ::open(filename.c_str(), O_RDONLY);
     if (fd < 0) {
       return PosixError(filename, errno);
     }
 
-    if (!mmap_limiter_.Acquire()) {
+    //如果获取不到mmap_limiter_， 那就获取PosixRandomAccessFile对象
+    //如果是partner, 那就直接利用RandomAccessFile， 因为文件一直在改变，而如果采用mmap, 需要保证文件不会改变了
+    if (partner || !mmap_limiter_.Acquire()) {
       *result = new PosixRandomAccessFile(filename, fd, &fd_limiter_);
       return Status::OK();
     }
 
+    //否则，获取文件大小
     uint64_t file_size;
     Status status = GetFileSize(filename, &file_size);
+    DEBUG_T("NewRandomAccessFile, filename:%s, filesize:%llu\n", filename.c_str(), file_size);
     if (status.ok()) {
+      //将该文件进行内存映射
       void* mmap_base = ::mmap(/*addr=*/nullptr, file_size, PROT_READ,
                                MAP_SHARED, fd, 0);
       if (mmap_base != MAP_FAILED) {
+        //内存映射成功，创建PosixMmapReadableFile对象
         *result = new PosixMmapReadableFile(
             filename, reinterpret_cast<char*>(mmap_base), file_size,
             &mmap_limiter_);
       } else {
+        //内存映射失败
         status = PosixError(filename, errno);
       }
     }
+    //关闭文件
     ::close(fd);
     if (!status.ok()) {
+      //状态不对,释放mmap_limiter_
       mmap_limiter_.Release();
     }
     return status;

@@ -56,10 +56,14 @@ Status TableCache::FindTable(uint64_t file_number, uint64_t file_size,
     std::string fname = TableFileName(dbname_, file_number);
     RandomAccessFile* file = nullptr;
     Table* table = nullptr;
-    s = env_->NewRandomAccessFile(fname, &file);
+    //////////meggie
+    s = env_->NewRandomAccessFile(fname, &file, isPartnerTable);
+    ////////meggie
     if (!s.ok()) {
       std::string old_fname = SSTTableFileName(dbname_, file_number);
-      if (env_->NewRandomAccessFile(old_fname, &file).ok()) {
+      //////////////meggie
+      if (env_->NewRandomAccessFile(old_fname, &file, isPartnerTable).ok()) {
+      //////////////meggie
         s = Status::OK();
       }
     }
@@ -117,13 +121,21 @@ Status TableCache::Get(const ReadOptions& options,
                        const Slice& k,
                        void* arg,
                        void (*saver)(void*, const Slice&, const Slice&)) {
+  const uint64_t find_table_start = options_.env->NowMicros();
   Cache::Handle* handle = nullptr;
   Status s = FindTable(file_number, file_size, &handle);
+  // const uint64_t find_table_end = options_.env->NowMicros();
+  // DEBUG_T("sstable find table need time:%llu\n", find_table_end - find_table_start);
   if (s.ok()) {
     Table* t = reinterpret_cast<TableAndFile*>(cache_->Value(handle))->table;
     s = t->InternalGet(options, k, arg, saver);
+    //const uint64_t internal_get_end = options_.env->NowMicros();
+    //DEBUG_T("sstable internal get need time:%llu\n", internal_get_end - find_table_end);
     cache_->Release(handle);
+    //const uint64_t release_end = options_.env->NowMicros();
+    //DEBUG_T("sstable release need time:%llu\n", release_end - internal_get_end);
   }
+  DEBUG_T("sstable get need time:%llu\n", options_.env->NowMicros() - find_table_start);
   return s;
 }
 
@@ -134,14 +146,24 @@ Status TableCache::Get(const ReadOptions& options,
                        void* arg,
                        void (*saver)(void*, const Slice&, const Slice&), 
                        uint64_t block_offset, 
-                       uint64_t block_size) {
+                       uint64_t block_size
+                       ) {
+  const uint64_t find_table_start = options_.env->NowMicros();
   Cache::Handle* handle = nullptr;
+  //const uint64_t find_table_start = options_.env->NowMicros();
   Status s = FindTable(file_number, 0, &handle, true);
+  //const uint64_t find_table_end = options_.env->NowMicros();
+  //DEBUG_T("partner find table need time:%llu\n", find_table_end - find_table_start);
   if (s.ok()) {
     Table* t = reinterpret_cast<TableAndFile*>(cache_->Value(handle))->table;
     s = t->InternalGet(options, k, arg, saver, block_offset, block_size);
+    //const uint64_t internal_get_end = options_.env->NowMicros();
+    //DEBUG_T("partner internal get need time:%llu\n", internal_get_end - find_table_end);
     cache_->Release(handle);
+    // const uint64_t release_end = options_.env->NowMicros();
+    // DEBUG_T("partner release need time:%llu\n", release_end - internal_get_end);
   }
+  DEBUG_T("partner get need time:%llu\n", options_.env->NowMicros() - find_table_start);
   return s;
 }
 

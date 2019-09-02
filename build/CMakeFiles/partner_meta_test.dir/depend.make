@@ -10,6 +10,7 @@ CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../port/cache_flush.
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../port/port.h
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../util/arena.h
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../util/coding.h
 CMakeFiles/partner_meta_test.dir/db/partner_meta_test.cc.o: ../util/debug.h

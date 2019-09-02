@@ -94,8 +94,7 @@ public:
             //printf("\nmessage:%d, ", i);
 			if (timer_count[i] > 0) {
                 //printf("print timer_micros, ");
-				result.append(message[i])
-						.append(": timer_micros: ");
+				result.append(message[i]).append(": timer_micros: ");
 				AppendNumberTo(&result, timer_micros[i]);
                 //printf("print timer_count, ");
 				result.append(" timer_count: ");

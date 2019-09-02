@@ -119,6 +119,10 @@ db/skiplist.h
 ../db/db/skiplist.h
 util/arena.h
 ../db/util/arena.h
+util/BloomFilter.h
+../db/util/BloomFilter.h
+unordered_set
+-
 
 ..//db/single_partner_table.h
 cstdio

@@ -33,6 +33,13 @@
 ///////////meggie
 extern int use_origin_victim_num;
 extern int partner_compaction_num;
+extern int searching_partner;
+extern int found_searching_partner;
+extern int not_found_searching_partner;
+extern int searching_not_found_partner;
+extern int predict_not_in_partner;
+extern int searching_found_partner;
+extern int searching_found_sstable;
 extern std::vector<uint64_t> partner_size;
 ///////////meggie
 
@@ -713,6 +720,14 @@ class Benchmark {
         method = &Benchmark::Readuniform100_30000k;
       ///////zipfian
       ////load 
+      } else if(name == Slice("loadzipfian100_500k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Loadzipfian100_500k;
+      } else if(name == Slice("loadzipfian100_1000k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Loadzipfian100_1000k;
       } else if(name == Slice("loadzipfian100_5000k")) {
         entries_per_batch_ = 1000;
         fresh_db = true;
@@ -738,6 +753,10 @@ class Benchmark {
         fresh_db = true;
         method = &Benchmark::Loadzipfian100_30000k;
       //////read
+      } else if(name == Slice("readzipfian100_500k")) {
+        method = &Benchmark::Readzipfian100_500k;
+      } else if(name == Slice("readzipfian100_1000k")) {
+        method = &Benchmark::Readzipfian100_1000k;
       } else if(name == Slice("readzipfian100_5000k")) {
         method = &Benchmark::Readzipfian100_5000k;
       } else if(name == Slice("readzipfian100_10000k")) {
@@ -887,15 +906,16 @@ class Benchmark {
       ////////////meggie
       db_->PrintTimerAudit();
       DEBUG_T("after PrintTimeAudit.....\n");
-      DEBUG_T("use_origin_victim_num:%d, partner_compaction_num:%d\n", 
-              use_origin_victim_num, partner_compaction_num);
-      DEBUG_T("Generate partner:%d, details like this:\n", partner_size.size());
-      for(int i = 0; i < partner_size.size(); i++) {
-          DEBUG_T("%lld, ", partner_size[i]);
-          if(i % 15 == 0)
-              DEBUG_T("\n");
-      }
-      DEBUG_T("\n");
+      DEBUG_T("searching_found_partner:%d, searching_found_sstable:%d\n", searching_found_partner, searching_found_sstable);
+      DEBUG_T("searching_partner:%d, found_searching_partner:%d, not_found_searching_partner:%d, searching_not_found_partner:%d\n", 
+              searching_partner, found_searching_partner, not_found_searching_partner, searching_not_found_partner);
+      // DEBUG_T("Generate partner:%d, details like this:\n", partner_size.size());
+      // for(int i = 0; i < partner_size.size(); i++) {
+      //     DEBUG_T("%lld, ", partner_size[i]);
+      //     if(i % 15 == 0)
+      //         DEBUG_T("\n");
+      // }
+      // DEBUG_T("\n");
       ////////////meggie
     }
   }
@@ -1325,6 +1345,14 @@ class Benchmark {
   }
   ////zipfian
   //////////load 
+  void Loadzipfian100_500k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/load_50M.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
+  void Loadzipfian100_1000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/load_100M.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
   void Loadzipfian100_5000k(ThreadState* thread){
       std::string fname = "/mnt/workloads/zipfian/load_500M.txt"; 
       CustomedWorkloadWrite(thread, fname);
@@ -1350,6 +1378,14 @@ class Benchmark {
       CustomedWorkloadWrite(thread, fname);
   }
   ////read 
+   void Readzipfian100_500k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/read_50M.txt"; 
+      CustomedWorkloadRead(thread, fname);
+  }
+  void Readzipfian100_1000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/read_100M.txt"; 
+      CustomedWorkloadRead(thread, fname);
+  }
   void Readzipfian100_5000k(ThreadState* thread){
       std::string fname = "/mnt/workloads/zipfian/read_500M.txt"; 
       CustomedWorkloadRead(thread, fname);
@@ -1400,12 +1436,12 @@ class Benchmark {
       snprintf(msg, sizeof(msg), "(%d/%d found)", found, total);
       thread->stats.AddMessage(msg);
       DEBUG_T("these keys(%d) not found:\n", notfounds.size());
-      //for(int i = 0; i < notfounds.size(); i++) {
-      //    DEBUG_T("%s, ", notfounds[i].c_str());
-      //    if(i % 4 == 0)
-      //        DEBUG_T("\n");
-      //}
-      //DEBUG_T("\n");
+      for(int i = 0; i < notfounds.size(); i++) {
+         DEBUG_T("%s, ", notfounds[i].c_str());
+         if(i % 4 == 0)
+             DEBUG_T("\n");
+      }
+      DEBUG_T("\n");
   } 
 
   //////latest

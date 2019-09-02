@@ -379,7 +379,9 @@ public:
     //   DEBUG_T("block iter is unvalid\n");
     // DEBUG_T("value is %s\n", block_iter->value().ToString().c_str());
     // DEBUG_T("after get value\n");
-    return block_iter->value();
+    Slice val = block_iter->value();
+    delete block_iter;
+    return val;
 	}
 	virtual Status status() const { return Status::OK(); }
 private:

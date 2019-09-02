@@ -16,6 +16,7 @@ CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../port/cache_flush.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../port/port.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../port/port_stdcxx.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../port/thread_annotations.h
+CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../util/BloomFilter.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../util/arena.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../util/coding.h
 CMakeFiles/corruption_test.dir/db/corruption_test.cc.o: ../util/debug.h

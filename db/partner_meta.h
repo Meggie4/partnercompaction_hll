@@ -8,6 +8,8 @@
 #include "db/dbformat.h"
 #include "db/skiplist.h"
 #include "util/arena.h"
+#include "util/BloomFilter.h"
+#include <unordered_set>
 
 namespace leveldb {
     class PartnerMetaIterator;
@@ -25,6 +27,13 @@ namespace leveldb {
             Iterator* NewIterator();
            
             Arena* arena_;
+
+            //用于预测键值对是否在partner中
+            // BloomFilter bloom_;
+            // std::unordered_set<std::string> predict_set_;
+            // void AddPredictIndex(std::unordered_set<std::string> *set, const uint8_t*);
+            // int  CheckPredictIndex(std::unordered_set<std::string> *set, const uint8_t*);
+            // void ClearPredictIndex(std::unordered_set<std::string> *set);
             
         private:
             struct KeyComparator {

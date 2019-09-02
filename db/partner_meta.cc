@@ -35,6 +35,7 @@ namespace leveldb {
         ArenaNVM* arena, bool recovery) 
         : comparator_(cmp), 
           arena_(arena), 
+          //bloom_(BLOOMSIZE, BLOOMHASH),
           meta_(comparator_, arena, recovery){          
     }
 
@@ -45,6 +46,18 @@ namespace leveldb {
             DEBUG_T("after delete arena\n");
         }
     }
+
+    // void PartnerMeta::AddPredictIndex(std::unordered_set<std::string> *set, const uint8_t* data) {
+    //     this->bloom_.add(data, strlen((const char*)data));
+    // }
+
+    // int PartnerMeta::CheckPredictIndex(std::unordered_set<std::string> *set, const uint8_t* data) {
+    //     return this->bloom_.possiblyContains(data, (size_t)strlen((const char*)data));
+    // }
+
+    // //TODO: Implement prediction clear
+    // void PartnerMeta::ClearPredictIndex(std::unordered_set<std::string> *set) {
+    // }
 
     size_t PartnerMeta::ApproximateMemoryUsage() {
         return arena_->MemoryUsage();
@@ -155,6 +168,10 @@ namespace leveldb {
     //这里的partner number指的是0~9中， 以及data的offset以及data block的大小
     void PartnerMeta::Add(const Slice& key, uint64_t block_offset, uint64_t block_size) {
        ///存储的形式是：key_size + key + block_offset(64) + block_size(64)
+       InternalKey ikey;
+       ikey.DecodeFrom(key);
+       Slice user_key = ikey.user_key();
+
        size_t key_size = key.size();
        const size_t encoded_len = VarintLength(key_size) + key_size + 8 + 8;
        char* buf = nullptr;
@@ -165,6 +182,11 @@ namespace leveldb {
            perror("Memory allocation failed");
            exit(-1);
        }
+    
+       //add prediction
+    //    char *keystr = (char*)user_key.data();
+    //    keystr[user_key.size()]=0;
+    //    AddPredictIndex(&predict_set_, (const uint8_t *)keystr);
 
        char* p = EncodeVarint32(buf, key_size);
        
@@ -186,7 +208,9 @@ namespace leveldb {
     bool PartnerMeta::Get(const LookupKey& key, uint64_t* block_offset, uint64_t* block_size, Status* s) {
         Slice memkey = key.memtable_key();
         Meta::Iterator iter(&meta_);
-        DEBUG_T("memtable key is %s\n", memkey.ToString().c_str());
+        //DEBUG_T("memtable key is %s\n", memkey.ToString().c_str());
+        Env* env = Env::Default();
+        const uint64_t seek_start = env->NowMicros();
         iter.Seek(memkey.data());
         
         if(iter.Valid()) {
@@ -199,8 +223,7 @@ namespace leveldb {
 #endif
             uint32_t key_length;
             const char* key_ptr = GetVarint32Ptr(entry, entry + 5, &key_length);
-            if(comparator_.comparator.user_comparator()->Compare(
-                        Slice(key_ptr, key_length - 8), 
+            if(comparator_.comparator.user_comparator()->Compare(Slice(key_ptr, key_length - 8), 
                         key.user_key()) == 0) {
                 uint64_t tag = DecodeFixed64(key_ptr + key_length - 8);
                 switch (static_cast<ValueType>(tag & 0xff)) {
@@ -208,6 +231,7 @@ namespace leveldb {
                     *block_offset = DecodeFixed64(key_ptr + key_length);
                     *block_size = DecodeFixed64(key_ptr + key_length + 8); 
                     //DEBUG_T("offset, is %d, size:%llu\n", *block_offset, *block_size);
+                    DEBUG_T("partner meta seek need time:%llu\n", env->NowMicros() - seek_start);
                     return true;
                 }
                 case kTypeDeletion:

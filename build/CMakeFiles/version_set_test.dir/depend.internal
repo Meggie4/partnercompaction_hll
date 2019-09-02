@@ -12,6 +12,7 @@ CMakeFiles/version_set_test.dir/db/version_set_test.cc.o
  ..//port/port.h
  ..//port/port_stdcxx.h
  ..//port/thread_annotations.h
+ ..//util/BloomFilter.h
  ..//util/arena.h
  ..//util/coding.h
  ..//util/debug.h

@@ -52,7 +52,8 @@ class TableCache {
                        void* arg,
                        void (*saver)(void*, const Slice&, const Slice&), 
                        uint64_t block_offset, 
-                       uint64_t block_size);
+                       uint64_t block_size
+                       );
   Iterator* NewPartnerIterator(const ReadOptions& options,
                         uint64_t file_number,
                         PartnerMeta* pm,

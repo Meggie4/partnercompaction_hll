@@ -31,6 +31,10 @@ db/skiplist.h
 ../db/db/skiplist.h
 util/arena.h
 ../db/util/arena.h
+util/BloomFilter.h
+../db/util/BloomFilter.h
+unordered_set
+-
 
 ..//db/skiplist.h
 assert.h
@@ -133,6 +137,14 @@ port/thread_annotations.h
 ../port/port/thread_annotations.h
 
 ..//port/thread_annotations.h
+
+..//util/BloomFilter.h
+stdlib.h
+-
+vector
+-
+stdint.h
+-
 
 ..//util/arena.h
 vector
