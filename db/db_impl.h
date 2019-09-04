@@ -136,10 +136,10 @@ class DBImpl : public DB {
   static void DoTraditionCompactionWork(void* args);
   static void DoPartnerCompactionWork(void* args);
   void DealWithTraditionCompaction(CompactionState* compact, 
-                        TSplitCompaction* t_sptcompaction);
+                        TSplitCompaction* t_sptcompaction, Status* s);
   // void DealWithPartnerCompaction(CompactionState* compact, 
   //                           SplitCompaction* p_sptcompaction);
-  void DealWithPartnerCompaction(PartnerCompactionState* compact, SplitCompaction* p_sptcompaction);
+  void DealWithPartnerCompaction(PartnerCompactionState* compact, SplitCompaction* p_sptcompaction, Status* s);
   void AddFileWithTraditionalCompaction(VersionEdit* edit, 
         std::vector<CompactionState*>& t_compactionstate_list);
   bool ValidAndInRange(Iterator* iter, InternalKey end, 

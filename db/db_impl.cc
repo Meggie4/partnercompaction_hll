@@ -831,7 +831,10 @@ void DBImpl::BackgroundCompaction() {
   mutex_.AssertHeld();
 
   if (imm_ != nullptr) {
+    uint64_t cm_start = env_->NowMicros();
     CompactMemTable();
+    uint64_t cm_end = env_->NowMicros();
+    DEBUG_T("compact memtable need %llu\n", cm_end - cm_start);
     return;
   }
 
@@ -1164,12 +1167,14 @@ struct DBImpl::TraditionalCompactionArgs {
     DBImpl* db;
     CompactionState* compact;
     TSplitCompaction* t_sptcompaction;
+    Status s;
 };
 
 struct DBImpl::PartnerCompactionArgs {
     DBImpl* db;
     PartnerCompactionState* compact;
     SplitCompaction* p_sptcompaction;
+    Status s;
 };
 
 void DBImpl::DoTraditionCompactionWork(void* args) {
@@ -1177,8 +1182,8 @@ void DBImpl::DoTraditionCompactionWork(void* args) {
             reinterpret_cast<TraditionalCompactionArgs*>(args);
     DBImpl* db = tcargs->db;
     db->DealWithTraditionCompaction(tcargs->compact, 
-                        tcargs->t_sptcompaction);
-    delete tcargs;
+                        tcargs->t_sptcompaction, &tcargs->s);
+    //delete tcargs;
 }
 
 void DBImpl::DoPartnerCompactionWork(void* args) {
@@ -1186,8 +1191,8 @@ void DBImpl::DoPartnerCompactionWork(void* args) {
             reinterpret_cast<PartnerCompactionArgs*>(args);
     DBImpl* db = pcargs->db;
     db->DealWithPartnerCompaction(pcargs->compact, 
-                        pcargs->p_sptcompaction);
-    delete pcargs;
+                        pcargs->p_sptcompaction, &pcargs->s);
+    //delete pcargs;
 }
 
 void DBImpl::AddFileWithTraditionalCompaction(VersionEdit* edit, 
@@ -1291,7 +1296,7 @@ bool DBImpl::ValidAndInRange(Iterator* iter, InternalKey end,
 }
 
 void DBImpl::DealWithTraditionCompaction(CompactionState* compact, 
-                        TSplitCompaction* t_sptcompaction) {
+                        TSplitCompaction* t_sptcompaction, Status* status) {
     DEBUG_T("in DealWithTraditionCompaction\n");
     DEBUG_T("victim_start:%s, victim_end:%s\n", 
             t_sptcompaction->victim_start.user_key().ToString().c_str(),
@@ -1311,7 +1316,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
             t_sptcompaction->containsend);
     DEBUG_T("after set child range\n");
     merge_iter->SeekToFirst();
-    Status status;
+    //Status status;
     ParsedInternalKey ikey;
     Iterator* current_iter;
     std::string current_user_key;
@@ -1346,8 +1351,8 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
         }
         if(!drop) {
             if(compact->builder == nullptr) {
-                status = OpenCompactionOutputFile(compact);
-                if(!status.ok()) {
+                *status = OpenCompactionOutputFile(compact);
+                if(!(*status).ok()) {
                     break;
                 }
             }    
@@ -1365,8 +1370,8 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
             if(compact->builder->FileSize() >= 
                     compact->compaction->MaxOutputFileSize()) {
                 //DEBUG_T("to finish generated a sstable\n");
-                status = FinishCompactionOutputFile(compact, merge_iter);
-                if(!status.ok()) {
+                *status = FinishCompactionOutputFile(compact, merge_iter);
+                if(!(*status).ok()) {
                     break;
                 }
                 //DEBUG_T("have generated a sstable\n");
@@ -1377,17 +1382,17 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
    
     DEBUG_T("partner largest is %s\n", 
         compact->current_output()->largest.user_key().ToString().c_str());
-    if(status.ok() && shutting_down_.Acquire_Load()) {
-        status = Status::IOError("Deleting DB during compaction");
+    if((*status).ok() && shutting_down_.Acquire_Load()) {
+        *status = Status::IOError("Deleting DB during compaction");
     }
    
-    if(status.ok() && compact->builder != nullptr) {
-        status = FinishCompactionOutputFile(compact, merge_iter);
+    if((*status).ok() && compact->builder != nullptr) {
+        *status = FinishCompactionOutputFile(compact, merge_iter);
     }
 
 
-    if(!status.ok()) {
-        RecordBackgroundError(status);
+    if(!(*status).ok()) {
+        RecordBackgroundError(*status);
     }
     delete merge_iter;
 }
@@ -1500,7 +1505,7 @@ void DBImpl::DealWithTraditionCompaction(CompactionState* compact,
 //     }
 // }
 void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact, 
-                            SplitCompaction* p_sptcompaction) {
+                            SplitCompaction* p_sptcompaction, Status* status) {
     DEBUG_T("in DealWithPartnerCompaction\n");
     DEBUG_T("victim_start:%s, victim_end:%s, containsend:%d\n", 
         p_sptcompaction->victim_start.user_key().ToString().c_str(),
@@ -1521,7 +1526,7 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
     //定位到开始位置
     input->Seek(p_sptcompaction->victim_start.Encode());
     
-    Status status;
+    //Status status;
     ParsedInternalKey ikey;
     std::string current_user_key;
     bool has_current_user_key = false;
@@ -1568,9 +1573,9 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         if(!drop) {            
             if(compact->partner_table == nullptr) {
                 //DEBUG_T("to set partner table\n");
-                status = OpenPartnerTable(compact, p_sptcompaction->inputs1_index);
+                *status = OpenPartnerTable(compact, p_sptcompaction->inputs1_index);
                 DEBUG_T("after open partner table, partner number:%llu\n", compact->number);
-                if(!status.ok()) {
+                if(!(*status).ok()) {
                     break;
                 }              
                 this_smallest.DecodeFrom(key);
@@ -1595,12 +1600,12 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         entries++;
     }
 
-    if(status.ok() && shutting_down_.Acquire_Load()) {
-        status = Status::IOError("Deleting DB during compaction");
+    if((*status).ok() && shutting_down_.Acquire_Load()) {
+        *status = Status::IOError("Deleting DB during compaction");
     }
    
     DEBUG_T("after finish iter input, add entries:%llu\n", entries);
-    if(status.ok() && compact->partner_table != nullptr) {
+    if((*status).ok() && compact->partner_table != nullptr) {
        DEBUG_T("before finish partner table, this_smallest user key is %s, this_largest user key is:%s\n", 
               this_smallest.user_key().ToString().c_str(), 
               this_largest.user_key().ToString().c_str());
@@ -1613,11 +1618,11 @@ void DBImpl::DealWithPartnerCompaction(PartnerCompactionState* compact,
         DEBUG_T("before finish partner table, smallest user key is %s, largest user key is:%s\n", 
               compact->curr_smallest.user_key().ToString().c_str(), 
               compact->curr_largest.user_key().ToString().c_str());
-        status = FinishPartnerTable(compact, input);
+        *status = FinishPartnerTable(compact, input);
     }
     
-    if(!status.ok()) {
-        RecordBackgroundError(status);
+    if(!(*status).ok()) {
+        RecordBackgroundError(*status);
     }
 }
 
@@ -1726,6 +1731,9 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   std::vector<PartnerCompactionState*> p_compactionstate_list;
   std::vector<int> tcompaction_index;
   std::vector<uint64_t> pcompaction_files;
+
+  std::vector<TraditionalCompactionArgs*> tcargs_set;
+  std::vector<PartnerCompactionArgs*> pcargs_set;
   
   SequenceNumber smallest_snapshot;
   if (snapshots_.empty()) {
@@ -1769,24 +1777,26 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
         tcargs->compact->smallest_snapshot = smallest_snapshot;
         t_compactionstate_list.push_back(tcargs->compact);
         tcargs->t_sptcompaction = tcompactionlist[i];
-        thpool_->AddJob(DoTraditionCompactionWork, tcargs); 
+        thpool_->AddJob(DoTraditionCompactionWork, tcargs);
+        tcargs_set.push_back(tcargs); 
     }
   }
 
 	DEBUG_T("----------partner compaction, has:----------\n");
 	if(p_sptcompactions.size() > 0) {
       for(int i = 0; i < p_sptcompactions.size(); i++) {
-		   FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
-		   int number = fm->number;
-       pcompaction_files.push_back(number);
-       DEBUG_T("%d, ", p_sptcompactions[i]->inputs1_index);
-		   PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
-		   pcargs->db = this;
-		   pcargs->compact = new PartnerCompactionState(c);
-           pcargs->compact->smallest_snapshot = smallest_snapshot;
-           p_compactionstate_list.push_back(pcargs->compact);
-		   pcargs->p_sptcompaction = p_sptcompactions[i];
-           thpool_->AddJob(DoPartnerCompactionWork,	pcargs);
+        FileMetaData* fm = c->input(1, p_sptcompactions[i]->inputs1_index);
+        int number = fm->number;
+        pcompaction_files.push_back(number);
+        DEBUG_T("%d, ", p_sptcompactions[i]->inputs1_index);
+        PartnerCompactionArgs* pcargs = new PartnerCompactionArgs;
+        pcargs->db = this;
+        pcargs->compact = new PartnerCompactionState(c);
+        pcargs->compact->smallest_snapshot = smallest_snapshot;
+        p_compactionstate_list.push_back(pcargs->compact);
+		    pcargs->p_sptcompaction = p_sptcompactions[i];
+        thpool_->AddJob(DoPartnerCompactionWork,	pcargs);
+        pcargs_set.push_back(pcargs);
       }
   }
   thpool_->WaitAll();
@@ -1794,14 +1804,43 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
 	DEBUG_T("---------------finish in SplitCompaction----------------\n\n");
 
   mutex_.Lock();
+  Status tstatus, pstatus;
+  for(int i = 0; i < tcargs_set.size(); i++) {
+    if(tstatus.ok()){
+     tstatus = tcargs_set[i]->s; 
+    }
+    delete tcargs_set[i];
+  }
+
+  for(int i = 0; i < pcargs_set.size(); i++) {
+    if(pstatus.ok()){
+     pstatus = pcargs_set[i]->s; 
+    }
+     delete pcargs_set[i];
+  }
   
   VersionEdit edit;
-  versions_->AddInputDeletions(&edit, c, tcompaction_index);
-  AddFileWithTraditionalCompaction(&edit, t_compactionstate_list);
-  UpdateFileWithPartnerCompaction(&edit, pcompaction_files, p_compactionstate_list);
-  DEBUG_T("-------------finish delete and add-----------\n\n");
+  if(tstatus.ok() && pstatus.ok()) {
+    versions_->AddInputDeletions(&edit, c, tcompaction_index);
+  } 
+  
+  if(tstatus.ok()) {
+     AddFileWithTraditionalCompaction(&edit, t_compactionstate_list);
+  }else {
+    DEBUG_T("traditional shutting down....\n");
+  }
 
-  versions_->LogAndApply(&edit, &mutex_);
+  if(pstatus.ok()){
+    UpdateFileWithPartnerCompaction(&edit, pcompaction_files, p_compactionstate_list);
+  } else {
+     DEBUG_T("partner shutting down....\n");
+  }
+  DEBUG_T("-------------finish delete and add-----------\n\n"); DEBUG_T("-------------finish delete and add-----------\n\n");
+
+  if((tcompactionlist.size() > 0 && tstatus.ok()) || 
+      (p_sptcompactions.size() > 0 && pstatus.ok())) {
+    versions_->LogAndApply(&edit, &mutex_);
+  }
 
   DEBUG_T("-------------finish LogAndApply-----------\n\n");
   
@@ -1826,6 +1865,10 @@ Status DBImpl::DoSplitCompactionWork(Compaction* c) {
   DEBUG_T("-------------finish DoSplitCompactionWork-----------\n\n");
 
   record_timer(DO_SPLITCOMPACTION_WORK); 
+	if(!tstatus.ok())
+    return tstatus;
+  if(!pstatus.ok())
+    return pstatus;
 	return Status::OK();
 }
 

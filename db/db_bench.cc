@@ -769,6 +769,23 @@ class Benchmark {
         method = &Benchmark::Readzipfian100_25000k;
       } else if(name == Slice("readzipfian100_30000k")) {
         method = &Benchmark::Readzipfian100_30000k;
+        //write 
+      } else if(name == Slice("writezipfian100_5000k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Writezipfian100_5000k;
+      } else if(name == Slice("writezipfian100_10000k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Writezipfian100_10000k;
+      } else if(name == Slice("writezipfian100_20000k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Writezipfian100_20000k;
+      } else if(name == Slice("writezipfian100_25000k")) {
+        entries_per_batch_ = 1000;
+        fresh_db = true;
+        method = &Benchmark::Writezipfian100_25000k;
       /////latest
       } else if(name == Slice("customedlatest1k_100k")) {
         entries_per_batch_ = 1000;
@@ -1411,6 +1428,22 @@ class Benchmark {
       CustomedWorkloadRead(thread, fname);
   }
   ///////////write
+  void Writezipfian100_5000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/write_500M.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
+  void Writezipfian100_10000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/write_1G.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
+  void Writezipfian100_20000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/write_2G.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
+  void Writezipfian100_25000k(ThreadState* thread){
+      std::string fname = "/mnt/workloads/zipfian/write_2.5G.txt"; 
+      CustomedWorkloadWrite(thread, fname);
+  }
   
   void CustomedWorkloadRead(ThreadState* thread, std::string fname) {
       leveldb::WorkloadGenerator wlgnerator(fname);

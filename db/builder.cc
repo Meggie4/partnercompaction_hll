@@ -51,7 +51,10 @@ Status BuildTable(const std::string& dbname,
     for (; iter->Valid(); iter->Next()) {
       Slice key = iter->key();
       meta->largest.DecodeFrom(key);
+      uint64_t add_start = env->NowMicros();
       builder->Add(key, iter->value());
+      uint64_t add_end = env->NowMicros();
+      DEBUG_T("level0 add need time:%d\n", add_end - add_start);
 	    ////////meggie
 	    // AddKeyToHyperLogLog(meta->hll, key);
 	    // meta->hll_add_count++;
